@@ -1,4 +1,4 @@
-package com.example.TrabajoMyDAI.model;
+package com.example.TrabajoMyDAI.data.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
