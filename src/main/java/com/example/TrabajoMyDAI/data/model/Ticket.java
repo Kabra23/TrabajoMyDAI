@@ -1,9 +1,6 @@
 package com.example.TrabajoMyDAI.data.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 
 @Entity
@@ -11,8 +8,13 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_ticket;
-    private Long id_usuario;
-    private Long id_evento;
+
+    @ManyToOne
+    private Usuario usuario;
+
+    @ManyToOne
+    private Evento evento;
+
     private double precio;
     private Long asiento;
 
@@ -29,21 +31,21 @@ public class Ticket {
     }
 
     //Usuario
-    public Long getId_usuario() {
-        return id_usuario;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setId_usuario(Long id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setUsuario(Usuario id_usuario) {
+        this.usuario = id_usuario;
     }
 
     //Evento
-    public Long getId_evento() {
-        return id_evento;
+    public Evento getEvento() {
+        return evento;
     }
 
-    public void setId_evento(Long id_evento) {
-        this.id_evento = id_evento;
+    public void setEvento(Evento id_evento) {
+        this.evento = id_evento;
     }
 
 
@@ -72,8 +74,8 @@ public class Ticket {
     public String toString() {
         return "Ticket{" +
                 "id_ticket=" + id_ticket +
-                ", id_usuario=" + id_usuario +
-                ", id_evento=" + id_evento +
+                ", id_usuario=" + usuario +
+                ", id_evento=" + evento +
                 ", precio=" + precio +
                 ", asiento=" + asiento +
                 '}';
