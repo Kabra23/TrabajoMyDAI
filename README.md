@@ -36,38 +36,51 @@ La plataforma conecta a los aficionados con el día a día del Barça Athletic, 
 
 ---
 
-## CRUD de las entidades principales
+## CRUD y relaciones (actualizado)
 
-### Usuario (solo administradores)
+General
+- Todas las operaciones CRUD deben ejecutarse dentro de transacciones.
+- Operaciones sensibles (crear/actualizar/eliminar usuarios, eventos, entradas) restringidas a administradores.
+- Reglas de negocio (re-asignar, validar cancelaciones, reembolsos) manejarse en el servicio, no confiar solo en cascadas JPA.
+- Para integridad referencial se puede usar:
+    - Cascada JPA (`CascadeType.REMOVE`, `orphanRemoval=true`) cuando eliminar una entidad debe eliminar dependientes.
+    - `ON DELETE CASCADE` en la BD si se requiere eliminación a nivel de base de datos.
+    - `SET NULL` o re-asignación cuando se quiera conservar el registro hijo.
 
-- **Crear**: Registro de nuevos usuarios solo para administradores.
-- **Leer**: Consulta de datos de usuario (perfil, roles, historial de compras) solo para administradores.
-- **Actualizar**: Modificación de datos personales y roles solo por administradores.
-- **Eliminar**: Baja de usuario solo por administradores.
+Entidad `Usuario`
+- **Crear**: solo administradores (`POST /admin/usuarios`).
+- **Leer**: admin: lista y detalle; usuario: su propio perfil y entradas/recordatorios.
+- **Actualizar**: admin o el propio usuario (según permiso).
+- **Eliminar**: solo admin.
+    - Efectos:
+        - `Entrada`: eliminar `Usuario` debe eliminar sus entradas asociadas (cascada).
+        - `eventos_usuarios` (inscripciones): eliminar usuario debe borrar sus inscripciones.
+        - `Recordatorio`: eliminar usuario debe eliminar sus recordatorios (cascada).
+    - Implementar en JPA con `CascadeType.ALL`/`orphanRemoval=true` o en BD con `ON DELETE CASCADE`.
 
+Entidad `Entrada` (Ticket)
+- **Crear**: compra de entrada, asociada a `Usuario` y a un `Evento`.
+- **Leer**: usuario ve sus entradas; admin ve todas.
+- **Actualizar**: cambios según política (asiento, estado).
+- **Eliminar**: cancelación/reembolso; si se elimina `Usuario` o `Evento`, gestionar cascada según política.
 
-## Funcionalidades principales
+Entidad `Evento`
+- **Crear**: solo administradores.
+- **Leer**: público.
+- **Actualizar**: solo administradores.
+- **Eliminar**: solo administradores.
+    - Efectos:
+        - `Entrada` e `eventos_usuarios` deben eliminarse o marcarse como canceladas al borrar un `Evento`.
+        - Preferible diseñar soft-delete o reglas de notificación antes de eliminación.
 
-- Solo los administradores pueden registrarse y acceder mediante login.
-- Los usuarios aficionados no pueden registrarse ni iniciar sesión.
+Entidad `eventos_usuarios` (inscripciones)
+- Tabla relacional entre `Usuario` y `Evento` (puede ser entidad `EventoUsuario` con datos adicionales: rol, fecha inscripción).
+- CRUD: crear inscripción al comprar o reservar; eliminar al cancelar o al eliminar usuario/evento.
 
----
-
-### Entrada (Ticket)
-
-- **Crear**: Compra de entradas, generando un ticket personal con código único.
-- **Leer**: Consulta de entradas disponibles y entradas adquiridas por usuario.
-- **Actualizar**: Modificación de datos de la entrada (por ejemplo, cambio de asiento antes del partido, si la política lo permite).
-- **Eliminar**: Cancelación de entradas (según condiciones del club).
-
-### Noticia
-
-- **Crear**: Publicación de nuevas noticias por administradores.
-- **Leer**: Visualización de noticias y detalles por parte de todos los usuarios.
-- **Actualizar**: Edición de noticias existentes (solo administradores).
-- **Eliminar**: Eliminación de noticias (solo administradores).
-
----
+Entidad `Recordatorio`
+- Asociado a `Usuario` y opcionalmente a un `Evento`.
+- **Crear/Leer/Actualizar/Eliminar**: usuario administra sus recordatorios; admin puede gestionar globalmente.
+- Al eliminar `Usuario`, borrar sus recordatorios.
 
 ## Funcionalidades opcionales y futuras
 
