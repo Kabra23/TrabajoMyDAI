@@ -1,9 +1,6 @@
 package com.example.TrabajoMyDAI.data.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 
 @Entity
@@ -13,8 +10,11 @@ public class Recordatorio
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_recordatorio;
 
-    private Long id_usuario;
-    private Long id_evento;
+    @ManyToOne
+    private Usuario usuario;
+
+    @ManyToOne
+    private Evento evento;
     private String mensaje;
     private String fecha;
 
@@ -28,20 +28,20 @@ public class Recordatorio
         this.id_recordatorio = id_recordatorio;
     }
 
-    public Long getId_usuario() {
-        return id_usuario;
+    public Usuario getUusario() {
+        return usuario;
     }
 
-    public void setId_usuario(Long id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setUsuario(Usuario id_usuario) {
+        this.usuario = id_usuario;
     }
 
-    public Long getId_evento() {
-        return id_evento;
+    public Evento getEvento() {
+        return evento;
     }
 
-    public void setId_evento(Long id_evento) {
-        this.id_evento = id_evento;
+    public void setEvento(Evento id_evento) {
+        this.evento = id_evento;
     }
 
     public String getMensaje() {
@@ -64,8 +64,8 @@ public class Recordatorio
     public String toString() {
         return "Ticket{" +
                 "id_recordatorio=" + id_recordatorio +
-                ", id_usuario=" + id_usuario +
-                ", id_evento=" + id_evento +
+                ", id_usuario=" + usuario.getDni()+
+                ", id_evento=" + evento.getId_evento() +
                 ", mensaje=" + mensaje +
                 ", fecha=" + fecha +
                 '}';
