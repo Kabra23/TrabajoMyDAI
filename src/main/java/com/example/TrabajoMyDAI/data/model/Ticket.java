@@ -9,10 +9,13 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_ticket;
 
+
     @ManyToOne
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     @ManyToOne
+    @JoinColumn(name = "evento_id")
     private Evento evento;
 
     private double precio;

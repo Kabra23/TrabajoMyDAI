@@ -15,6 +15,14 @@ public class Usuario {
     private String nombre;
     private String email;
 
+    // Relación con Ticket
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets;
+
+    // Relación con EventoUsuario
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventoUsuario> eventosUsuario;
+
     public Long getDni() {
         return dni;
     }
