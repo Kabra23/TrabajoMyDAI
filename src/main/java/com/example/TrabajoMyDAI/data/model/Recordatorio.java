@@ -70,5 +70,4 @@ public class Recordatorio
                 ", fecha=" + fecha +
                 '}';
     }
-
 }
