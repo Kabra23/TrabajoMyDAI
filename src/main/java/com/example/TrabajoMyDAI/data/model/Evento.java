@@ -14,7 +14,8 @@ public class Evento {
     private String lugar_evento;
     private String descripcion_evento;
     @ManyToOne
-    private Usuario usuario; // Foreign key to Usuario
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
     private String tipo_evento;
 
 

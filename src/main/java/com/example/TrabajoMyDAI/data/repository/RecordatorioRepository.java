@@ -1,5 +1,5 @@
 // RecordatorioRepository.java
-package com.example.TrabajoMyDAI.repository;
+package com.example.TrabajoMyDAI.data.repository;
 
 import com.example.TrabajoMyDAI.data.model.Recordatorio;
 import org.springframework.data.jpa.repository.JpaRepository;
