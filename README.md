@@ -109,11 +109,3 @@ Entidad `Recordatorio`
 5. Accede a la web en `http://localhost:8080`.
 
 ---
-
-## Contacto
-
-Para dudas o sugerencias, contacta a los integrantes del proyecto.
-
----
-
-Puedes personalizar las rutas, imágenes y detalles según tu implementación real.
