@@ -1,7 +1,9 @@
+// java
 package com.example.TrabajoMyDAI.data.model;
 
 import jakarta.persistence.*;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -13,11 +15,15 @@ public class Evento {
     private String fecha_evento;
     private String lugar_evento;
     private String descripcion_evento;
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+
+    @ManyToMany(mappedBy = "usuarios")
+    private List<Usuario> usuarios = new ArrayList<>();
+
     private String tipo_evento;
 
+    public Evento() {
+        // usuarios ya inicializado en la declaración
+    }
 
     public Long getId_evento() {
         return id_evento;
@@ -49,12 +55,14 @@ public class Evento {
     public void setDescripcion_evento(String descripcion_evento) {
         this.descripcion_evento = descripcion_evento;
     }
-    public Usuario getUsuario() {
-        return usuario;
+
+    public List<Usuario> getUsuarios() {
+        return usuarios;
     }
-    public void setUsuario(Usuario dni_usuario) {
-        this.usuario = dni_usuario;
+    public void setUsuarios(List<Usuario> usuarios) {
+        this.usuarios = usuarios;
     }
+
     public String getTipo_evento() {
         return tipo_evento;
     }
@@ -66,12 +74,18 @@ public class Evento {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Evento evento = (Evento) o;
-        return Objects.equals(id_evento, evento.id_evento) && Objects.equals(nombre_evento, evento.nombre_evento) && Objects.equals(fecha_evento, evento.fecha_evento) && Objects.equals(lugar_evento, evento.lugar_evento) && Objects.equals(descripcion_evento, evento.descripcion_evento) && Objects.equals(usuario.getDni(), evento.getUsuario().getDni()) && Objects.equals(tipo_evento, evento.tipo_evento);
+        return Objects.equals(id_evento, evento.id_evento) &&
+                Objects.equals(nombre_evento, evento.nombre_evento) &&
+                Objects.equals(fecha_evento, evento.fecha_evento) &&
+                Objects.equals(lugar_evento, evento.lugar_evento) &&
+                Objects.equals(descripcion_evento, evento.descripcion_evento) &&
+                Objects.equals(usuarios, evento.usuarios) &&
+                Objects.equals(tipo_evento, evento.tipo_evento);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id_evento, nombre_evento, fecha_evento, lugar_evento, descripcion_evento, usuario.getDni(), tipo_evento);
+        return Objects.hash(id_evento, nombre_evento, fecha_evento, lugar_evento, descripcion_evento, usuarios, tipo_evento);
     }
 
     @Override
@@ -82,7 +96,7 @@ public class Evento {
                 ", fecha_evento='" + fecha_evento + '\'' +
                 ", lugar_evento='" + lugar_evento + '\'' +
                 ", descripcion_evento='" + descripcion_evento + '\'' +
-                ", dni_usuario=" + usuario.getDni() +
+                ", usuarios=" + usuarios +
                 ", tipo_evento='" + tipo_evento + '\'' +
                 '}';
     }

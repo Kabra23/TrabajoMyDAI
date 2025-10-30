@@ -1,11 +1,6 @@
 package com.example.TrabajoMyDAI.data.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,8 +20,8 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Evento_Usuario> eventosUsuario;
+    @ManyToMany (mappedBy = "eventos")
+    private List<Evento> eventos;
 
     public Usuario() {
         if(tickets == null)
@@ -39,6 +34,7 @@ public class Usuario {
     public void setId(Long dni) {
         this.dni = dni;
     }
+
     public String getNombre() {
         return nombre;
     }
