@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 
 import java.util.LinkedList;
 import java.util.List;
-
-
 import java.util.Objects;
 
 @Entity
@@ -18,20 +16,60 @@ public class Usuario {
 
     // Relación con Ticket
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets;
+    private List<Ticket> tickets = new LinkedList<>();
 
-    @ManyToMany (mappedBy = "eventos")
-    private List<Evento> eventos;
+    // Usuario será owner de la relación ManyToMany con Evento
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "usuario_eventos",
+        joinColumns = @JoinColumn(name = "usuario_dni"),
+        inverseJoinColumns = @JoinColumn(name = "eventos_id_evento")
+    )
+    private java.util.Set<Evento> eventos = new java.util.LinkedHashSet<>() {
+        @Override
+        public boolean add(Evento evento) {
+            if (evento == null) return false;
+            boolean added = super.add(evento);
+            if (added) {
+                if (!evento.getUsuarios().contains(Usuario.this)) {
+                    evento.getUsuarios().add(Usuario.this);
+                }
+            }
+            return added;
+        }
 
-    public Usuario() {
-        if(tickets == null)
-            tickets = new LinkedList<>();
+        @Override
+        public boolean remove(Object o) {
+            boolean removed = super.remove(o);
+            if (removed && o instanceof Evento) {
+                Evento evento = (Evento) o;
+                evento.getUsuarios().remove(Usuario.this);
+            }
+            return removed;
+        }
+    };
+
+    // helper methods to keep both sides in sync (optional)
+    public void addEvento(Evento evento) {
+        if (evento == null) return;
+        this.eventos.add(evento);
+        if (!evento.getUsuarios().contains(this)) {
+            evento.getUsuarios().add(this);
+        }
     }
+
+    public void removeEvento(Evento evento) {
+        if (evento == null) return;
+        this.eventos.remove(evento);
+        evento.getUsuarios().remove(this);
+    }
+
+    public Usuario() { }
 
     public Long getDni() {
         return dni;
     }
-    public void setId(Long dni) {
+    public void setDni(Long dni) {
         this.dni = dni;
     }
 
@@ -46,6 +84,20 @@ public class Usuario {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public java.util.Set<Evento> getEventos() {
+        return eventos;
+    }
+    public void setEventos(java.util.Set<Evento> eventos) {
+        this.eventos = eventos;
     }
 
     @Override

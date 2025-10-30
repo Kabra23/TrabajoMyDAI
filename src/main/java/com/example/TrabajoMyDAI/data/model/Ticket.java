@@ -65,11 +65,11 @@ public class Ticket {
 
     //Asiento
 
-    public double getAsiento() {
+    public Long getAsiento() {
         return asiento;
     }
 
-    public void setAsiento(long asiento) {
+    public void setAsiento(Long asiento) {
         this.asiento = asiento;
     }
 
