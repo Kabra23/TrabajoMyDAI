@@ -1,6 +1,6 @@
 # Barça Athletic WebApp
 
-![LOGO](ruta/a/tu/logo.png)
+![LOGO]("C:\Users\negro\Downloads\unnamed.jpg")
 
 ## Integrantes
 
