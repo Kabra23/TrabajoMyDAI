@@ -19,35 +19,14 @@ public class Usuario {
     private List<Ticket> tickets = new LinkedList<>();
 
     // Usuario será owner de la relación ManyToMany con Evento
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany()
     @JoinTable(
         name = "usuario_eventos",
         joinColumns = @JoinColumn(name = "usuario_dni"),
         inverseJoinColumns = @JoinColumn(name = "eventos_id_evento")
     )
-    private java.util.Set<Evento> eventos = new java.util.LinkedHashSet<>() {
-        @Override
-        public boolean add(Evento evento) {
-            if (evento == null) return false;
-            boolean added = super.add(evento);
-            if (added) {
-                if (!evento.getUsuarios().contains(Usuario.this)) {
-                    evento.getUsuarios().add(Usuario.this);
-                }
-            }
-            return added;
-        }
+    private List<Evento> eventos = new LinkedList<>();
 
-        @Override
-        public boolean remove(Object o) {
-            boolean removed = super.remove(o);
-            if (removed && o instanceof Evento) {
-                Evento evento = (Evento) o;
-                evento.getUsuarios().remove(Usuario.this);
-            }
-            return removed;
-        }
-    };
 
     // helper methods to keep both sides in sync (optional)
     public void addEvento(Evento evento) {
@@ -64,7 +43,11 @@ public class Usuario {
         evento.getUsuarios().remove(this);
     }
 
-    public Usuario() { }
+    public Usuario() {
+        if(this.eventos == null){
+            this.eventos = new LinkedList<>();
+        }
+    }
 
     public Long getDni() {
         return dni;
@@ -93,10 +76,10 @@ public class Usuario {
         this.tickets = tickets;
     }
 
-    public java.util.Set<Evento> getEventos() {
+    public List<Evento> getEventos() {
         return eventos;
     }
-    public void setEventos(java.util.Set<Evento> eventos) {
+    public void setEventos(List<Evento> eventos) {
         this.eventos = eventos;
     }
 

@@ -1,8 +1,10 @@
 package com.example.TrabajoMyDAI.data.model;
 
 import jakarta.persistence.*;
+
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Set; // Importado java.util.Set
+import java.util.List; // Importado java.util.Set
 
 @Entity
 public class Evento {
@@ -14,9 +16,9 @@ public class Evento {
     private String lugar_evento;
     private String descripcion_evento;
 
-    // Lado Inverso de la relación ManyToMany, mapeado por "eventos" en Usuario
-    @ManyToMany(mappedBy = "eventos")
-    private Set<Usuario> usuarios = new java.util.LinkedHashSet<>(); // Usando el tipo Set
+
+    @ManyToMany
+    private List<Usuario> usuarios = new LinkedList<>();
 
     private String tipo_evento;
 
@@ -56,21 +58,12 @@ public class Evento {
         this.descripcion_evento = descripcion_evento;
     }
 
-    // --- Getters y Setters de la Relación (CORREGIDOS) ---
 
-    /**
-     * Devuelve la colección de usuarios. Es crucial que devuelva la referencia
-     * directa al Set manejado por JPA para la correcta carga perezosa.
-     * @return El Set de Usuarios.
-     */
-    public Set<Usuario> getUsuarios() { // <-- ¡CORRECCIÓN! Devuelve Set
+    public List<Usuario> getUsuarios() { // <-- ¡CORRECCIÓN! Devuelve Set
         return usuarios;
     }
 
-    /**
-     * Establece la colección de usuarios.
-     */
-    public void setUsuarios(Set<Usuario> usuarios) { // <-- ¡CORRECCIÓN! Acepta Set
+    public void setUsuarios(List<Usuario> usuarios) { // <-- ¡CORRECCIÓN! Acepta Set
         this.usuarios = usuarios;
     }
 
@@ -81,15 +74,12 @@ public class Evento {
         this.tipo_evento = tipo_evento;
     }
 
-    // --- Métodos de Conveniencia (Recomendado, aunque no se usa en este caso) ---
+
 
     public void addUsuario(Usuario usuario) {
         this.usuarios.add(usuario);
-        // Si Usuario fuera el lado inverso, necesitaríamos actualizarlo aquí.
-        // Pero como Evento es el lado inverso, no manejamos la persistencia aquí.
-    }
 
-    // ... (equals, hashCode y toString se mantienen)
+    }
 
     @Override
     public boolean equals(Object o) {
