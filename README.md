@@ -1,6 +1,7 @@
 # Barça Athletic WebApp
 
-![LOGO](ruta/a/tu/logo.png)
+![LOGO](<img width="2400" height="2400" alt="image" src="https://github.com/user-attachments/assets/be5ee7e0-8d0d-41e4-9609-04e490499a14" />
+)
 
 ## Integrantes
 
