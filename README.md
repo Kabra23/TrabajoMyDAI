@@ -109,3 +109,16 @@ Entidad `Recordatorio`
 5. Accede a la web en `http://localhost:8080`.
 
 ---
+
+## Configuración de la Base de Datos
+Este proyecto utiliza H2 como base de datos en memoria para desarrollo y pruebas.
+Acceso a la consola H2:
+Asegúrate de que la aplicación esté en ejecución.
+
+Accede a http://localhost:8080/h2-console.
+
+Usa la siguiente configuración:
+
+1. JDBC URL: jdbc:h2:mem:testdb
+2. User Name: sa
+3. Password: (dejar en blanco)
