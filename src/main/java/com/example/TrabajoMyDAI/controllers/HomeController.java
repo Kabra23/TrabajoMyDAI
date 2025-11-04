@@ -1,4 +1,4 @@
-package com.example.TrabajoMyDAI.controller;
+package com.example.TrabajoMyDAI.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
