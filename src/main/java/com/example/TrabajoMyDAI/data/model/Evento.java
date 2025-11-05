@@ -27,34 +27,34 @@ public class Evento {
 
     // --- Getters y Setters Básicos ---
 
-    public Long getId_evento() {
+    public Long getId() {
         return id_evento;
     }
-    public void setId_evento(Long id_evento) {
+    public void setId(Long id_evento) {
         this.id_evento = id_evento;
     }
-    public String getNombre_evento() {
+    public String getNombre() {
         return nombre_evento;
     }
-    public void setNombre_evento(String nombre_evento) {
+    public void setNombre(String nombre_evento) {
         this.nombre_evento = nombre_evento;
     }
-    public String getFecha_evento() {
+    public String getFecha() {
         return fecha_evento;
     }
-    public void setFecha_evento(String fecha_evento) {
+    public void setFecha(String fecha_evento) {
         this.fecha_evento = fecha_evento;
     }
-    public String getLugar_evento() {
+    public String getLugar() {
         return lugar_evento;
     }
     public void setLugar_evento(String lugar_evento) {
         this.lugar_evento = lugar_evento;
     }
-    public String getDescripcion_evento() {
+    public String getDescripcion() {
         return descripcion_evento;
     }
-    public void setDescripcion_evento(String descripcion_evento) {
+    public void setDescripcion(String descripcion_evento) {
         this.descripcion_evento = descripcion_evento;
     }
 
@@ -67,10 +67,10 @@ public class Evento {
         this.usuarios = usuarios;
     }
 
-    public String getTipo_evento() {
+    public String getTipo() {
         return tipo_evento;
     }
-    public void setTipo_evento(String tipo_evento) {
+    public void setTipo(String tipo_evento) {
         this.tipo_evento = tipo_evento;
     }
 

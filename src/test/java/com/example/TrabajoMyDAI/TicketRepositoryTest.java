@@ -23,7 +23,7 @@ public class TicketRepositoryTest {
         em.persist(u);
 
         Evento e = new Evento();
-        e.setNombre_evento("Feria");
+        e.setNombre("Feria");
         em.persist(e);
 
         Ticket t = new Ticket();
@@ -35,7 +35,7 @@ public class TicketRepositoryTest {
         Ticket saved = em.persistFlushFind(t);
         assertNotNull(saved.getId_ticket());
         assertEquals(u.getDni(), saved.getUsuario().getDni());
-        assertEquals(e.getId_evento(), saved.getEvento().getId_evento());
+        assertEquals(e.getId(), saved.getEvento().getId());
 
         // update
         saved.setPrecio(6.0);

@@ -21,7 +21,7 @@ public class EventoUsuarioRelationTest {
         u.setEmail("maria@example.com");
 
         Evento e = new Evento();
-        e.setNombre_evento("Charla");
+        e.setNombre("Charla");
 
         // ***************************************************************
         // ESTO ES LO QUE SE CORRIGE/MODIFICA:
@@ -43,7 +43,7 @@ public class EventoUsuarioRelationTest {
         // y para forzar la lectura de la tabla de unión.
         // Dado que u.addEvento(e) YA sincronizó el objeto 'e' en memoria,
         // y el em.find carga la relación, la aserción debería pasar.
-        Evento foundEvento = em.find(Evento.class, e.getId_evento());
+        Evento foundEvento = em.find(Evento.class, e.getId());
         assertNotNull(foundEvento);
 
         // Si Usuario tiene 1 Evento, entonces el Evento debe tener 1 Usuario.
@@ -65,7 +65,7 @@ public class EventoUsuarioRelationTest {
         em.clear();
 
         // Recuperar el Evento después de eliminar la relación
-        Evento afterDelete = em.find(Evento.class, e.getId_evento());
+        Evento afterDelete = em.find(Evento.class, e.getId());
         assertNotNull(afterDelete);
         // Depuración: mostrar contenidos para entender por qué seguiría habiendo usuarios
         System.out.println("Usuarios en afterDelete: " + afterDelete.getUsuarios());
@@ -79,7 +79,7 @@ public class EventoUsuarioRelationTest {
         em.flush();
         em.clear();
 
-        Evento afterUserRemove = em.find(Evento.class, e.getId_evento());
+        Evento afterUserRemove = em.find(Evento.class, e.getId());
         assertNotNull(afterUserRemove);
         assertTrue(afterUserRemove.getUsuarios().isEmpty());
     }

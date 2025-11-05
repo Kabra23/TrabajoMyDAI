@@ -28,7 +28,7 @@ public class Recordatorio
         this.id_recordatorio = id_recordatorio;
     }
 
-    public Usuario getUusario() {
+    public Usuario getUsuario() {
         return usuario;
     }
 
@@ -65,7 +65,7 @@ public class Recordatorio
         return "Ticket{" +
                 "id_recordatorio=" + id_recordatorio +
                 ", id_usuario=" + usuario.getDni()+
-                ", id_evento=" + evento.getId_evento() +
+                ", id_evento=" + evento.getId() +
                 ", mensaje=" + mensaje +
                 ", fecha=" + fecha +
                 '}';

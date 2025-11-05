@@ -23,7 +23,7 @@ public class RecordatorioRepositoryTest {
         em.persist(u);
 
         Evento e = new Evento();
-        e.setNombre_evento("Seminario");
+        e.setNombre("Seminario");
         em.persist(e);
 
         Recordatorio r = new Recordatorio();
