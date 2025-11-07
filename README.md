@@ -49,6 +49,10 @@ General
 
 ## Entidad `Usuario`
 
+La entidad `Usuario` es la raiz de todo el modelo. De esta entidad dependen otras como `Ticket`, donde no puede existir tickets sin usuario primeramente. En cambio, el usuario sí tiene sentido por sí mismo ya que puede existir aunque todavía no tenga tickets o eventos.
+
+En nuestra aplicación el usuario es aquel que se registra, compra ticketsy asiste a los eventos.
+
 - **Crear**: solo administradores (`POST /admin/usuarios`).
 - **Leer**: admin: lista y detalle; usuario: su propio perfil y entradas/recordatorios.
 - **Actualizar**: admin o el propio usuario (según permiso).
@@ -117,6 +121,9 @@ Con esto se demuestra que el mapeo entre Usuario y Ticket está bien y el métod
 ---
 
 ## Entidad `Entrada` (Ticket)
+
+La entidad `Ticket` es una entidad dependiente que prueba que un usuario está yendo a un evento, en un asiento y por un precio.
+
 - **Crear**: compra de entrada, asociada a `Usuario` y a un `Evento`.
 - **Leer**: usuario ve sus entradas; admin ve todas.
 - **Actualizar**: cambios según política (asiento, estado).
@@ -169,7 +176,7 @@ private Usuario usuario;
   
      Al final demostramos que el ticket se puede borrar y que no se rompe la relación con usuario y evento.
   
-### Test que lo demuestra: `TicketRepositoryTest`
+### Test `TicketRepositoryTest`
 
 Este test prueba las 4 operaciones básicas de CRUD sobre Ticket y que estén bien establecidas las relaciones JPA:
 
@@ -184,6 +191,9 @@ Resumidamente, la entidad `Ticket` es dependiente de `Usuario` y `Evento`, pero 
 ---
 
 ## Entidad `Evento`
+
+`Evento`es la entidad que representa algo a lo que los usuarios se pueden apuntar como es un partido, una charla, una presentación del Barça B, etc.
+
 - **Crear**: solo administradores.
 - **Leer**: público.
 - **Actualizar**: solo administradores.
@@ -197,16 +207,178 @@ Resumidamente, la entidad `Ticket` es dependiente de `Usuario` y `Evento`, pero 
 - `nombre_evento`
 - `fecha_evento`
 - `lugar_evento`
-- `descripcion_evento` 
+- `descripcion_evento`
+- `tipo_evento`
 
-Entidad `eventos_usuarios` (inscripciones)
-- Tabla relacional entre `Usuario` y `Evento` (puede ser entidad `EventoUsuario` con datos adicionales: rol, fecha inscripción).
-- CRUD: crear inscripción al comprar o reservar; eliminar al cancelar o al eliminar usuario/evento.
+### Relaciones
 
-Entidad `Recordatorio`
+1. **Evento → Usuario (M:N)**
+
+`@ManyToMany(mappedBy = "eventos")
+private List<Usuario> usuarios = new LinkedList<>()`
+
+- Muchos usuarios pueden ir a muchos eventos.
+- El dueño de la relación en este caso es `Usuario` debido al `@JoinTable(...)`.
+- La tabla intermedia `usuario_eventos` la define Usuario.
+- `Evento` solo muestra qué usuarios están apuntados, no crea la tabla.
+
+### Comportamiento CRUD entre las clases relacionadas
+
+- Crear Evento:
+  - Para crear un evento no son necesarios los usuarios, simplemente si desde el lado de `Usuario` usamos `u.addEvento(e)`, al guardar se crea la relación en la tabla intermedia. Con esto sabemos que al crear un evento no se crean los usuarios, solo queda listo para que se le asocien.
+  
+- Leer Evento:
+  - Cuando recuperamos un evento desde la BD usando (`em.find(Evento.class, id)`) podemos usar `evento.getUsuarios();` para ver la lista de usuarios asociados con ese evento.
+
+- Actualizar Evento:
+  - Si cambiamos parámetros como `nombre_evento` o `fecha_evento` no afecta a los usuarios y esto es porque los usuarios no guardan el nombre del evento, solo se relacionan con él en la tabla intermedia que creamos.
+
+- Borrar Evento:
+  - Si borramos un evento, también se borrarán las filas de la tabla intermedia (`usuario_eventos`) que lo relacionaban con usuarios, pero esto no borra a los usuarios por la relación ManyToMany. Es decir, si borramos un evento que tiene usuarios asociados no se borran los usuarios, solo se rompe la relación.
+ 
+### Test `EventoUsuarioRelationTest`
+
+En este test probamos que se guarde la relación en la tabla intermedia y que se pueda quitar la relación, con lo que al volver a leer el evento, ya no aparezcan los usuarios que antes estaban relacionados.
+
+- Primero creamos un usuario y un evento para después, por medio del método `u.addEvento(e)` en `Usuario`, podemos agregar el evento a la lista del usuario y aseguremos que el usuario también quede en la lista del evento. Con esto se sincronizan ambos lados de la relación.
+- Como sigueinte paso, guardamos las dos entidades  por medio de `em.persist(e);`, `em.persist(u);` y `em.flush();` y se crea la fila en la tabla intermedia de `usuario_eventos`.
+- Usando `Evento foundEvento = em.find(Evento.class, e.getId());
+assertNotNull(foundEvento);
+assertEquals(1, foundEvento.getUsuarios().size());` comprobamos no solo que el usuario tenga el evento, sino que el evento también tenga al usuario. Con esto garantizamos que al guardar desde `Usuario` también se pueda leer en `Evento`.
+- Ahora quitamos, guardamos y limpiamos la relación usando `u.removeEvento(e);
+em.persist(u);
+em.flush();
+em.clear();`.
+- Comprobamos que la relación se haya borrado por medio de `Evento afterDelete = em.find(Evento.class, e.getId());
+assertNotNull(afterDelete);
+assertTrue(afterDelete.getUsuarios().isEmpty());`. Con esto veremos que si se quita la relación entre un usuario y un evento, al volver a leer el evento el usuario ya no debe de salir.
+- Finalmente borramos el usuario y comprobamos que el evento sigue usando `em.remove(em.find(Usuario.class, u.getDni()));
+Evento afterUserRemove = em.find(Evento.class, e.getId());
+assertNotNull(afterUserRemove);
+assertTrue(afterUserRemove.getUsuarios().isEmpty());`.
+    Con esto ya sabemos que si se borra el usuario, el evento no se borra y solo desaparece la relación en la tabla intermedia.
+
+## Entidad `Recordatorio`
+
+La entidad `Recordatorio` sirve para guardar mensajes o avisos relacionados con un usuario y un evento, como por ejemplo recordar una inscripción a un evento, recordar un evento para mañana, etc.
+
 - Asociado a `Usuario` y opcionalmente a un `Evento`.
 - **Crear/Leer/Actualizar/Eliminar**: usuario administra sus recordatorios; admin puede gestionar globalmente.
 - Al eliminar `Usuario`, borrar sus recordatorios.
+
+### Atributos principales
+- `id_recordatorio` (PK)
+- `usuario`
+- `evento`
+- `mensaje`
+- `fecha`
+
+### Relaciones
+
+1. **Recordatorio → Usuario (N:1)**
+
+`@ManyToOne
+private Usuario usuario;
+`
+
+- Muchos recordatorios pueden pertenecer al mismo usuario.
+- La tabla `recordatorio` tendrá una columna `usuario_dni` como FK hacia la tabla `usuario`.
+
+2. **Recordatorio → Evento (N:1)**
+
+`@ManyToOne
+private Evento evento;`
+
+- Muchos recordatorios pueden referirse al mismo evento.
+- La tabla `recordatorio` tendrá también una columna `evento_id_evento` como FK hacia la tabla  `evento`.
+
+De esta forma cada `Recordatorio` conecta un usuario con un evento y además guarda otro tipo de información como (`mensaje` y `fecha`).
+
+### Comportamiento CRUD entre las clases relacionadas
+
+- Crear Recordatorio:
+  - Para crear un recordatorio se necesita que existan antes un `Usuario` y un `Evento`, así que al crear un recordatorio los asignamos por medio de `r.setUsuario(u);
+r.setEvento(e);` y con esto llenamos las foreign keys.
+  -  Guardamos por medio del método (`em.persistFlushFind(r)`) y se crea una fila en la tabla recordatorio que contiene:
+        - El ID del usuario (`usuario_dni`).
+        - El ID del evento (`evento_id_dni`).
+        - Menasaje.
+        - Fecha.
+
+- Leer Recordatorio:
+  - Podemos acceder a los datos propios del recordatorio como (`mensaje` y `fecha`) y también al usuario y al evento a los que pertenece por medio de `recordatorio.getUsuario().getNombre();` y `recordatorio.getEvento().getNombre();` demostrando que la relación ManyToOne funciona.
+
+- Actualizar Recordatorio:
+  - Si cambiamos parámetros como `mensaje` o `fecha` no afecta a los usuarios ni tampoco al evento, pero si quisieramos cambiar sus atributos lo podríamos hacer por medio de `recordatorio.setUsuario(otroUsuario);` y `recordatorio.setEvento(otroEvento);`.
+    Con esto se actualizarían las FKs de la tabla `recodatorio`.
+
+- Borrar Evento:
+  - Si borramos un recordatorio, el usuario y el evento siguen existiendo. Como no hay método `cascade` hacia las entidades, solo se elimina la fila del recordatorio.
+ 
+### Test `RecordatorioRepositoryTest`
+
+En el test probamos el ciclo CRUD  y que las relaciones estén bien configuradas.
+
+- Primero creamos las entidades básicas necesarias, como son `usuario` y `evento` ya que sin ellas, como mencionamos, no pueden existir los recordatorios.
+- Posteriormente establecemos las relaciones ManyToOne con `usuario` y `evento` por medio de `Recordatorio r = new Recordatorio();
+        r.setUsuario(u);
+        r.setEvento(e);
+        r.setMensaje("Recordar inscripción");
+        r.setFecha("2025-11-01");`
+- Usando `persistFlushFind` guardamos el recordatiro y lo volvemos a buscar en la BD y por medio de `assertNotNull(saved.getId_recordatorio());
+        assertEquals("Recordar inscripción", saved.getMensaje());`, verificamos que haya generado un ID y que el mensaje se guardó correctamente.
+- Finalmente eliminamos el recordatorio y verificamos que ya no exista usando `assertNotNull(saved.getId_recordatorio());
+        assertEquals("Recordar inscripción", saved.getMensaje());`. Sabemos que el usuario y el evento no se borran, porque no hay método `cascade`.
+
+## Prueba global de integración `Global Test`
+
+En este test probamos el comportamiento de las disitntas entidades al mismo tiempo y su objetivo es verificar que las relaciones entre ellas funcionan correctamente durante las operaciones CRUD.
+
+- Crear:
+  - En el primer bloque de la prueba se contruyen las entidades involucradas, las cuales son un `Usuario` y `Evento` independientes. Posteriormente se crea un `Recordatorio` que hace la unión entre ambos debido a que tiene dos relaciones `@ManyToOne` en (`usuario` y `evento`).
+  - Se hace persistencia, se guardan las referencias al usuario y al evento y se genere el `id_recordatorio` como PK.
+ 
+- Leer:
+  - Después de la creación, el test revisa que los datos se guardaron correctamente por medio de `assertNotNull(saved.getId_recordatorio());
+assertEquals("Recordar inscripción", saved.getMensaje());
+assertEquals("2025-11-01", saved.getFecha());
+assertNotNull(saved.getUsuario());
+assertNotNull(saved.getEvento());
+assertEquals("Luis", saved.getUsuario().getNombre());
+assertEquals("Seminario", saved.getEvento().getNombre());`.
+
+    Aquí se valida que el recordatorio tiene un ID, que los datos como `mensaje` y `fecha` se conservaron sin alterarse, que las relaciones ManyToOne funcionan viendo que el recordatorio reconoce quién es su usuario y a qué evento pertenece y que al leer el recordatorio desde la base de datos, sus objetos relacionados también se cargan correctamente.
+
+- Actualizar:
+  - Por medio de `saved.setMensaje("Nuevo mensaje de recordatorio");
+saved.getUsuario().setNombre("Luis Actualizado");
+saved.getEvento().setNombre("Seminario Actualizado");
+em.persist(saved);
+em.flush();` se actualizan los datos.
+
+    En primer nivel `Recordatorio` cambia su propio mensaje y esto comprueba que los datos de la entidad dependiente se pueden modificar sin perder las relaciones.
+
+    En segundo nivel `Usuario` y `Evento` actualizan el nombre de sus atributos vinculados al recordatorio. Se detectan cambios en las entidades relacionadas y (`managed entities`) los sincroniza automáticamente.
+
+    Aquí se demuestra que los objetos pueden actualizarse de forma conjunta dentro del mismo contexto de persistencia sin romper las referencias ni generar errores de sincronización.
+
+  - Borrar:
+    - En este punto se prueba que la eliminación del recordatorio funciona correctamente, ya que el registro desaparece de la tabla `recordatorio`. Esto lo hacemos por medio de `em.remove(updated);
+em.flush();
+Recordatorio deleted = em.find(Recordatorio.class, saved.getId_recordatorio());
+assertNull(deleted);`,.
+
+      Aquí validamos las relaciones ManyToOne y vemos que al borrar el hijo (Recordatorio), los padres (Usuario y Evento) se mantienen, por lo que no hay riesgo de eliminar datos principales por accidente.
+
+- Revisión final:
+  - El test realiza una consulta directa a la base de datos para asegurarse de que el usuario y el evento no fueron afectados y se demuestra que el `Usuario` y el `Evento` siguen persistentes tras eliminar el `Recordatorio`, que los cambios hechos en `Actualizar` se conservaron y que no hay borrados accidental en cascada.
+        
+
+## Entidad `eventos_usuarios` (inscripciones)
+
+- Tabla relacional entre `Usuario` y `Evento` (puede ser entidad `EventoUsuario` con datos adicionales: rol, fecha inscripción).
+- CRUD: crear inscripción al comprar o reservar; eliminar al cancelar o al eliminar usuario/evento.
+
 
 ## Funcionalidades opcionales y futuras
 
