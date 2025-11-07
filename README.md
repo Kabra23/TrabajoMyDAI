@@ -93,26 +93,24 @@ private List<Evento> eventos;``
 
 ### Comportamiento CRUD entre las clases relacionadas
 - Crear Usuario:
-    - Se puede crear solo.
-    - Si ya trae tickets en la lista también se guardan por el cascade.
-    - Si se le agregan eventos con `addEvento` se guarda la relación en la tabla intermedia.
+    - Se puede crear un usuario solo con nombre e email y si al mismo tiempo añadimos un ticket a su lista con `(u.getTickets().add(t1);`, al guardar el usuario se guardan los tickets por `cascade = ALL`. De igual forma si le añadimos eventos por medio del helper `addEvento(evento)` se guarda la relación en la tabla intermedia.
 
 - Leer Usuario:
-    - Se puede acceder a `getTickets()` y a `getEventos()`.
+    - Al traer un usuario desde la BD podemos navegar a ver sus tickets usando `usuario.getTickets()` y ver los eventos a los que está inscrito por `usuario.getEventos()`, demostrando que las relaciones están bien mapeadas.
 
  - Actualizar Usuario:
-    - Cambios, por ejemplo, en el nombre no afectan a tickets ni eventos, porque ellos solo guardan la referencia al usuario.
+    - Si cambiamos nombre o email solo cambia el usuario y los tickets no necesitan actualizarse porque ellos guardan solo la FK (`usuario_id`). Lo mismo pasa con los eventos, porque la relación ManyToMany no duplica datos del usuario, solo guarda los IDs.
 
 - Borrar Usuario:
-  - Se borran sus tickets por la relación 1:N con cascade.
-  - Se borran sus relaciones con eventos (las filas de la tabla intermedia), pero no se borran los eventos.
+  - Cuando borramos un usuario se deben de borrar sus tickets por la relación 1:N con cascade y se deben de borrar sus filas en la tabla `usuario_eventos`, donde están las relaciones con eventos y estos mismos no se borran. Esto hace que el modelo no deje tickets huérfanos y no se borran entidades que no tienen que desaparecer, por ejemplo con `Evento` en donde solo se elimina la asociación en la tabla intermedia.
 
-### Test que lo demuestra: `UsuarioRepositoryTest`
+### Test `UsuarioRepositoryTest`
 
-Este test prueba que:
+Dentro del test probamos que:
 
-- Al guardar un usuario con 2 tickets, se guardan los 2 tickets.
-- Al borrar el usuario ya no quedan tickets en la BD.
+- Se cree un usuario y dos tickets y que estén asociados por ambos lados de la relación, sabiendo el ticket quién es su usuario por medio de (`t1.setUsuario(u)`) y que el usuario tiene los tickets en su lista usando (`u.getTickets().add(t1)`)
+- Por medio de `em.persistFlushFind(u)` guardamos el usuario y con el `cascade = ALL` se guarden también los tickets. Con flush se ecribe en la BD y lo vuelve a leer para comprobar. Con esto nos aseguramos que el usuario exista en la BD y que tenga dos tickets asignados.
+- Si borramos una entidad usando `em.remove(saved)` y `em.flush()` se borra el usuario y con ayuda de `cascade`y `orphanRemoval` se borran sus tickets. Posteriormente, consultamos a la tabla de tickets y verificamos que no quedó ninguno. 
 
 Con esto se demuestra que el mapeo entre Usuario y Ticket está bien y el método cascade funciona correctamente.
 
@@ -154,19 +152,22 @@ private Usuario usuario;
 ### Comportamiento CRUD entre las clases relacionadas
 
 - Crear Ticket:
-    - Necesita que existan antes un Usuario y un Evento (porque tiene FKs).
-    - Al guardarlo, no afecta al usuario ni al evento.
+    - Necesita que existan antes un Usuario y un Evento (porque tiene FKs). Esto se hace usando `em.persist(u);` y `em.persist(e);`. Posteriormente se crean los tickets, usamos `t.setUsuario(u);` y `t.setEvento(e);` para llenar las FKs y cuando guardamos el ticket no se modifica ni el usuario ni el evento, tan solo se crea una fila en `ticket` para señálar que el ticket es de un usuario X y un evento Y.
  
 - Leer Ticket:
-  - Con esto se puede saber a qué usuario y evento pertenece.
+  - Por medio de `find` tenemos acceso a `ticket.getUsuario()` usuario que compró el ticket, `ticket.getEvento()` para qué evento es y `ticket.getPrecio()` y `ticket.getAsiento()` para obtener el precio y asiento.
+
+    Con esto demostramos que el mapeo ManyToOne funciona ya que el ticket sabe a quién pertenece y a qué evento.
 
  - Actualizar Ticket:
-   - Puedes cambiar precio, asiento, incluso el usuario o evento al que apunta.
-   - No modifica al usuario ni al evento, solo las referencias.
+   - Se puede cambiar precio y asiento sin tocar al usuario ni al evento porque son datos del ticket. También podemos modificar el `ticket.setUsuario()` o `ticket.setEvento()` y cambiar la FK en la tabla `ticket` para así actualizar a quién pertenece ese ticket.
+
+     Con esto nos aseguramos que si cambiamos el nombre del usuario en la tabla `usuario`, todos los tickets que apuntan a él lo van a seguir mostrando bien cuando lo consultes, porque la relación es por ID.
 
  - Borrar Ticket:
-   - Se borra el ticket y no se borra ni el usuario ni el evento.
-   - Aquí no hay cascade hacia arriba.
+   - Si se borra el ticket, no se borra ni el usuario ni el evento, mostrando un caso contratrio a lo que teniamos en `Usuario → Ticket` donde se usaba el `cascade`. Aquí no hay cascade porque sería contraproducente que por borrar un ticket se borrara un usuario o un evento.
+  
+     Al final demostramos que el ticket se puede borrar y que no se rompe la relación con usuario y evento.
   
 ### Test que lo demuestra: `TicketRepositoryTest`
 
@@ -175,8 +176,10 @@ Este test prueba las 4 operaciones básicas de CRUD sobre Ticket y que estén bi
 - Dentro del test se prueba a crear un nuevo evento y usuario, ya que sin esto no se puede asignar un ticket.
 - Se crea un nuevo ticket y se guarda. Esto no modifica al usuario ni al evento, solo se crea una fila en `ticket` que señála la relación con el usuario y el evento.
 - Usamos el método find para tener acceso quién lo compró, para qué evento, precio y asiento.
-- Se pueden actualizar los datos propios del ticket, sin tocar al usuario o el evento, por lo que si se cambia el nombre del usuario en la tabla `usuario`, todos los tickets que apuntan a él lo van a seguir mostrando bien cuando lo consultes, porque la relación es por ID.
+- Se pueden actualizar los datos propios del ticket, sin tocar al usuario o el evento, por lo que si se cambia el nombre del usuario en la tabla `usuario`, todos los tickets que apuntan a él lo van a seguir mostrando bien cuando se consulte, porque la relación es por ID.
 - Al borrar un Ticket, el usuario y el evento sigue existiendo, contrario a lo que pasa con `Usuario → Ticket` donde había cascade desde el usuario.
+
+Resumidamente, la entidad `Ticket` es dependiente de `Usuario` y `Evento`, pero su eliminación no afecta a las entidades padre.
   
 ---
 
@@ -188,6 +191,13 @@ Este test prueba las 4 operaciones básicas de CRUD sobre Ticket y que estén bi
     - Efectos:
         - `Entrada` e `eventos_usuarios` deben eliminarse o marcarse como canceladas al borrar un `Evento`.
         - Preferible diseñar soft-delete o reglas de notificación antes de eliminación.
+
+### Atributos principales
+- `id_evento` (PK)
+- `nombre_evento`
+- `fecha_evento`
+- `lugar_evento`
+- `descripcion_evento` 
 
 Entidad `eventos_usuarios` (inscripciones)
 - Tabla relacional entre `Usuario` y `Evento` (puede ser entidad `EventoUsuario` con datos adicionales: rol, fecha inscripción).
