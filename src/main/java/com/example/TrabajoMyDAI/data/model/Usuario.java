@@ -19,12 +19,7 @@ public class Usuario {
     private List<Ticket> tickets = new LinkedList<>();
 
     // Usuario será owner de la relación ManyToMany con Evento
-    @ManyToMany()
-    @JoinTable(
-        name = "usuario_eventos",
-        joinColumns = @JoinColumn(name = "usuario_dni"),
-        inverseJoinColumns = @JoinColumn(name = "eventos_id_evento")
-    )
+    @ManyToMany
     private List<Evento> eventos = new LinkedList<>();
 
 

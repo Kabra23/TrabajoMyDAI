@@ -17,7 +17,7 @@ public class Evento {
     private String descripcion_evento;
 
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "eventos")
     private List<Usuario> usuarios = new LinkedList<>();
 
     private String tipo_evento;
