@@ -54,20 +54,23 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">TrabajoMyDAI</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" th:href="@{/}">Barça Athletic Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+                        <a class="nav-link active" aria-current="page" th:href="@{/}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Acerca de</a>
+                        <a class="nav-link" th:href="@{/noticias}">Noticias</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
+                        <a class="nav-link" th:href="@{/eventos}">Eventos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/plantilla}">Plantilla</a>
                     </li>
                 </ul>
             </div>
@@ -87,19 +90,19 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Eventos</h3>
+                        <h3><a th:href="@{/eventos}" style="color:inherit; text-decoration:none;">Eventos</a></h3>
                         <p>Organiza y administra tus eventos de manera eficiente.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Recordatorios</h3>
+                        <h3><a th:href="@{/recordatorios}" style="color:inherit; text-decoration:none;">Recordatorios</a></h3>
                         <p>No olvides nada con nuestros recordatorios personalizados.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Tickets</h3>
+                        <h3><a th:href="@{/tickets}" style="color:inherit; text-decoration:none;">Tickets</a></h3>
                         <p>Gestiona entradas y accesos fácilmente.</p>
                     </div>
                 </div>

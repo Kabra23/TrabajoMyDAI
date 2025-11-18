@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets - Barça Athletic Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }.container { padding-top: 60px; } .card { background-color: rgba(255,255,255,0.06); }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Barça Athletic Hub</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/}">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/noticias}">Noticias</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/eventos}">Eventos</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/plantilla}">Plantilla</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 th:text="${mensaje}">Tickets</h1>
+    <div th:if="${tickets == null}">No hay tickets.</div>
+    <div class="row">
+        <div class="col-md-4" th:each="ticket : ${tickets}">
+            <div class="card mb-3 text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Ticket <span th:text="${ticket.id_ticket}"></span></h5>
+                    <p class="card-text">Usuario: <span th:text="${ticket.usuario.nombre}">Usuario</span></p>
+                    <p class="card-text">Evento: <span th:text="${ticket.evento.nombre}">Evento</span></p>
+                    <p class="card-text">Precio: <strong th:text="${ticket.precio}">0.0</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
