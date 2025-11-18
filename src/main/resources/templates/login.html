@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            padding: 40px 32px;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-title {
+            color: #764ba2;
+            font-weight: bold;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .form-label {
+            color: #764ba2;
+            font-weight: 500;
+        }
+        .btn-custom {
+            background-color: #764ba2;
+            color: #fff;
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            margin-top: 16px;
+        }
+        .btn-custom:hover {
+            background-color: #667eea;
+        }
+        .extra-links {
+            text-align: center;
+            margin-top: 18px;
+        }
+        .alert {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="login-title">Iniciar Sesión</h2>
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuario</label>
+                <input type="text" class="form-control" id="username" name="username" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-custom">Entrar</button>
+        </form>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div class="extra-links">
+            <span>¿No tienes cuenta? <a href="/registro" style="color:#764ba2;font-weight:bold;">Regístrate aquí</a></span>
+        </div>
+    </div>
+</body>
+</html>

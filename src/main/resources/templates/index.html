@@ -8,9 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: #fff;
             min-height: 100vh;
+        }
+        .navbar, .navbar-brand, .nav-link {
+            color: #fff !important;
         }
         .hero {
             padding: 100px 0;
@@ -19,35 +22,48 @@
         .hero h1 {
             font-size: 3rem;
             margin-bottom: 20px;
+            color: #fff;
         }
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 40px;
+            color: #e3e3e3;
         }
         .btn-custom {
-            background-color: #ff6b6b;
+            background-color: #283593;
             border: none;
             padding: 10px 30px;
             font-size: 1.1rem;
+            color: #fff;
         }
         .btn-custom:hover {
-            background-color: #ff5252;
+            background-color: #1a237e;
+            color: #fff;
         }
         .features {
             padding: 50px 0;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.08);
         }
         .feature-card {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #fff;
+            color: #283593;
             border-radius: 10px;
             padding: 20px;
             margin: 10px;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(40,53,147,0.08);
+        }
+        .feature-card h3 a {
+            color: #283593;
+        }
+        .feature-card h3, .feature-card p {
+            color: #283593;
         }
         footer {
             text-align: center;
             padding: 20px 0;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: #1a237e;
+            color: #fff;
         }
     </style>
 </head>
@@ -72,6 +88,15 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/plantilla}">Plantilla</a>
                     </li>
+                    <li class="nav-item" th:if="${!logueado}">
+                        <a class="nav-link" th:href="@{/login}">Login</a>
+                    </li>
+                    <li class="nav-item" th:if="${!logueado}">
+                        <a class="nav-link" th:href="@{/registro}">Registro</a>
+                    </li>
+                    <li class="nav-item" th:if="${logueado}">
+                        <a class="nav-link" th:href="@{/logout}">Cerrar Sesión</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -94,13 +119,14 @@
                         <p>Organiza y administra tus eventos de manera eficiente.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <!-- Oculto las opciones de recordatorios y tickets si no está logueado -->
+                <div class="col-md-4" th:if="${logueado}">
                     <div class="feature-card">
                         <h3><a th:href="@{/recordatorios}" style="color:inherit; text-decoration:none;">Recordatorios</a></h3>
                         <p>No olvides nada con nuestros recordatorios personalizados.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" th:if="${logueado}">
                     <div class="feature-card">
                         <h3><a th:href="@{/tickets}" style="color:inherit; text-decoration:none;">Tickets</a></h3>
                         <p>Gestiona entradas y accesos fácilmente.</p>
@@ -109,6 +135,20 @@
             </div>
         </div>
     </section>
+
+    <div class="hero">
+        <h1 th:text="${mensaje}"></h1>
+        <p>Bienvenido a la plataforma de gestión de Barça Athletic Hub.</p>
+        <div th:if="${logueado}">
+            <a href="/tickets" class="btn btn-custom">Ver Tickets</a>
+            <a href="/recordatorios" class="btn btn-custom">Ver Recordatorios</a>
+            <a href="/logout" class="btn btn-custom">Cerrar Sesión</a>
+        </div>
+        <div th:if="${!logueado}">
+            <a href="/login" class="btn btn-custom" style="margin-right:10px;">Iniciar Sesión</a>
+            <a href="/registro" class="btn btn-custom">Registrarse</a>
+        </div>
+    </div>
 
     <footer>
         <div class="container">
