@@ -143,4 +143,10 @@ public class HomeController {
         model.addAttribute("mensaje", "Lista de recordatorios");
         return "recordatorios";
     }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
 }
