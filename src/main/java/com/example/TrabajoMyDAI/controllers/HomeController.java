@@ -1,5 +1,7 @@
 package com.example.TrabajoMyDAI.controllers;
 
+import com.example.TrabajoMyDAI.data.model.Evento;
+import com.example.TrabajoMyDAI.data.model.Ticket;
 import com.example.TrabajoMyDAI.data.repository.EventoRepository;
 import com.example.TrabajoMyDAI.data.repository.RecordatorioRepository;
 import com.example.TrabajoMyDAI.data.repository.TicketRepository;
@@ -11,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
@@ -148,5 +152,58 @@ public class HomeController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/";
+    }
+
+    @GetMapping("/eventos/{id}/comprar")
+    public String mostrarFormularioCompra(@PathVariable("id") Long id,
+                                          Model model,
+                                          HttpSession session) {
+        // Requerimos usuario logueado para comprar
+        if (session.getAttribute("usuario") == null) {
+            return "redirect:/login";
+        }
+
+        var evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
+
+        model.addAttribute("evento", evento);
+        // Zonas de ejemplo
+        model.addAttribute("zonas", java.util.List.of("Tribuna", "Grada Lateral", "Gol Nord", "Gol Sud"));
+        return "comprar-ticket";
+    }
+
+    @PostMapping("/eventos/{id}/comprar")
+    public String procesarCompra(@PathVariable("id") Long id,
+                                 @RequestParam String zona,
+                                 @RequestParam Long asiento,
+                                 HttpSession session,
+                                 Model model) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Evento evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
+
+        // Precio simple según la zona (puedes cambiarlo)
+        double precio = switch (zona) {
+            case "Tribuna" -> 35.0;
+            case "Grada Lateral" -> 25.0;
+            case "Gol Nord", "Gol Sud" -> 15.0;
+            default -> 20.0;
+        };
+
+        Ticket ticket = new Ticket();
+        ticket.setUsuario(usuario);
+        ticket.setEvento(evento);
+        ticket.setAsiento(asiento);
+        ticket.setPrecio(precio);
+
+        ticketRepository.save(ticket);
+
+        // Después de comprar, lo mandamos a la lista de tickets
+        return "redirect:/tickets";
     }
 }
