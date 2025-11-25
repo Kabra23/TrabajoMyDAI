@@ -1,4 +1,4 @@
-package com.example.TrabajoMyDAI;
+package com.example.TrabajoMyDAI.TrabajoMyDAI;
 
 import com.example.TrabajoMyDAI.data.model.Ticket;
 import com.example.TrabajoMyDAI.data.model.Usuario;

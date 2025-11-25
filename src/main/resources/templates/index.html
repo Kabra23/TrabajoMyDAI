@@ -88,13 +88,13 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/plantilla}">Plantilla</a>
                     </li>
-                    <li class="nav-item" th:if="${!logueado}">
+                    <li class="nav-item" th:if="${logueado != true}">
                         <a class="nav-link" th:href="@{/login}">Login</a>
                     </li>
-                    <li class="nav-item" th:if="${!logueado}">
+                    <li class="nav-item" th:if="${logueado != true}">
                         <a class="nav-link" th:href="@{/registro}">Registro</a>
                     </li>
-                    <li class="nav-item" th:if="${logueado}">
+                    <li class="nav-item" th:if="${logueado == true}">
                         <a class="nav-link" th:href="@{/logout}">Cerrar Sesión</a>
                     </li>
                 </ul>
@@ -102,13 +102,19 @@
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="container">
-            <h1 th:text="${mensaje}">Bienvenido a TrabajoMyDAI</h1>
-            <p>Tu plataforma para gestionar eventos, recordatorios y más.</p>
-            <a href="#" class="btn btn-custom">Comenzar</a>
+    <div class="hero">
+        <h1 th:text="${mensaje}"></h1>
+        <p>Bienvenido a la plataforma de gestión de Barça Athletic Hub.</p>
+        <div th:if="${logueado == true}">
+            <a href="/tickets" class="btn btn-custom">Ver Tickets</a>
+            <a href="/recordatorios" class="btn btn-custom">Ver Recordatorios</a>
+            <a href="/logout" class="btn btn-custom">Cerrar Sesión</a>
         </div>
-    </section>
+        <div th:if="${logueado != true}">
+            <a href="/login" class="btn btn-custom" style="margin-right:10px;">Iniciar Sesión</a>
+            <a href="/registro" class="btn btn-custom">Registrarse</a>
+        </div>
+    </div>
 
     <section class="features">
         <div class="container">
@@ -120,13 +126,13 @@
                     </div>
                 </div>
                 <!-- Oculto las opciones de recordatorios y tickets si no está logueado -->
-                <div class="col-md-4" th:if="${logueado}">
+                <div class="col-md-4" th:if="${logueado == true}">
                     <div class="feature-card">
                         <h3><a th:href="@{/recordatorios}" style="color:inherit; text-decoration:none;">Recordatorios</a></h3>
                         <p>No olvides nada con nuestros recordatorios personalizados.</p>
                     </div>
                 </div>
-                <div class="col-md-4" th:if="${logueado}">
+                <div class="col-md-4" th:if="${logueado == true}">
                     <div class="feature-card">
                         <h3><a th:href="@{/tickets}" style="color:inherit; text-decoration:none;">Tickets</a></h3>
                         <p>Gestiona entradas y accesos fácilmente.</p>
@@ -136,25 +142,6 @@
         </div>
     </section>
 
-    <div class="hero">
-        <h1 th:text="${mensaje}"></h1>
-        <p>Bienvenido a la plataforma de gestión de Barça Athletic Hub.</p>
-        <div th:if="${logueado}">
-            <a href="/tickets" class="btn btn-custom">Ver Tickets</a>
-            <a href="/recordatorios" class="btn btn-custom">Ver Recordatorios</a>
-            <a href="/logout" class="btn btn-custom">Cerrar Sesión</a>
-        </div>
-        <div th:if="${!logueado}">
-            <a href="/login" class="btn btn-custom" style="margin-right:10px;">Iniciar Sesión</a>
-            <a href="/registro" class="btn btn-custom">Registrarse</a>
-        </div>
-    </div>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 TrabajoMyDAI. Todos los derechos reservados.</p>
-        </div>
-    </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

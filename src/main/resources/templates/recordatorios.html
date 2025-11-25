@@ -27,16 +27,53 @@
 
 <div class="container">
     <h1 th:text="${mensaje}">Recordatorios</h1>
-    <div th:if="${recordatorios == null}">No hay recordatorios.</div>
-    <div class="row">
-        <div class="col-md-6" th:each="rec : ${recordatorios}">
-            <div class="card mb-3 text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Recordatorio <span th:text="${rec.id_recordatorio}"></span></h5>
-                    <p class="card-text">Usuario: <span th:text="${rec.usuario.nombre}">Usuario</span></p>
-                    <p class="card-text">Evento: <span th:text="${rec.evento.nombre}">Evento</span></p>
-                    <p class="card-text">Mensaje: <strong th:text="${rec.mensaje}">Mensaje</strong></p>
-                    <p class="card-text"><small th:text="${rec.fecha}">Fecha</small></p>
+    <!-- Mostrar mensaje si no hay tickets -->
+    <div th:if="${tickets == null || tickets.isEmpty()}">
+        <p>No tienes tickets asociados. Compra uno para crear recordatorios.</p>
+        <a th:href="@{/tickets}" class="btn btn-primary">Comprar Tickets</a>
+    </div>
+
+    <!-- Mostrar lista de tickets -->
+    <div th:if="${tickets != null && !tickets.isEmpty()}">
+        <h2>Mis Tickets</h2>
+        <ul>
+            <li th:each="ticket : ${tickets}" th:text="${ticket.nombre}"></li>
+        </ul>
+
+        <!-- Formulario para crear recordatorio -->
+        <h3>Crear Recordatorio</h3>
+        <form th:action="@{/recordatorios}" method="post" th:object="${recordatorioForm}">
+            <div class="mb-3">
+                <label for="mensaje" class="form-label">Mensaje</label>
+                <input type="text" id="mensaje" name="mensaje" class="form-control" th:field="*{mensaje}" required>
+            </div>
+            <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="datetime-local" id="fecha" name="fecha" class="form-control" th:field="*{fecha}" required>
+            </div>
+            <div class="mb-3">
+                <label for="evento" class="form-label">Evento</label>
+                <select id="evento" name="evento" class="form-select" th:field="*{evento}" required>
+                    <option th:each="ticket : ${tickets}" th:value="${ticket.id}" th:text="${ticket.nombre}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Crear Recordatorio</button>
+        </form>
+    </div>
+
+    <!-- Mostrar lista de recordatorios -->
+    <div th:if="${recordatorios != null && !recordatorios.isEmpty()}">
+        <h2>Mis Recordatorios</h2>
+        <div class="row">
+            <div class="col-md-6" th:each="rec : ${recordatorios}">
+                <div class="card mb-3 text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Recordatorio <span th:text="${rec.id_recordatorio}"></span></h5>
+                        <p class="card-text">Usuario: <span th:text="${rec.usuario.nombre}">Usuario</span></p>
+                        <p class="card-text">Evento: <span th:text="${rec.evento.nombre}">Evento</span></p>
+                        <p class="card-text">Mensaje: <strong th:text="${rec.mensaje}">Mensaje</strong></p>
+                        <p class="card-text"><small th:text="${rec.fecha}">Fecha</small></p>
+                    </div>
                 </div>
             </div>
         </div>

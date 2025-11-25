@@ -59,33 +59,33 @@
 <body>
     <div class="card-registro">
         <h2 class="registro-title"><i class="fa-solid fa-user-plus"></i> Registro de Usuario</h2>
-        <form action="/registro" method="post">
+        <form th:action="@{/registro}" th:object="${usuario}" th:method="post">
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <input th:field="*{nombre}" type="text" class="form-control" id="nombre" required>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="username" class="form-label">Usuario</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa-solid fa-user-tag"></i></span>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                    <input th:field="*{username}" type="text" class="form-control" id="username" required>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input th:field="*{email}" type="email" class="form-control" id="email" required>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Contraseña</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <input th:field="*{password}" type="password" class="form-control" id="password" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-custom">Registrarse</button>
@@ -93,9 +93,9 @@
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         <div th:if="${registroExitoso}" class="alert alert-success">¡Registro exitoso! Ahora puedes iniciar sesión.</div>
         <div class="extra-links">
-            <span>¿Ya tienes cuenta? <a href="/login" style="color:#283593;font-weight:bold;">Inicia sesión aquí</a></span>
+            <span>¿Ya tienes cuenta? <a th:href="@{/login}" style="color:#283593;font-weight:bold;">Inicia sesión aquí</a></span>
             <br>
-            <a href="/" class="btn btn-link" style="color:#283593;font-weight:bold;">Volver a la página inicial</a>
+            <a th:href="@{/}" class="btn btn-link" style="color:#283593;font-weight:bold;">Volver a la página inicial</a>
         </div>
     </div>
 </body>

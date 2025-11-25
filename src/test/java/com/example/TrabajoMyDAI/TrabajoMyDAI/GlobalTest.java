@@ -1,5 +1,5 @@
 // src/test/java/com/example/TrabajoMyDAI/RecordatorioRepositoryTest.java
-package com.example.TrabajoMyDAI;
+package com.example.TrabajoMyDAI.TrabajoMyDAI;
 
 import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.model.Recordatorio;

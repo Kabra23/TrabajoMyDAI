@@ -1,6 +1,9 @@
 package com.example.TrabajoMyDAI.data.model;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -11,12 +14,16 @@ public class Recordatorio
     private Long id_recordatorio;
 
     @ManyToOne
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     @ManyToOne
+    @JoinColumn(name = "evento_id")
     private Evento evento;
     private String mensaje;
-    private String fecha;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime fecha;
 
 
     // Getters y setters
@@ -52,21 +59,21 @@ public class Recordatorio
         this.mensaje = mensaje;
     }
 
-    public String getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 
     @Override
     public String toString() {
-        return "Ticket{" +
+        return "Recordatorio{" +
                 "id_recordatorio=" + id_recordatorio +
-                ", id_usuario=" + usuario.getDni()+
-                ", id_evento=" + evento.getId() +
-                ", mensaje=" + mensaje +
+                ", id_usuario=" + (usuario != null ? usuario.getDni() : null) +
+                ", id_evento=" + (evento != null ? evento.getId() : null) +
+                ", mensaje='" + mensaje + '\'' +
                 ", fecha=" + fecha +
                 '}';
     }

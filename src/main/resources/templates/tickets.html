@@ -3,9 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tickets - Barça Athletic Hub</title>
+    <title>Mis Tickets - Barça Athletic Hub</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }.container { padding-top: 60px; } .card { background-color: rgba(255,255,255,0.06); }</style>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar, .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .hero {
+            padding: 60px 0 30px 0;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .hero p {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            color: #e3e3e3;
+        }
+        .btn-custom {
+            background-color: #283593;
+            border: none;
+            padding: 8px 20px;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .btn-custom:hover {
+            background-color: #1a237e;
+            color: #fff;
+        }
+        .tickets-list {
+            padding: 30px 0 60px 0;
+        }
+        .ticket-card {
+            background-color: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 16px;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #1a237e;
+            color: #fff;
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -20,28 +73,52 @@
                 <li class="nav-item"><a class="nav-link" th:href="@{/noticias}">Noticias</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/eventos}">Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/plantilla}">Plantilla</a></li>
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" th:href="@{/login}">Login</a></li>
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" th:href="@{/registro}">Registro</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" th:href="@{/logout}">Cerrar Sesión</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container">
-    <h1 th:text="${mensaje}">Tickets</h1>
-    <div th:if="${tickets == null}">No hay tickets.</div>
+<section class="hero">
+    <div class="container">
+        <h1 th:text="${mensaje}">Mis Tickets</h1>
+        <p>Aquí tienes tus entradas asociadas a tu cuenta.</p>
+        <div th:if="${logueado == true}">
+            <a th:href="@{/eventos}" class="btn btn-custom" style="margin-right:8px;">Ver Eventos</a>
+            <a th:href="@{/recordatorios}" class="btn btn-custom">Recordatorios</a>
+        </div>
+    </div>
+</section>
+
+<div class="container tickets-list">
+    <div th:if="${tickets == null or #lists.isEmpty(tickets)}" class="text-center text-muted mb-4">No tienes tickets aún.</div>
+
     <div class="row">
-        <div class="col-md-4" th:each="ticket : ${tickets}">
-            <div class="card mb-3 text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Ticket <span th:text="${ticket.id_ticket}"></span></h5>
-                    <p class="card-text">Usuario: <span th:text="${ticket.usuario.nombre}">Usuario</span></p>
-                    <p class="card-text">Evento: <span th:text="${ticket.evento.nombre}">Evento</span></p>
-                    <p class="card-text">Precio: <strong th:text="${ticket.precio}">0.0</strong></p>
+        <div class="col-md-6" th:each="ticket : ${tickets}">
+            <div class="ticket-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1"> <span th:text="${ticket.evento.nombre}">Nombre Evento</span></h5>
+                        <p class="mb-1" style="color:#e3e3e3;">Asiento: <strong th:text="${ticket.asiento}">0</strong></p>
+                        <p class="mb-0" style="color:#e3e3e3;">Precio: <strong th:text="${ticket.precio} + ' €'">0.00 €</strong></p>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted">Ticket ID <span th:text="${ticket.id_ticket}">0</span></small>
+                        <div style="margin-top:8px;">
+                            <a th:href="@{'/eventos'}" class="btn btn-sm btn-custom">Ver Evento</a>
+                            <a th:href="@{'/recordatorios/crear'(ticketId=${ticket.id_ticket})}" class="btn btn-sm btn-outline-light" style="margin-left:6px;">Crear recordatorio</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
