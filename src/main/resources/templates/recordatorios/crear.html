@@ -3,131 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Recordatorio - Barça Athletic Hub</title>
-    <!-- Bootstrap CSS -->
+    <title>Crear Recordatorio - Barça Atlètic</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #ffd700;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: #fff;
             min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .navbar, .navbar-brand, .nav-link {
-            color: #fff !important;
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.35) !important;
+            backdrop-filter: blur(8px);
         }
-        .hero {
-            padding: 100px 0;
-            text-align: center;
+
+        .navbar-brand {
+            color: var(--accent) !important;
+            font-weight: 700;
         }
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #fff;
+
+        .container {
+            padding-top: 110px;
         }
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 40px;
-            color: #e3e3e3;
+
+        .card-form {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            color: var(--secondary);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
         }
-        .btn-custom {
-            background-color: #283593;
+
+        .btn-create {
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            color: var(--primary);
             border: none;
-            padding: 10px 30px;
-            font-size: 1.1rem;
-            color: #fff;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 800;
         }
-        .btn-custom:hover {
-            background-color: #1a237e;
-            color: #fff;
-        }
-        .features {
-            padding: 50px 0;
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-        .feature-card {
-            background-color: #fff;
-            color: #283593;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(40,53,147,0.08);
-        }
-        .feature-card h3 a {
-            color: #283593;
-        }
-        .feature-card h3, .feature-card p {
-            color: #283593;
-        }
-        footer {
-            text-align: center;
-            padding: 20px 0;
-            background-color: #1a237e;
-            color: #fff;
-        }
+
+        .btn-create:hover { transform: translateY(-3px); }
+
+        footer { text-align: center; padding: 24px 0; background: rgba(0,0,0,0.35); margin-top: 40px; }
+
+        .help-text { color: #666; }
+
+        @media (max-width:768px) { .container { padding-top: 90px; } }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Barça Atlètic</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <a class="navbar-brand" href="/"> <i class="fas fa-shield-alt"></i> Barça Atlètic</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/eventos">Eventos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/tickets">Tickets</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/recordatorios">Recordatorios</a>
-                </li>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <h1 th:text="${mensaje}">Crear Recordatorio</h1>
+<div class="container">
+    <div class="card-form mt-4">
+        <h1 class="mb-3">Crear Recordatorio</h1>
+        <div th:if="${tickets != null and !#lists.isEmpty(tickets)}">
+            <form th:action="@{/recordatorios}" th:object="${recordatorioForm}" method="post" class="mt-2" id="crearRecordatorioForm">
 
-    <div th:if="${error}">
-        <div class="alert alert-danger" th:text="${error}"></div>
+                <div class="mb-3">
+                    <label for="ticketSelect" class="form-label">Ticket (obligatorio)</label>
+                    <select id="ticketSelect" name="ticketId" class="form-select" required>
+                        <option value="" disabled th:text="'-- Seleccionar ticket --'">-- Seleccionar ticket --</option>
+                        <option th:each="ticket : ${tickets}"
+                                th:value="${ticket.id_ticket}"
+                                th:selected="${ticketId != null and ticketId == ticket.id_ticket}"
+                                th:data-eventodate="${#temporals.format(ticket.evento.fecha, 'yyyy-MM-dd')}"
+                                th:text="${ticket.evento.nombre} + ' · ' + ${#temporals.format(ticket.evento.fecha, 'dd/MM/yyyy HH:mm')}">
+                            Ticket
+                        </option>
+                    </select>
+                    <div class="form-text help-text">Selecciona el ticket asociado al evento para fijar la fecha límite.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mensaje" class="form-label">Mensaje</label>
+                    <textarea class="form-control" id="mensaje" th:field="*{mensaje}" rows="4" required></textarea>
+                    <div class="form-text help-text">Texto que verás en el recordatorio (por ejemplo: "Recordar entrada y llegada 30 minutos antes").</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="fechaDate" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="fechaDate" name="fechaDate" required
+                               th:attr="min=${minDate}
+                                        , max=${recordatorioForm.evento != null ? #temporals.format(recordatorioForm.evento.fecha, 'yyyy-MM-dd') : ''}"
+                               th:value="${recordatorioForm.fecha != null ? #temporals.format(recordatorioForm.fecha,'yyyy-MM-dd') : ''}">
+                        <div class="form-text help-text">La fecha debe ser entre hoy y la fecha del evento (si has seleccionado un ticket).</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="hora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" id="hora" name="hora" required th:value="${recordatorioForm.fecha != null ? #temporals.format(recordatorioForm.fecha,'HH:mm') : ''}">
+                        <!-- Hidden field combinado que enviará la fecha+hora en formato ISO para que Spring la convierta -->
+                        <input type="hidden" id="fechaHidden" th:field="*{fecha}" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-create btn w-100 mt-2"><i class="fas fa-plus-circle me-2"></i>Crear</button>
+            </form>
+        </div>
+
+        <div th:if="${tickets == null or #lists.isEmpty(tickets)}" class="mb-3">
+            <div class="alert alert-warning" role="alert">
+                No tienes tickets disponibles para crear recordatorios. <a href="/eventos" class="alert-link">Ver eventos</a> o <a href="/tickets" class="alert-link">ver tus tickets</a>.
+            </div>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
     </div>
-
-    <form th:action="@{/recordatorios}" method="post" th:object="${recordatorioForm}">
-        <!-- Usar ticketId pasado en el modelo en lugar de #request -->
-        <input type="hidden" name="ticketId" th:value="${ticketId}" />
-        <div class="mb-3">
-            <label for="mensaje" class="form-label">Mensaje</label>
-            <input type="text" id="mensaje" name="mensaje" class="form-control" th:field="*{mensaje}" required>
-        </div>
-        <div class="mb-3">
-            <label for="fecha" class="form-label">Fecha y hora</label>
-            <input type="datetime-local" id="fecha" name="fecha" class="form-control" th:field="*{fecha}" required>
-        </div>
-        <div class="mb-3">
-            <label for="ticketSelect" class="form-label">Seleccionar ticket / evento</label>
-            <select id="ticketSelect" name="ticketId" class="form-select">
-                <option value="" th:if="${#lists.isEmpty(tickets)}">No hay tickets</option>
-                <option th:each="ticket : ${tickets}"
-                        th:value="${ticket.id_ticket}"
-                        th:text="|${ticket.evento.nombre} (Asiento: ${ticket.asiento}) - ${ticket.evento.fecha}|"
-                        th:selected="${recordatorioForm.evento != null} ? ${ticket.evento.id == recordatorioForm.evento.id} : false">
-                </option>
-            </select>
-        </div>
-        <div>
-            <button type="submit" class="btn btn-success">Crear</button>
-            <a th:href="@{/recordatorios}" class="btn btn-secondary">Volver</a>
-        </div>
-    </form>
 </div>
 
-<footer>Contenido estático del pie de página</footer>
+<footer>
+    <div class="container"><p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p></div>
+</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Actualiza el atributo max del input fechaDate cuando se selecciona un ticket
+    (function(){
+        const ticketSelect = document.getElementById('ticketSelect');
+        const fechaDateInput = document.getElementById('fechaDate');
+        const horaInput = document.getElementById('hora');
+        const fechaHidden = document.getElementById('fechaHidden');
+        const form = document.getElementById('crearRecordatorioForm');
+        if(!ticketSelect || !fechaDateInput || !horaInput || !fechaHidden || !form) return;
+
+        function applyMaxFromSelected(){
+            const selected = ticketSelect.options[ticketSelect.selectedIndex];
+            const eventDate = selected ? selected.getAttribute('data-eventodate') : null;
+            if(eventDate && eventDate.trim() !== ''){
+                fechaDateInput.max = eventDate;
+            } else {
+                // si no hay ticket seleccionado, limpiar max para permitir cualquier fecha >= hoy
+                fechaDateInput.removeAttribute('max');
+            }
+        }
+
+        // Combina fecha y hora en ISO antes de enviar el formulario
+        form.addEventListener('submit', function(){
+            const dateVal = fechaDateInput.value;
+            const timeVal = horaInput.value || '00:00';
+            if(!dateVal){
+                // dejar que el navegador valide la ausencia de fecha
+                return;
+            }
+            // Formato ISO simple: yyyy-MM-ddTHH:mm
+            fechaHidden.value = dateVal + 'T' + timeVal;
+        });
+
+        // aplicar al cargar (por si hay preselección)
+        applyMaxFromSelected();
+
+        ticketSelect.addEventListener('change', applyMaxFromSelected);
+    })();
+</script>
+
 </body>
 </html>

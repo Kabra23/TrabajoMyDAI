@@ -44,8 +44,10 @@
         <ul>
             <li th:each="ticket : ${tickets}" th:text="${ticket.nombre}"></li>
         </ul>
+    </div>
 
-        <!-- Formulario para crear recordatorio -->
+    <!-- Restaurar funcionalidad de crear recordatorio desde ticket -->
+    <div th:if="${tickets != null && !tickets.isEmpty()}">
         <h3>Crear Recordatorio</h3>
         <form th:action="@{/recordatorios}" method="post" th:object="${recordatorioForm}">
             <div class="mb-3">

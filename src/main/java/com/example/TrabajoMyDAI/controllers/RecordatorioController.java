@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/recordatorios")
@@ -62,6 +63,8 @@ public class RecordatorioController {
         } else {
             model.addAttribute("ticketId", null);
         }
+        // pasar la fecha mínima (hoy) formateada como yyyy-MM-dd para usarla en el input date
+        model.addAttribute("minDate", LocalDate.now().toString());
         model.addAttribute("recordatorioForm", recordatorio);
         model.addAttribute("tickets", tickets);
         model.addAttribute("mensaje", "Crear recordatorio");
@@ -88,6 +91,8 @@ public class RecordatorioController {
             model.addAttribute("recordatorioForm", recordatorioForm);
             model.addAttribute("ticketId", ticketId);
             model.addAttribute("error", ve.getMessage());
+            // asegurar minDate también cuando re-renderizamos la vista con error
+            model.addAttribute("minDate", java.time.LocalDate.now().toString());
             return "recordatorios/crear";
         }
 

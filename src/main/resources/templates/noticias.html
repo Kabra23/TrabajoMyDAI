@@ -5,35 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noticias - Barça Athletic Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }
-        .container { padding-top: 60px; }
-        .card { background-color: rgba(255,255,255,0.06); }
+        :root{
+            --primary:#1a237e; --secondary:#283593; --accent:#ffd700;
+        }
+        body{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; min-height:100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar{ background: rgba(0,0,0,0.35) !important; backdrop-filter: blur(8px); }
+        .navbar-brand{ color:var(--accent) !important; font-weight:700; }
+        .container{ padding-top:110px; }
+        .page-header{ text-align:center; margin-bottom:30px; }
+        .card-news{ background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); color:var(--secondary); border-radius:14px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+        .card-news h5{ font-weight:800; }
+        .card-news p{ color:#555; }
+        .empty-state{ text-align:center; padding:40px; background: rgba(255,255,255,0.06); border-radius:12px; }
+        footer{ text-align:center; padding:24px 0; background: rgba(0,0,0,0.35); margin-top:40px; }
+        @media (max-width:768px){ .container{ padding-top:90px; } }
     </style>
 </head>
 <body>
-
-<div class="navbar">Contenido estático de la barra de navegación</div>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/"> <i class="fas fa-shield-alt"></i> Barça Atlètic</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 <div class="container">
-    <h1 th:text="${mensaje}">Noticias</h1>
-    <div class="row">
-        <div class="col-12">
-            <div th:if="${noticias == null}">No hay noticias disponibles.</div>
-            <div class="list-group">
-                <div th:each="evento : ${noticias}" class="list-group-item list-group-item-action mb-2 card text-white">
-                    <div class="card-body">
-                        <h5 th:text="${evento.nombre}"></h5>
-                        <p th:text="${evento.descripcion}"></p>
-                        <small th:text="${evento.fecha} + ' · ' + ${evento.lugar}"></small>
-                    </div>
-                </div>
+    <div class="page-header">
+        <h1 th:text="${mensaje}">Noticias</h1>
+        <p>Últimas novedades y comunicados del Barça Atlètic</p>
+    </div>
+
+    <div th:if="${noticias == null || #lists.isEmpty(noticias)}" class="empty-state">
+        <i class="fas fa-newspaper fa-3x" style="opacity:0.6"></i>
+        <h3>No hay noticias disponibles</h3>
+        <p>Vuelve más tarde para ver actualizaciones</p>
+    </div>
+
+    <div class="row g-3" th:if="${noticias != null}">
+        <div class="col-md-6" th:each="evento : ${noticias}">
+            <div class="card-news">
+                <h5 th:text="${evento.nombre}">Título noticia</h5>
+                <p th:text="${evento.descripcion}">Descripción</p>
+                <small class="text-muted" th:text="${#temporals.format(evento.fecha,'dd MMM yyyy')} + ' · ' + ${evento.lugar}">Fecha · Lugar</small>
             </div>
         </div>
     </div>
 </div>
 
-<footer>Contenido estático del pie de página</footer>
+<footer>
+    <div class="container"><p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p></div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -5,141 +5,332 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos - Barça Athletic Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }
-        .container { padding-top: 60px; }
-        .card { background-color: rgba(255,255,255,0.06); }
-
-        .events-list { margin-top: 24px; }
-        .event-row {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-            border-left: 8px solid rgba(0,0,0,0.08);
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #ffd700;
+            --danger: #e33e3e;
         }
 
-        .event-date {
-            width: 110px;
-            min-width: 110px;
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--accent) !important;
+        }
+
+        .nav-link {
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        /* Container */
+        .container {
+            padding-top: 100px;
+            padding-bottom: 60px;
+        }
+
+        .page-header {
             text-align: center;
-            color: #111;
-            background: linear-gradient(180deg, #ffffff, #f1f1f1);
-            border-radius: 6px;
-            padding: 8px 6px;
-            font-weight: 700;
+            margin-bottom: 50px;
         }
-        .event-date .dia { font-size: 28px; color: #0a0a0a; }
-        .event-date .mes { font-size: 12px; color: #c63737; letter-spacing: 1px; }
-        .event-date .hora { font-size: 12px, color: #6b6b6b; }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Event Cards - Diseño moderno tipo tarjeta */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .event-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .event-header {
+            background: linear-gradient(135deg, var(--danger), #c63737);
+            padding: 20px;
+            text-align: center;
+        }
 
         .event-type {
-            font-weight: 800;
-            color: #e33e3e;
-            font-size: 22px;
-            flex: 0 0 160px;
-            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 10px;
         }
 
-        .event-teams {
-            flex: 1 1 auto;
+        .event-date-big {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .event-date-big .day {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .event-date-big .month-year {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .event-date-big .month {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .event-date-big .time {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .event-body {
+            padding: 25px;
+        }
+
+        .event-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .event-details {
+            margin-bottom: 20px;
+        }
+
+        .event-detail-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 18px;
-            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
         }
 
-        .event-teams .team { display:flex; align-items:center; gap:8px; }
-        .event-teams .team img { width:48px; height:48px; object-fit:contain; }
-        .event-teams .team-name { font-weight:700; font-size:18px; color:#ffffff; }
-        .event-teams .vs { font-weight:800; color:#ffd7a8; margin: 0 6px; }
+        .event-detail-item i {
+            width: 25px;
+            color: var(--accent);
+            margin-right: 10px;
+        }
 
-        .event-action { display:flex; flex-direction:column; align-items:flex-end; gap:6px; min-width:170px; }
-        .btn-cta {
-            background: #f5b400;
-            color: #1b1b1b;
-            font-weight: 800;
-            border-radius: 6px;
-            padding: 10px 18px;
-            text-decoration: none;
+        .event-footer {
+            padding: 0 25px 25px 25px;
+        }
+
+        .btn-buy {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            color: var(--primary);
             border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
-        .btn-cta:hover { filter: brightness(0.95); }
-        .promo { font-size: 12px; color: #ffefcf; font-weight:700; }
 
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            color: var(--primary);
+        }
+
+        .promo-badge {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            margin-top: 60px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .event-row { flex-direction: column; align-items: stretch; }
-            .event-type { order: 3; text-align: left; }
-            .event-action { align-items: stretch; flex-direction:row; justify-content:space-between; }
-            .event-date { width: 100%; display:flex; justify-content:space-between; padding:10px; }
-            .event-teams { justify-content:space-between; padding: 6px 0; }
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Barça Atlètic</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-shield-alt"></i> Barça Atlètic
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/eventos">Eventos</a>
+                    <a class="nav-link active" href="/eventos">
+                        <i class="fas fa-calendar-alt"></i> Eventos
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/tickets">Tickets</a>
+                    <a class="nav-link" href="/tickets">
+                        <i class="fas fa-ticket-alt"></i> Tickets
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/recordatorios">Recordatorios</a>
+                    <a class="nav-link" href="/recordatorios">
+                        <i class="fas fa-bell"></i> Recordatorios
+                    </a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+
+<!-- Main Content -->
 <div class="container">
-    <h1 th:text="${mensaje}" class="mb-3">Eventos</h1>
+    <div class="page-header">
+        <h1><i class="fas fa-calendar-star"></i> Próximos Eventos</h1>
+        <p>Descubre todos los partidos y eventos del Barça Atlètic</p>
+    </div>
 
-    <div class="events-list">
-
-        <!-- Fila por cada evento (estilo banner) -->
-        <div class="event-row" th:each="evento : ${eventos}">
-
-            <div class="event-date">
-                <div class="dia" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'dd') : (evento.fecha != null and #strings.length(evento.fecha) >= 2 ? #strings.substring(evento.fecha,0,2) : '')}">29</div>
-                <div class="mes" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'MMM').toUpperCase() : (evento.fecha != null and #strings.length(evento.fecha) >= 7 ? #strings.substring(evento.fecha,5,7) : '')}">NOV</div>
-                <div class="hora" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'HH:mm') : (evento.fecha != null and #strings.length(evento.fecha) >= 16 ? #strings.substring(evento.fecha,11,16) : '')}">16:15</div>
-            </div>
-
-            <div class="event-type" th:text="${evento.tipo}">LALIGA</div>
-
-            <div class="event-teams">
-                <!-- Mostrar nombre y lugar del evento (propiedades disponibles en la entidad Evento) -->
-                <div class="team-info" style="text-align:center;">
-                    <div class="team-name" th:text="${evento.nombre}">Nombre del evento</div>
-                    <div class="team-place" style="font-size:14px; color:#ffd7a8;" th:text="${evento.lugar}">Lugar del evento</div>
+    <!-- Events Grid -->
+    <div class="events-grid">
+        <div class="event-card" th:each="evento : ${eventos}">
+            <div class="event-header">
+                <div class="event-type" th:text="${evento.tipo}">LALIGA</div>
+                <div class="event-date-big">
+                    <span class="day" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'dd') : (evento.fecha != null and #strings.length(evento.fecha) >= 2 ? #strings.substring(evento.fecha,0,2) : '')}">24</span>
+                    <div class="month-year">
+                        <span class="month" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'MMM') : (evento.fecha != null and #strings.length(evento.fecha) >= 7 ? #strings.substring(evento.fecha,5,7) : '')}">DIC</span>
+                        <span class="time" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'HH:mm') : (evento.fecha != null and #strings.length(evento.fecha) >= 16 ? #strings.substring(evento.fecha,11,16) : '')}">19:00</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="event-action">
-                <a class="btn-cta" th:href="@{/eventos/{id}/comprar(id=${evento.id})}" target="_blank">Ver entradas</a>
-                <div class="promo" th:if="${evento.codigoPromo != null}" th:text="'-' + ${evento.descuento} + '% CÓDIGO: ' + ${evento.codigoPromo}">-15% CÓDIGO: BLACKFRIDAY</div>
+            <div class="event-body">
+                <h3 class="event-name" th:text="${evento.nombre}">
+                    Barça Atlètic vs Real Madrid Castilla
+                </h3>
+
+                <div class="event-details">
+                    <div class="event-detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${evento.lugar}">Estadi Johan Cruyff</span>
+                    </div>
+                    <div class="event-detail-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span th:text="${evento.descripcion}">Partido de Primera Federación</span>
+                    </div>
+                </div>
+
+                <div th:if="${evento.codigoPromo != null}">
+                        <span class="promo-badge">
+                            <i class="fas fa-tag"></i>
+                            <span th:text="'-' + ${evento.descuento} + '% ' + ${evento.codigoPromo}">-15% BLACKFRIDAY</span>
+                        </span>
+                </div>
             </div>
 
+            <div class="event-footer">
+                <a class="btn btn-buy" th:href="@{/eventos/{id}/comprar(id=${evento.id})}">
+                    <i class="fas fa-ticket-alt me-2"></i>Comprar Entradas
+                </a>
+            </div>
         </div>
+    </div>
 
-        <!-- Mensaje si no hay eventos -->
-        <div th:if="${#lists.isEmpty(eventos)}" class="text-white">No hay eventos disponibles.</div>
-
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(eventos)}" class="empty-state">
+        <i class="fas fa-calendar-times"></i>
+        <h3>No hay eventos disponibles</h3>
+        <p>Vuelve pronto para ver los próximos partidos</p>
     </div>
 </div>
-<footer>Contenido estático del pie de página</footer>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

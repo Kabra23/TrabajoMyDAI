@@ -3,139 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Inicial - TrabajoMyDAI</title>
-    <!-- Bootstrap CSS -->
+    <title>Barça Athletic Hub - Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #ffd700;
+            --text-light: #e3e3e3;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: #fff;
             min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .navbar, .navbar-brand, .nav-link {
+
+        /* Navbar mejorado */
+        .navbar {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent-color) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
             color: #fff !important;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s ease;
         }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Hero section mejorado */
         .hero {
-            padding: 100px 0;
+            padding: 120px 0 80px 0;
             text-align: center;
+            position: relative;
         }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            font-weight: 800;
             margin-bottom: 20px;
             color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 1s ease;
         }
+
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 40px;
-            color: #e3e3e3;
+            color: var(--text-light);
+            animation: fadeInUp 1s ease;
         }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Botones mejorados */
         .btn-custom {
-            background-color: #283593;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #ffed4e 100%);
+            color: var(--primary-color);
             border: none;
-            padding: 10px 30px;
+            padding: 12px 35px;
             font-size: 1.1rem;
-            color: #fff;
+            font-weight: 600;
+            border-radius: 50px;
+            margin: 0 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
+
         .btn-custom:hover {
-            background-color: #1a237e;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-custom {
+            background: transparent;
             color: #fff;
+            border: 2px solid #fff;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            margin: 0 8px;
+            transition: all 0.3s ease;
         }
+
+        .btn-outline-custom:hover {
+            background: #fff;
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Cards de características mejoradas */
         .features {
-            padding: 50px 0;
-            background-color: rgba(255, 255, 255, 0.08);
+            padding: 80px 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
         }
+
         .feature-card {
-            background-color: #fff;
-            color: #283593;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 10px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            color: var(--secondary-color);
+            border-radius: 20px;
+            padding: 35px 25px;
+            margin: 15px 0;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(40,53,147,0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            height: 100%;
         }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-card h3 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
         .feature-card h3 a {
-            color: #283593;
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
         }
-        .feature-card h3, .feature-card p {
-            color: #283593;
+
+        .feature-card h3 a:hover {
+            color: var(--primary-color);
         }
+
+        .feature-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Footer mejorado */
         footer {
             text-align: center;
-            padding: 20px 0;
-            background-color: #1a237e;
-            color: #fff;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-light);
+            margin-top: 60px;
+            backdrop-filter: blur(10px);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .btn-custom, .btn-outline-custom {
+                margin: 8px 0;
+                width: 80%;
+            }
+
+            .feature-card {
+                margin: 20px 0;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Barça Atlètic</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/eventos">Eventos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/tickets">Tickets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/recordatorios">Recordatorios</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="hero">
-        <h1 th:text="${mensaje}"></h1>
-        <p>Bienvenido a la plataforma de gestión de Barça Athletic Hub.</p>
-        <div th:if="${logueado == true}">
-            <a href="/tickets" class="btn btn-custom">Ver Tickets</a>
-            <a href="/recordatorios" class="btn btn-custom">Ver Recordatorios</a>
-            <a href="/logout" class="btn btn-custom">Cerrar Sesión</a>
-        </div>
-        <div th:if="${logueado != true}">
-            <a href="/login" class="btn btn-custom" style="margin-right:10px;">Iniciar Sesión</a>
-            <a href="/registro" class="btn btn-custom">Registrarse</a>
+<!-- Navbar mejorado -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-shield-alt"></i> Barça Atlètic
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/eventos">
+                        <i class="fas fa-calendar-alt"></i> Eventos
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${logueado == true}">
+                    <a class="nav-link" href="/tickets">
+                        <i class="fas fa-ticket-alt"></i> Tickets
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${logueado == true}">
+                    <a class="nav-link" href="/recordatorios">
+                        <i class="fas fa-bell"></i> Recordatorios
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
+</nav>
 
-    <section class="features">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <h3><a th:href="@{/eventos}" style="color:inherit; text-decoration:none;">Eventos</a></h3>
-                        <p>Organiza y administra tus eventos de manera eficiente.</p>
+<!-- Hero Section -->
+<div class="hero">
+    <div class="container">
+        <h1 th:text="${mensaje}">¡Bienvenido a Barça Athletic Hub!</h1>
+        <p>Tu plataforma completa para gestionar eventos, entradas y recordatorios del Barça Atlètic</p>
+
+        <div th:if="${logueado == true}">
+            <a href="/tickets" class="btn btn-custom">
+                <i class="fas fa-ticket-alt me-2"></i>Mis Tickets
+            </a>
+            <a href="/recordatorios" class="btn btn-custom">
+                <i class="fas fa-bell me-2"></i>Recordatorios
+            </a>
+            <a href="/logout" class="btn btn-outline-custom">
+                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+            </a>
+        </div>
+
+        <div th:if="${logueado != true}">
+            <a href="/login" class="btn btn-custom">
+                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+            </a>
+            <a href="/registro" class="btn btn-outline-custom">
+                <i class="fas fa-user-plus me-2"></i>Registrarse
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-check"></i>
                     </div>
+                    <h3>
+                        <a href="/eventos">Eventos</a>
+                    </h3>
+                    <p>Descubre y reserva entradas para todos los partidos del Barça Atlètic. No te pierdas ningún evento.</p>
                 </div>
-                <!-- Oculto las opciones de recordatorios y tickets si no está logueado -->
-                <div class="col-md-4" th:if="${logueado == true}">
-                    <div class="feature-card">
-                        <h3><a th:href="@{/recordatorios}" style="color:inherit; text-decoration:none;">Recordatorios</a></h3>
-                        <p>No olvides nada con nuestros recordatorios personalizados.</p>
+            </div>
+
+            <div class="col-md-4" th:if="${logueado == true}">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell-on"></i>
                     </div>
+                    <h3>
+                        <a href="/recordatorios">Recordatorios</a>
+                    </h3>
+                    <p>Configura alertas personalizadas para nunca olvidar tus eventos favoritos.</p>
                 </div>
-                <div class="col-md-4" th:if="${logueado == true}">
-                    <div class="feature-card">
-                        <h3><a th:href="@{/tickets}" style="color:inherit; text-decoration:none;">Tickets</a></h3>
-                        <p>Gestiona entradas y accesos fácilmente.</p>
+            </div>
+
+            <div class="col-md-4" th:if="${logueado == true}">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ticket-alt"></i>
                     </div>
+                    <h3>
+                        <a href="/tickets">Mis Tickets</a>
+                    </h3>
+                    <p>Gestiona todas tus entradas en un solo lugar. Acceso rápido y sencillo.</p>
+                </div>
+            </div>
+
+            <!-- Si no está logueado, mostrar solo eventos y dos llamadas a la acción -->
+            <div class="col-md-4" th:if="${logueado != true}">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>
+                        <a href="/registro">Crea tu Cuenta</a>
+                    </h3>
+                    <p>Regístrate para acceder a todas las funcionalidades y gestionar tus tickets.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4" th:if="${logueado != true}">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Beneficios Exclusivos</h3>
+                    <p>Accede a ofertas especiales, descuentos y contenido exclusivo para miembros.</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer class="bg-dark text-white text-center py-3">
-        <p>&copy; 2025 Barça Athletic Hub. Todos los derechos reservados.</p>
-    </footer>
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p>
+            <i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.
+        </p>
+    </div>
+</footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

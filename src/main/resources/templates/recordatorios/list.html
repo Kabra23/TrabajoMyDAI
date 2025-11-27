@@ -5,120 +5,451 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recordatorios - Barça Athletic Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #ffd700;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: #fff;
             min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .navbar, .navbar-brand, .nav-link {
-            color: #fff !important;
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .hero {
-            padding: 100px 0;
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--accent) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        .hero-section {
+            padding: 120px 0 40px 0;
             text-align: center;
         }
-        .hero h1 {
+
+        .hero-section h1 {
             font-size: 3rem;
-            margin-bottom: 20px;
-            color: #fff;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        .hero p {
+
+        .hero-section p {
             font-size: 1.2rem;
-            margin-bottom: 40px;
-            color: #e3e3e3;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 30px;
         }
-        .btn-custom {
-            background-color: #283593;
+
+        .btn-create {
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            color: var(--primary);
             border: none;
-            padding: 10px 30px;
+            padding: 12px 30px;
+            font-weight: 700;
+            border-radius: 25px;
             font-size: 1.1rem;
-            color: #fff;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
-        .btn-custom:hover {
-            background-color: #1a237e;
-            color: #fff;
+
+        .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
         }
-        .features {
-            padding: 50px 0;
-            background-color: rgba(255, 255, 255, 0.08);
+
+        .content-container {
+            padding: 40px 0 80px 0;
         }
-        .feature-card {
-            background-color: #fff;
-            color: #283593;
+
+        /* Recordatorio Card */
+        .reminder-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            border-left: 6px solid var(--accent);
+        }
+
+        .reminder-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .reminder-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 0;
+        }
+
+        .reminder-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .reminder-id {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .reminder-body {
+            padding: 25px;
+            color: var(--primary);
+        }
+
+        .reminder-event {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .reminder-message {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .reminder-message-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .reminder-message-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .reminder-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
             border-radius: 10px;
-            padding: 20px;
-            margin: 10px;
+        }
+
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 2px dashed #ddd;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .empty-state {
             text-align: center;
-            box-shadow: 0 2px 8px rgba(40,53,147,0.08);
+            padding: 80px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
         }
-        .feature-card h3 a {
-            color: #283593;
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 25px;
+            opacity: 0.5;
         }
-        .feature-card h3, .feature-card p {
-            color: #283593;
+
+        .empty-state h3 {
+            margin-bottom: 15px;
+            font-size: 2rem;
         }
+
+        .empty-state p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+
         footer {
             text-align: center;
-            padding: 20px 0;
-            background-color: #1a237e;
-            color: #fff;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Badge de estado */
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .status-upcoming {
+            background: linear-gradient(135deg, var(--success), #20c997);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .reminder-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .reminder-details {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Barça Atlètic</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-shield-alt"></i> Barça Atlètic
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/eventos">Eventos</a>
+                    <a class="nav-link" href="/eventos">
+                        <i class="fas fa-calendar-alt"></i> Eventos
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/tickets">Tickets</a>
+                    <a class="nav-link" href="/tickets">
+                        <i class="fas fa-ticket-alt"></i> Tickets
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/recordatorios">Recordatorios</a>
+                    <a class="nav-link active" href="/recordatorios">
+                        <i class="fas fa-bell"></i> Recordatorios
+                    </a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <h1 th:text="${mensaje}">Recordatorios</h1>
-    <div class="mb-3">
-        <a th:href="@{/recordatorios/crear}" class="btn btn-primary">Crear nuevo recordatorio</a>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1><i class="fas fa-bell-on"></i> Mis Recordatorios</h1>
+        <p>Mantente al día con todos tus eventos</p>
+        <a th:href="@{/recordatorios/crear}" class="btn btn-create">
+            <i class="fas fa-plus-circle me-2"></i>Crear Nuevo Recordatorio
+        </a>
+    </div>
+</section>
+
+<!-- Content Container -->
+<div class="container content-container">
+    <!-- Empty State -->
+    <div th:if="${recordatorios == null || #lists.isEmpty(recordatorios)}" class="empty-state">
+        <i class="fas fa-bell-slash"></i>
+        <h3>No tienes recordatorios</h3>
+        <p>Crea recordatorios para no perderte ningún evento importante</p>
+        <a th:href="@{/recordatorios/crear}" class="btn btn-create btn-lg">
+            <i class="fas fa-plus-circle me-2"></i>Crear Mi Primer Recordatorio
+        </a>
     </div>
 
-    <div th:if="${recordatorios == null || #lists.isEmpty(recordatorios)}">
-        <p>No tienes recordatorios.</p>
-    </div>
+    <!-- Recordatorios List -->
+    <div class="row" th:if="${recordatorios != null && !#lists.isEmpty(recordatorios)}">
+        <div class="col-lg-6" th:each="rec : ${recordatorios}">
+            <div class="reminder-card">
+                <div class="reminder-header">
+                    <div class="reminder-title">
+                        <div class="reminder-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div>
+                            <div class="reminder-id">
+                                <i class="fas fa-hashtag"></i>
+                                <span th:text="${rec.id_recordatorio}">001</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="status-badge status-upcoming">
+                            <i class="fas fa-check-circle me-1"></i>Activo
+                        </span>
+                </div>
 
-    <div class="row" th:if="${recordatorios != null}">
-        <div class="col-md-6" th:each="rec : ${recordatorios}">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Recordatorio <span th:text="${rec.id_recordatorio}"></span></h5>
-                    <p class="card-text">Usuario: <span th:text="${rec.usuario.nombre}">Usuario</span></p>
-                    <p class="card-text">Evento: <span th:text="${rec.evento.nombre}">Evento</span></p>
-                    <p class="card-text">Mensaje: <strong th:text="${rec.mensaje}">Mensaje</strong></p>
-                    <p class="card-text">Fecha del evento: <span th:text="${rec.evento.fecha}">Fecha evento</span></p>
-                    <p class="card-text">Fecha recordatorio: <span th:text="${#temporals.format(rec.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
-                    <form th:action="@{'/recordatorios/eliminar/' + ${rec.id_recordatorio}}" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                    </form>
+                <div class="reminder-body">
+                    <h3 class="reminder-event">
+                        <i class="fas fa-futbol me-2"></i>
+                        <span th:text="${rec.evento.nombre}">Nombre del Evento</span>
+                    </h3>
+
+                    <div class="reminder-message">
+                        <div class="reminder-message-label">
+                            <i class="fas fa-comment-dots me-1"></i>Mensaje
+                        </div>
+                        <div class="reminder-message-text" th:text="${rec.mensaje}">
+                            Recordar llevar la entrada
+                        </div>
+                    </div>
+
+                    <div class="reminder-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Fecha recordatorio</div>
+                                <div class="detail-value" th:text="${#temporals.format(rec.fecha, 'dd/MM/yyyy')}">
+                                    24/12/2025
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Hora</div>
+                                <div class="detail-value" th:text="${#temporals.format(rec.fecha, 'HH:mm')}">
+                                    18:00
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Fecha del evento</div>
+                                <div class="detail-value" th:text="${#temporals.format(rec.evento.fecha, 'dd/MM/yyyy')}">
+                                    25/12/2025
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Ubicación</div>
+                                <div class="detail-value" th:text="${rec.evento.lugar}">
+                                    Estadi Johan Cruyff
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reminder-actions">
+                        <form th:action="@{'/recordatorios/eliminar/' + ${rec.id_recordatorio}}" method="post" style="width: 100%;">
+                            <button type="submit" class="btn btn-delete"
+                                    onclick="return confirm('¿Estás seguro de que quieres eliminar este recordatorio?')">
+                                <i class="fas fa-trash-alt me-2"></i>Eliminar Recordatorio
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<footer>Contenido estático del pie de página</footer>
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
