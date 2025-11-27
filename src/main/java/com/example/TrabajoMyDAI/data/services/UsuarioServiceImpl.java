@@ -42,17 +42,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (usuario.getUsername().length() < 2) {
             throw new IllegalArgumentException("El nombre de usuario debe tener al menos 2 caracteres");
         }
-        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("El email no puede estar vacío");
-        }
-        if (!usuario.getEmail().contains("@")) {
-            throw new IllegalArgumentException("Formato de email inválido");
-        }
         if (usuario.getPassword() == null || usuario.getPassword().length() < 6) {
             throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
-        }
-        if (usuario.getRoles() == null || usuario.getRoles().trim().isEmpty()) {
-            usuario.setRoles("USER");
         }
         return usuarioRepository.save(usuario);
     }

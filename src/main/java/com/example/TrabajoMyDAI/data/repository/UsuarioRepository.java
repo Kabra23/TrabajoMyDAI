@@ -1,4 +1,3 @@
-// language: java
 package com.example.TrabajoMyDAI.data.repository;
 
 import com.example.TrabajoMyDAI.data.model.Usuario;

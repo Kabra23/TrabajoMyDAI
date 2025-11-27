@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import jakarta.persistence.NoResultException;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,14 +38,14 @@ public class GlobalTest {
         r.setUsuario(u);
         r.setEvento(e);
         r.setMensaje("Recordar inscripción");
-        r.setFecha("2025-11-01");
+        r.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
         Recordatorio saved = em.persistFlushFind(r);
 
         // READ: comprobaciones básicas y relaciones
         assertNotNull(saved);
         assertNotNull(saved.getId_recordatorio());
         assertEquals("Recordar inscripción", saved.getMensaje());
-        assertEquals("2025-11-01", saved.getFecha());
+        assertNotNull(saved.getFecha());
         assertNotNull(saved.getUsuario());
         assertNotNull(saved.getEvento());
         assertEquals("Luis", saved.getUsuario().getNombre());

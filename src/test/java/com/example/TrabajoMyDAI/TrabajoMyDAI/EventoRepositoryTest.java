@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +25,7 @@ public class EventoRepositoryTest {
     void testCreateEvento() {
         Evento e = new Evento();
         e.setNombre("Concierto");
-        e.setFecha("2025-12-01");
+        e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
         e.setLugar_evento("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
@@ -39,7 +40,7 @@ public class EventoRepositoryTest {
     void testReadEvento() {
         Evento e = new Evento();
         e.setNombre("Concierto");
-        e.setFecha("2025-12-01");
+        e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
         e.setLugar_evento("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
@@ -55,7 +56,7 @@ public class EventoRepositoryTest {
     void testReadAllEventos() {
         Evento e1 = new Evento();
         e1.setNombre("Concierto");
-        e1.setFecha("2025-12-01");
+        e1.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
         e1.setLugar_evento("Teatro Principal");
         e1.setDescripcion("Un gran concierto");
         e1.setTipo("Musical");
@@ -63,7 +64,7 @@ public class EventoRepositoryTest {
 
         Evento e2 = new Evento();
         e2.setNombre("Teatro");
-        e2.setFecha("2025-12-02");
+        e2.setFecha(LocalDateTime.parse("2025-12-02T00:00"));
         e2.setLugar_evento("Teatro Secundario");
         e2.setDescripcion("Obra de teatro");
         e2.setTipo("Teatro");
@@ -78,7 +79,7 @@ public class EventoRepositoryTest {
     void testUpdateEvento() {
         Evento e = new Evento();
         e.setNombre("Concierto");
-        e.setFecha("2025-12-01");
+        e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
         e.setLugar_evento("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
@@ -97,7 +98,7 @@ public class EventoRepositoryTest {
     void testDeleteEvento() {
         Evento e = new Evento();
         e.setNombre("Concierto");
-        e.setFecha("2025-12-01");
+        e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
         e.setLugar_evento("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");

@@ -5,6 +5,8 @@ import com.example.TrabajoMyDAI.data.model.Ticket;
 import com.example.TrabajoMyDAI.data.model.Usuario;
 import com.example.TrabajoMyDAI.data.repository.RecordatorioRepository;
 import com.example.TrabajoMyDAI.data.repository.TicketRepository;
+import com.example.TrabajoMyDAI.data.services.RecordatorioService;
+import com.example.TrabajoMyDAI.data.exceptions.ValidationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +21,14 @@ public class RecordatorioController {
 
     private final RecordatorioRepository recordatorioRepository;
     private final TicketRepository ticketRepository;
+    private final RecordatorioService recordatorioService;
 
     public RecordatorioController(RecordatorioRepository recordatorioRepository,
-                                  TicketRepository ticketRepository) {
+                                  TicketRepository ticketRepository,
+                                  RecordatorioService recordatorioService) {
         this.recordatorioRepository = recordatorioRepository;
         this.ticketRepository = ticketRepository;
+        this.recordatorioService = recordatorioService;
     }
 
     @GetMapping
@@ -73,21 +78,19 @@ public class RecordatorioController {
         }
         Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-        // Validate ticket ownership if ticketId provided
-        if (ticketId != null) {
-            Optional<Ticket> optionalTicket = ticketRepository.findById(ticketId);
-            if (optionalTicket.isEmpty() || !optionalTicket.get().getUsuario().getDni().equals(usuario.getDni())) {
-                model.addAttribute("error", "Ticket inválido o no pertenece al usuario");
-                return "recordatorios/crear";
-            }
-            recordatorioForm.setEvento(optionalTicket.get().getEvento());
+        try {
+            // usar el servicio para validar fecha actual y fecha del evento, y guardar
+            recordatorioService.crearRecordatorio(recordatorioForm, ticketId, usuario);
+        } catch (ValidationException ve) {
+            // preparar datos para volver a la vista de creación con el error
+            List<Ticket> tickets = ticketRepository.findByUsuario(usuario);
+            model.addAttribute("tickets", tickets);
+            model.addAttribute("recordatorioForm", recordatorioForm);
+            model.addAttribute("ticketId", ticketId);
+            model.addAttribute("error", ve.getMessage());
+            return "recordatorios/crear";
         }
 
-        // Set usuario owner
-        recordatorioForm.setUsuario(usuario);
-
-        // Save
-        recordatorioRepository.save(recordatorioForm);
         return "redirect:/recordatorios";
     }
 

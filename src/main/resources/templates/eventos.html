@@ -9,6 +9,76 @@
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }
         .container { padding-top: 60px; }
         .card { background-color: rgba(255,255,255,0.06); }
+
+        .events-list { margin-top: 24px; }
+        .event-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            border-left: 8px solid rgba(0,0,0,0.08);
+        }
+
+        .event-date {
+            width: 110px;
+            min-width: 110px;
+            text-align: center;
+            color: #111;
+            background: linear-gradient(180deg, #ffffff, #f1f1f1);
+            border-radius: 6px;
+            padding: 8px 6px;
+            font-weight: 700;
+        }
+        .event-date .dia { font-size: 28px; color: #0a0a0a; }
+        .event-date .mes { font-size: 12px; color: #c63737; letter-spacing: 1px; }
+        .event-date .hora { font-size: 12px; color: #6b6b6b; }
+
+        .event-type {
+            font-weight: 800;
+            color: #e33e3e;
+            font-size: 22px;
+            flex: 0 0 160px;
+            text-align: center;
+        }
+
+        .event-teams {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            color: #ffffff;
+        }
+
+        .event-teams .team { display:flex; align-items:center; gap:8px; }
+        .event-teams .team img { width:48px; height:48px; object-fit:contain; }
+        .event-teams .team-name { font-weight:700; font-size:18px; color:#ffffff; }
+        .event-teams .vs { font-weight:800; color:#ffd7a8; margin: 0 6px; }
+
+        .event-action { display:flex; flex-direction:column; align-items:flex-end; gap:6px; min-width:170px; }
+        .btn-cta {
+            background: #f5b400;
+            color: #1b1b1b;
+            font-weight: 800;
+            border-radius: 6px;
+            padding: 10px 18px;
+            text-decoration: none;
+            border: none;
+        }
+        .btn-cta:hover { filter: brightness(0.95); }
+        .promo { font-size: 12px; color: #ffefcf; font-weight:700; }
+
+        @media (max-width: 768px) {
+            .event-row { flex-direction: column; align-items: stretch; }
+            .event-type { order: 3; text-align: left; }
+            .event-action { align-items: stretch; flex-direction:row; justify-content:space-between; }
+            .event-date { width: 100%; display:flex; justify-content:space-between; padding:10px; }
+            .event-teams { justify-content:space-between; padding: 6px 0; }
+        }
     </style>
 </head>
 <body>
@@ -58,45 +128,44 @@
 <!--
     ==========================
     NUEVA SECCIÓN DE EVENTOS
-    (tarjetas + botón "Comprar entradas")
+    (banner horizontal por evento)
     ==========================
 -->
+
 <div class="container">
-    <h1 th:text="${mensaje}">Eventos</h1>
+    <h1 th:text="${mensaje}" class="mb-3">Eventos</h1>
 
-    <div class="row mt-4">
+    <div class="events-list">
 
-        <!-- Tarjeta por cada evento -->
-        <div class="col-md-4 mb-3" th:each="evento : ${eventos}">
-            <div class="card h-100 text-white">
-                <div class="card-body d-flex flex-column">
+        <!-- Fila por cada evento (estilo banner) -->
+        <div class="event-row" th:each="evento : ${eventos}">
 
-                    <!-- Tipo de evento (Liga, Amistoso, etc.) -->
-                    <span class="badge bg-info mb-2" th:text="${evento.tipo}">Liga</span>
+            <div class="event-date">
+                <div class="dia" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'dd') : (evento.fecha != null and #strings.length(evento.fecha) >= 2 ? #strings.substring(evento.fecha,0,2) : '')}">29</div>
+                <div class="mes" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'MMM').toUpperCase() : (evento.fecha != null and #strings.length(evento.fecha) >= 7 ? #strings.substring(evento.fecha,5,7) : '')}">NOV</div>
+                <div class="hora" th:text="${evento.fecha instanceof T(java.time.temporal.TemporalAccessor) ? #temporals.format(evento.fecha,'HH:mm') : (evento.fecha != null and #strings.length(evento.fecha) >= 16 ? #strings.substring(evento.fecha,11,16) : '')}">16:15</div>
+            </div>
 
-                    <h5 class="card-title" th:text="${evento.nombre}">Nombre Evento</h5>
-                    <p class="card-text" th:text="${evento.descripcion}">Descripción</p>
+            <div class="event-type" th:text="${evento.tipo}">LALIGA</div>
 
-                    <p class="card-text mt-auto">
-                        <small th:text="${evento.fecha} + ' · ' + ${evento.lugar}">
-                            Fecha · Lugar
-                        </small>
-                    </p>
-
-                    <!-- Botón para comprar entradas de ESTE evento -->
-                    <a class="btn btn-outline-light w-100 mt-2"
-                       th:href="@{/eventos/{id}/comprar(id=${evento.id})}"
-                       target="_blank">
-                        Comprar entradas
-                    </a>
+            <div class="event-teams">
+                <!-- Mostrar nombre y lugar del evento (propiedades disponibles en la entidad Evento) -->
+                <div class="team-info" style="text-align:center;">
+                    <div class="team-name" th:text="${evento.nombre}">Nombre del evento</div>
+                    <div class="team-place" style="font-size:14px; color:#ffd7a8;" th:text="${evento.lugar}">Lugar del evento</div>
                 </div>
             </div>
+
+            <div class="event-action">
+                <a class="btn-cta" th:href="@{/eventos/{id}/comprar(id=${evento.id})}" target="_blank">Ver entradas</a>
+                <div class="promo" th:if="${evento.codigoPromo != null}" th:text="'-' + ${evento.descuento} + '% CÓDIGO: ' + ${evento.codigoPromo}">-15% CÓDIGO: BLACKFRIDAY</div>
+            </div>
+
         </div>
 
         <!-- Mensaje si no hay eventos -->
-        <div th:if="${#lists.isEmpty(eventos)}">
-            No hay eventos disponibles.
-        </div>
+        <div th:if="${#lists.isEmpty(eventos)}" class="text-white">No hay eventos disponibles.</div>
+
     </div>
 </div>
 

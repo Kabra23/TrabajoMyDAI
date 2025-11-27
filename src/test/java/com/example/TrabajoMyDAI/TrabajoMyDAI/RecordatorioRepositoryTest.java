@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +38,7 @@ public class RecordatorioRepositoryTest {
         r.setUsuario(u);
         r.setEvento(e);
         r.setMensaje("Recordar inscripción");
-        r.setFecha("2025-11-01");
+        r.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
 
         Recordatorio saved = recordatorioRepository.save(r);
         assertNotNull(saved.getId_recordatorio());
@@ -61,7 +62,7 @@ public class RecordatorioRepositoryTest {
         r.setUsuario(u);
         r.setEvento(e);
         r.setMensaje("Recordar inscripción");
-        r.setFecha("2025-11-01");
+        r.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
         Recordatorio saved = em.persistFlushFind(r);
 
         Optional<Recordatorio> found = recordatorioRepository.findById(saved.getId_recordatorio());
@@ -85,14 +86,14 @@ public class RecordatorioRepositoryTest {
         r1.setUsuario(u);
         r1.setEvento(e);
         r1.setMensaje("Recordar inscripción");
-        r1.setFecha("2025-11-01");
+        r1.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
         recordatorioRepository.save(r1);
 
         Recordatorio r2 = new Recordatorio();
         r2.setUsuario(u);
         r2.setEvento(e);
         r2.setMensaje("Otro recordatorio");
-        r2.setFecha("2025-11-02");
+        r2.setFecha(LocalDateTime.parse("2025-11-02T00:00"));
         recordatorioRepository.save(r2);
 
         Iterable<Recordatorio> recordatorios = recordatorioRepository.findAll();
@@ -115,7 +116,7 @@ public class RecordatorioRepositoryTest {
         r.setUsuario(u);
         r.setEvento(e);
         r.setMensaje("Recordar inscripción");
-        r.setFecha("2025-11-01");
+        r.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
         Recordatorio saved = recordatorioRepository.save(r);
 
         saved.setMensaje("Recordar pago");
@@ -142,7 +143,7 @@ public class RecordatorioRepositoryTest {
         r.setUsuario(u);
         r.setEvento(e);
         r.setMensaje("Recordar inscripción");
-        r.setFecha("2025-11-01");
+        r.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
         Recordatorio saved = recordatorioRepository.save(r);
 
         recordatorioRepository.deleteById(saved.getId_recordatorio());
@@ -166,7 +167,7 @@ public class RecordatorioRepositoryTest {
         r.setUsuario(u);
         r.setEvento(e);
         r.setMensaje("Recordar inscripción");
-        r.setFecha("2025-11-01");
+        r.setFecha(LocalDateTime.parse("2025-11-01T00:00"));
 
         Recordatorio saved = em.persistFlushFind(r);
         assertNotNull(saved.getId_recordatorio());
