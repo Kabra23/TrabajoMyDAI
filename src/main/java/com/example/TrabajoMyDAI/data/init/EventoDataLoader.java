@@ -32,21 +32,21 @@ public class EventoDataLoader {
             e1.setNombre("Barça Atlètic vs Real Madrid Castilla");
             e1.setDescripcion("Partido de Primera Federación en el Estadi Johan Cruyff.");
             e1.setFecha(LocalDateTime.parse("2025-12-24 19:00", formatter));
-            e1.setLugar_evento("Estadi Johan Cruyff");
+            e1.setLugar("Estadi Johan Cruyff");
             e1.setTipo("Liga");
 
             Evento e2 = new Evento();
             e2.setNombre("Barça Atlètic vs Nàstic de Tarragona");
             e2.setDescripcion("Derbi catalán con ambiente familiar y promociones especiales.");
             e2.setFecha(LocalDateTime.parse("2025-12-25 17:00", formatter));
-            e2.setLugar_evento("Estadi Johan Cruyff");
+            e2.setLugar("Estadi Johan Cruyff");
             e2.setTipo("Liga");
 
             Evento e3 = new Evento();
             e3.setNombre("Barça Atlètic vs Selecció Juvenil");
             e3.setDescripcion("Partido amistoso de presentación de la temporada.");
             e3.setFecha(LocalDateTime.parse("2025-12-26 20:30", formatter));
-            e3.setLugar_evento("Ciutat Esportiva Joan Gamper");
+            e3.setLugar("Ciutat Esportiva Joan Gamper");
             e3.setTipo("Amistoso");
 
             eventoRepository.save(e1);

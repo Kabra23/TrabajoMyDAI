@@ -1,13 +1,13 @@
-package com.example.TrabajoMyDAI.data.services;
+package com. example.TrabajoMyDAI.data.services;
 
-import com.example.TrabajoMyDAI.data. exceptions.ValidationException;
-import com.example. TrabajoMyDAI.data.model.Evento;
+import com.example.TrabajoMyDAI.data.exceptions.ValidationException;
+import com. example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.repository.EventoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java. util.List;
-import java. util.Optional;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream. Collectors;
 import java.util.stream.StreamSupport;
 
@@ -80,7 +80,7 @@ public class EventoService {
         Evento evento = eventoExistente.get();
 
         // Validaciones y actualizaciones
-        if (eventoActualizado.getNombre() != null && !eventoActualizado.getNombre().trim().isEmpty()) {
+        if (eventoActualizado.getNombre() != null && ! eventoActualizado.getNombre().trim().isEmpty()) {
             evento.setNombre(eventoActualizado.getNombre());
         }
 
@@ -88,11 +88,12 @@ public class EventoService {
             if (eventoActualizado.getFecha().isBefore(LocalDateTime.now())) {
                 throw new ValidationException("La fecha del evento no puede ser anterior a la fecha actual.");
             }
-            evento.setFecha(eventoActualizado.getFecha());
+            evento. setFecha(eventoActualizado.getFecha());
         }
 
-        if (eventoActualizado.getLugar() != null && !eventoActualizado.getLugar().trim().isEmpty()) {
-            evento.setLugar_evento(eventoActualizado. getLugar());
+        // 🔧 CORREGIDO: Usar setLugar() en lugar de setLugar_evento()
+        if (eventoActualizado.getLugar() != null && !eventoActualizado.getLugar().trim(). isEmpty()) {
+            evento.setLugar(eventoActualizado.getLugar());
         }
 
         if (eventoActualizado.getDescripcion() != null) {
@@ -160,7 +161,7 @@ public class EventoService {
             return false;
         }
 
-        Evento evento = eventoOpt.get();
+        Evento evento = eventoOpt. get();
 
         if (evento.getCapacidad() == null) {
             return true; // Sin límite de capacidad
@@ -177,7 +178,7 @@ public class EventoService {
     public Integer obtenerPlazasDisponibles(Long eventoId) {
         Optional<Evento> eventoOpt = eventoRepository.findById(eventoId);
 
-        if (eventoOpt. isEmpty()) {
+        if (eventoOpt.isEmpty()) {
             throw new ValidationException("Evento no encontrado.");
         }
 

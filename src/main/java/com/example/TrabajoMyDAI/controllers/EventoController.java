@@ -1,44 +1,51 @@
-package com.example.TrabajoMyDAI.controllers;
+package com. example.TrabajoMyDAI.controllers;
 
-import com.example.TrabajoMyDAI.data.repository.EventoRepository;
+import com.example.TrabajoMyDAI. data.services.EventoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation. GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class EventoController {
 
-    private final EventoRepository eventoRepository;
+    private final EventoService eventoService;
 
-    public EventoController(EventoRepository eventoRepository) {
-        this.eventoRepository = eventoRepository;
+    public EventoController(EventoService eventoService) {
+        this.eventoService = eventoService;
     }
 
     @GetMapping("/noticias")
     public String noticias(Model model) {
-        var eventos = eventoRepository.findAll();
-        model.addAttribute("noticias", eventos);
+        model.addAttribute("noticias", eventoService.obtenerTodosLosEventos());
         model.addAttribute("mensaje", "Últimas noticias");
         return "noticias";
     }
 
     @GetMapping("/eventos")
     public String eventos(Model model) {
-        var eventos = eventoRepository.findAll();
-        model.addAttribute("eventos", eventos);
-        model.addAttribute("mensaje", "Lista de eventos");
+        model.addAttribute("eventos", eventoService.obtenerEventosFuturos());
+        model. addAttribute("mensaje", "Lista de eventos");
         return "eventos";
     }
 
     @GetMapping("/eventos/{id}/comprar")
-    public String mostrarFormularioCompra(@PathVariable("id") Long id,
-                                          Model model) {
-        var evento = eventoRepository.findById(id)
+    public String mostrarFormularioCompra(@PathVariable("id") Long id, Model model) {
+        var evento = eventoService.obtenerEventoPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 
         model.addAttribute("evento", evento);
         model.addAttribute("zonas", java.util.List.of("Tribuna", "Grada Lateral", "Gol Nord", "Gol Sud"));
+
+        // Agregar información de capacidad si existe
+        if (evento.getCapacidad() != null) {
+            Integer plazasDisponibles = eventoService.obtenerPlazasDisponibles(id);
+            model.addAttribute("plazasDisponibles", plazasDisponibles);
+            model.addAttribute("tieneCapacidad", true);
+        } else {
+            model.addAttribute("tieneCapacidad", false);
+        }
+
         return "comprar-ticket";
     }
 }

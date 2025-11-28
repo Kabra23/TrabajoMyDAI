@@ -1,8 +1,9 @@
 package com.example.TrabajoMyDAI.controllers;
 
-import com.example.TrabajoMyDAI.data.model. Evento;
-import com.example. TrabajoMyDAI.data.model.Usuario;
-import com.example.TrabajoMyDAI.data. repository.EventoRepository;
+import com.example.TrabajoMyDAI.data.exceptions.ValidationException;
+import com. example.TrabajoMyDAI.data.model.Evento;
+import com.example.TrabajoMyDAI.data.model.Usuario;
+import com.example.TrabajoMyDAI.data. services.EventoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,18 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
+import java. time.format.DateTimeFormatter;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminEventoController {
 
-    private final EventoRepository eventoRepository;
+    private final EventoService eventoService;
 
-    public AdminEventoController(EventoRepository eventoRepository) {
-        this.eventoRepository = eventoRepository;
+    public AdminEventoController(EventoService eventoService) {
+        this.eventoService = eventoService;
     }
 
     // Verificar si el usuario es admin
@@ -36,56 +35,116 @@ public class AdminEventoController {
             return "redirect:/";
         }
 
-        LinkedList<Evento> eventos = new LinkedList<>();
-        eventoRepository.findAll().forEach(eventos::add);
-        model.addAttribute("eventos", eventos);
+        model.addAttribute("eventos", eventoService. obtenerTodosLosEventos());
         model.addAttribute("esAdmin", true);
         model.addAttribute("logueado", true);
         return "admin-eventos";
     }
 
-
-    @GetMapping("/admin/eventos/crear")
-    public String mostrarFormularioCrearEvento(Model model) {
-        model.addAttribute("evento", new Evento());
-        String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-        model.addAttribute("minFecha", minFecha);
-        return "admin-crear-evento";
-    }
-
-    @PostMapping("/admin/eventos/crear")
-    public String crearEvento(@ModelAttribute Evento evento, Model model) {
-        // lógica de creación
-        return "redirect:/admin/eventos";
-    }
-
-
-
-    @PostMapping("/eventos/crear")
-    public String crearEvento(@ModelAttribute Evento evento, HttpSession session, Model model) {
+    @GetMapping("/eventos/crear")
+    public String mostrarFormularioCrearEvento(HttpSession session, Model model) {
         if (! esAdmin(session)) {
             return "redirect:/";
         }
 
+        model.addAttribute("evento", new Evento());
+        String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        model.addAttribute("minFecha", minFecha);
+        model.addAttribute("esAdmin", true);
+        model.addAttribute("logueado", true);
+        return "admin-crear-evento";
+    }
+
+    @PostMapping("/eventos/crear")
+    public String crearEvento(@ModelAttribute Evento evento, HttpSession session, Model model) {
+        if (!esAdmin(session)) {
+            return "redirect:/";
+        }
+
         try {
-            eventoRepository.save(evento);
-            return "redirect:/admin/eventos? success=creado";
+            eventoService.crearEvento(evento);
+            return "redirect:/admin/eventos?success=creado";
+        } catch (ValidationException ve) {
+            model.addAttribute("error", ve.getMessage());
+            model.addAttribute("evento", evento);
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("logueado", true);
+            String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            model.addAttribute("minFecha", minFecha);
+            return "admin-crear-evento";
         } catch (Exception e) {
             model.addAttribute("error", "Error al crear el evento: " + e.getMessage());
-            model.addAttribute("evento", evento);
-            model. addAttribute("esAdmin", true);
+            model. addAttribute("evento", evento);
+            model.addAttribute("esAdmin", true);
             model.addAttribute("logueado", true);
+            String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            model.addAttribute("minFecha", minFecha);
             return "admin-crear-evento";
         }
     }
 
     @GetMapping("/eventos/eliminar/{id}")
-    public String eliminarEvento(@PathVariable Long id, HttpSession session) {
+    public String eliminarEvento(@PathVariable Long id, HttpSession session, Model model) {
+        if (! esAdmin(session)) {
+            return "redirect:/";
+        }
+
+        try {
+            eventoService.eliminarEvento(id);
+            return "redirect:/admin/eventos? success=eliminado";
+        } catch (ValidationException ve) {
+            return "redirect:/admin/eventos?error=" + ve.getMessage();
+        } catch (Exception e) {
+            return "redirect:/admin/eventos?error=Error al eliminar el evento";
+        }
+    }
+
+    @GetMapping("/eventos/editar/{id}")
+    public String mostrarFormularioEditarEvento(@PathVariable Long id, HttpSession session, Model model) {
         if (!esAdmin(session)) {
             return "redirect:/";
         }
 
-        eventoRepository.deleteById(id);
-        return "redirect:/admin/eventos?success=eliminado";
+        try {
+            Evento evento = eventoService. obtenerEventoPorId(id)
+                    .orElseThrow(() -> new ValidationException("Evento no encontrado"));
+
+            model.addAttribute("evento", evento);
+            String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            model.addAttribute("minFecha", minFecha);
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("logueado", true);
+            return "admin-editar-evento";
+        } catch (ValidationException ve) {
+            return "redirect:/admin/eventos?error=" + ve.getMessage();
+        }
+    }
+
+    @PostMapping("/eventos/editar/{id}")
+    public String editarEvento(@PathVariable Long id, @ModelAttribute Evento evento, HttpSession session, Model model) {
+        if (!esAdmin(session)) {
+            return "redirect:/";
+        }
+
+        try {
+            eventoService.actualizarEvento(id, evento);
+            return "redirect:/admin/eventos?success=actualizado";
+        } catch (ValidationException ve) {
+            model.addAttribute("error", ve.getMessage());
+            model.addAttribute("evento", evento);
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("logueado", true);
+            String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            model.addAttribute("minFecha", minFecha);
+            return "admin-editar-evento";
+        } catch (Exception e) {
+            model. addAttribute("error", "Error al actualizar el evento: " + e.getMessage());
+            model.addAttribute("evento", evento);
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("logueado", true);
+            String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            model.addAttribute("minFecha", minFecha);
+            return "admin-editar-evento";
+        }
     }
 }
