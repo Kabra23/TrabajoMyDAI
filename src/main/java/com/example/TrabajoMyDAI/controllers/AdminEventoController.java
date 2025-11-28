@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,17 +44,22 @@ public class AdminEventoController {
         return "admin-eventos";
     }
 
-    @GetMapping("/eventos/crear")
-    public String crearEventoForm(HttpSession session, Model model) {
-        if (!esAdmin(session)) {
-            return "redirect:/";
-        }
 
+    @GetMapping("/admin/eventos/crear")
+    public String mostrarFormularioCrearEvento(Model model) {
         model.addAttribute("evento", new Evento());
-        model.addAttribute("esAdmin", true);
-        model.addAttribute("logueado", true);
+        String minFecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        model.addAttribute("minFecha", minFecha);
         return "admin-crear-evento";
     }
+
+    @PostMapping("/admin/eventos/crear")
+    public String crearEvento(@ModelAttribute Evento evento, Model model) {
+        // lógica de creación
+        return "redirect:/admin/eventos";
+    }
+
+
 
     @PostMapping("/eventos/crear")
     public String crearEvento(@ModelAttribute Evento evento, HttpSession session, Model model) {

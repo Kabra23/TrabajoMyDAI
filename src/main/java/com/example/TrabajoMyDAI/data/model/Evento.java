@@ -1,4 +1,4 @@
-package com.example.TrabajoMyDAI.data.model;
+package com.example. TrabajoMyDAI.data.model;
 
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +28,9 @@ public class Evento {
 
     // Nuevo campo para codigo promocional esperado por Thymeleaf
     private String codigoPromo;
+
+    // NUEVO: Campo para capacidad máxima del evento
+    private Integer capacidad;
 
     public Evento() { }
 
@@ -59,6 +62,10 @@ public class Evento {
     public String getCodigoPromo() { return codigoPromo; }
     public void setCodigoPromo(String codigoPromo) { this.codigoPromo = codigoPromo; }
 
+    // NUEVO: Getter y setter para capacidad
+    public Integer getCapacidad() { return capacidad; }
+    public void setCapacidad(Integer capacidad) { this. capacidad = capacidad; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,15 +74,16 @@ public class Evento {
         return Objects.equals(id_evento, evento.id_evento) &&
                 Objects.equals(nombre_evento, evento.nombre_evento) &&
                 Objects.equals(fecha_evento, evento.fecha_evento) &&
-                Objects.equals(lugar_evento, evento.lugar_evento) &&
+                Objects. equals(lugar_evento, evento. lugar_evento) &&
                 Objects.equals(descripcion_evento, evento.descripcion_evento) &&
                 Objects.equals(tipo_evento, evento.tipo_evento) &&
-                Objects.equals(codigoPromo, evento.codigoPromo);
+                Objects.equals(codigoPromo, evento. codigoPromo) &&
+                Objects.equals(capacidad, evento.capacidad);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id_evento, nombre_evento, fecha_evento, lugar_evento, descripcion_evento, tipo_evento, codigoPromo);
+        return Objects.hash(id_evento, nombre_evento, fecha_evento, lugar_evento, descripcion_evento, tipo_evento, codigoPromo, capacidad);
     }
 
     @Override
@@ -89,6 +97,7 @@ public class Evento {
                 ", usuarios=" + usuarios +
                 ", tipo_evento='" + tipo_evento + '\'' +
                 ", codigoPromo='" + codigoPromo + '\'' +
+                ", capacidad=" + capacidad +
                 '}';
     }
 }

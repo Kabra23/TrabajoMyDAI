@@ -168,7 +168,10 @@
 
             <div class="mb-3">
                 <label for="fecha" class="form-label">Fecha y Hora *</label>
-                <input th:field="*{fecha}" type="datetime-local" class="form-control" id="fecha" required>
+                <!-- HTML -->
+                <input th:field="*{fecha}" type="datetime-local" class="form-control" id="fecha" required
+                       th:attr="min=${minFecha}" />
+
             </div>
 
             <div class="mb-3">
