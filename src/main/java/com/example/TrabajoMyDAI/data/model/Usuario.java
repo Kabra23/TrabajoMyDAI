@@ -47,6 +47,11 @@ public class Usuario {
         }
     }
 
+    // Método para verificar si el usuario es administrador
+    public boolean isAdmin() {
+        return this.roles != null && this.roles.contains("ADMIN");
+    }
+
     public Long getDni() {
         return dni;
     }

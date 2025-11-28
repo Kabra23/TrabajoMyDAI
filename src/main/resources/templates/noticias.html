@@ -3,71 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias - Barça Athletic Hub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Noticias Barça Atlètic</title>
     <style>
-        :root{
-            --primary:#1a237e; --secondary:#283593; --accent:#ffd700;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        body{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; min-height:100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar{ background: rgba(0,0,0,0.35) !important; backdrop-filter: blur(8px); }
-        .navbar-brand{ color:var(--accent) !important; font-weight:700; }
-        .container{ padding-top:110px; }
-        .page-header{ text-align:center; margin-bottom:30px; }
-        .card-news{ background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); color:var(--secondary); border-radius:14px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
-        .card-news h5{ font-weight:800; }
-        .card-news p{ color:#555; }
-        .empty-state{ text-align:center; padding:40px; background: rgba(255,255,255,0.06); border-radius:12px; }
-        footer{ text-align:center; padding:24px 0; background: rgba(0,0,0,0.35); margin-top:40px; }
-        @media (max-width:768px){ .container{ padding-top:90px; } }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #004D98, #A50044);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            background-color: #004D98;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #A50044;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .noticias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .noticia-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .noticia-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 77, 152, 0.3);
+        }
+
+        .noticia-imagen {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #004D98, #A50044);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+        }
+
+        .noticia-contenido {
+            padding: 20px;
+        }
+
+        .noticia-fecha {
+            color: #A50044;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .noticia-titulo {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #004D98;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .noticia-descripcion {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .noticia-link {
+            display: inline-block;
+            color: #004D98;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid #A50044;
+            transition: color 0.3s ease;
+        }
+
+        .noticia-link:hover {
+            color: #A50044;
+        }
+
+        footer {
+            background-color: #004D98;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
+<header>
+    <h1>⚽ Noticias Barça Atlètic</h1>
+    <p>Las últimas novedades del filial azulgrana</p>
+</header>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/"> <i class="fas fa-shield-alt"></i> Barça Atlètic</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/plantilla">Plantilla</a></li>
-                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
-                <li class="nav-item"><a class="nav-link active" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
-            </ul>
-        </div>
-    </div>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Inicio</a></li>
+        <li><a th:href="@{/noticias}">Noticias</a></li>
+        <li><a th:href="@{/equipo}">Equipo</a></li>
+        <li><a th:href="@{/contacto}">Contacto</a></li>
+    </ul>
 </nav>
 
 <div class="container">
-    <div class="page-header">
-        <h1 th:text="${mensaje}">Noticias</h1>
-        <p>Últimas novedades y comunicados del Barça Atlètic</p>
-    </div>
+    <div class="noticias-grid">
+        <!-- Noticia 1 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">🏥</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">Noviembre 2025</div>
+                <h2 class="noticia-titulo">Ibrahim Diarra operado con éxito</h2>
+                <p class="noticia-descripcion">
+                    Ibrahim Diarra fue operado por una rotura muscular en el muslo derecho.
+                    Se espera que esté fuera aproximadamente cinco meses.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
 
-    <div th:if="${noticias == null || #lists.isEmpty(noticias)}" class="empty-state">
-        <i class="fas fa-newspaper fa-3x" style="opacity:0.6"></i>
-        <h3>No hay noticias disponibles</h3>
-        <p>Vuelve más tarde para ver actualizaciones</p>
-    </div>
+        <!-- Noticia 2 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">❌</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">16 Noviembre</div>
+                <h2 class="noticia-titulo">Espanyol B 1-0 Barça Atlètic</h2>
+                <p class="noticia-descripcion">
+                    El equipo perdió el derbi local en un partido difícil en el Estadio Dani Jarque.
+                    Una derrota que deja al equipo con ganas de revancha.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
 
-    <div class="row g-3" th:if="${noticias != null}">
-        <div class="col-md-6" th:each="evento : ${noticias}">
-            <div class="card-news">
-                <h5 th:text="${evento.nombre}">Título noticia</h5>
-                <p th:text="${evento.descripcion}">Descripción</p>
-                <small class="text-muted" th:text="${#temporals.format(evento.fecha,'dd MMM yyyy')} + ' · ' + ${evento.lugar}">Fecha · Lugar</small>
+        <!-- Noticia 3 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">🎉</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">9 Noviembre</div>
+                <h2 class="noticia-titulo">Barça Atlètic 4-1 Torrent</h2>
+                <p class="noticia-descripcion">
+                    Victoria cómoda que mueve al equipo al segundo lugar de la clasificación.
+                    Gran actuación del conjunto azulgrana en casa.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 4 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">⚖️</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">2 Noviembre</div>
+                <h2 class="noticia-titulo">Girona B 0-0 Barça Atlètic</h2>
+                <p class="noticia-descripcion">
+                    Ambos equipos sumaron un punto.  El Barça Atlètic perdió el primer lugar
+                    tras este empate sin goles en Girona.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 5 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">🟥</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">26 Octubre</div>
+                <h2 class="noticia-titulo">Empate 2-2 con compromiso</h2>
+                <p class="noticia-descripcion">
+                    El Barça Atlètic empató 2-2 a pesar de la expulsión de Joan Anaya.
+                    El equipo mostró carácter y compromiso en inferioridad numérica.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 6 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">😔</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">19 Octubre</div>
+                <h2 class="noticia-titulo">Derrota 3-2 en Camp d'Esport</h2>
+                <p class="noticia-descripcion">
+                    A pesar del buen esfuerzo del equipo, cayeron derrotados 3-2 en el
+                    Camp d'Esport. El conjunto mostró actitud pese al resultado.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 7 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">✍️</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">Octubre 2025</div>
+                <h2 class="noticia-titulo">Renovación de Landry hasta 2028</h2>
+                <p class="noticia-descripcion">
+                    El contrato de Landry fue extendido hasta 2028. Una gran noticia para
+                    el futuro del Barça Atlètic y la apuesta por el talento joven.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 8 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">🏥</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">Octubre 2025</div>
+                <h2 class="noticia-titulo">Alexis Olmedo operado con éxito</h2>
+                <p class="noticia-descripcion">
+                    Alexis Olmedo sufrió una rotura parcial de menisco y fue operado con éxito.
+                    El jugador trabajará para volver lo antes posible.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 9 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">💪</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">Noviembre 2025</div>
+                <h2 class="noticia-titulo">Belletti habla sobre el equipo</h2>
+                <p class="noticia-descripcion">
+                    El entrenador habló sobre cómo la plantilla está trabajando duro para
+                    recuperarse tras las derrotas y mantener actuaciones sólidas.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
+            </div>
+        </div>
+
+        <!-- Noticia 10 -->
+        <div class="noticia-card">
+            <div class="noticia-imagen">🔜</div>
+            <div class="noticia-contenido">
+                <div class="noticia-fecha">Próximamente</div>
+                <h2 class="noticia-titulo">Próximo partido vs Terrassa FC</h2>
+                <p class="noticia-descripcion">
+                    El siguiente partido es contra Terrassa FC. El equipo está determinado
+                    a volver a ganar en el Estadi Johan Cruyff.
+                </p>
+                <a href="#" class="noticia-link">Leer más →</a>
             </div>
         </div>
     </div>
 </div>
 
 <footer>
-    <div class="container"><p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p></div>
+    <p>&copy; 2025 Barça Atlètic - Noticias.  Todos los derechos reservados.</p>
 </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
