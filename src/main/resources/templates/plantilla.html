@@ -1,22 +1,140 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plantilla - Barça Athletic Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare. com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary:#1a237e; --secondary:#283593; --accent:#ffd700; }
-        body{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; min-height:100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar{ background: rgba(0,0,0,0.35) !important; backdrop-filter: blur(8px); }
-        .navbar-brand{ color:var(--accent) !important; font-weight:700; }
-        .container{ padding-top:110px; }
-        .stat { background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); color:var(--secondary); padding: 24px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); }
-        .stat h3{ font-size:2rem; font-weight:800; margin:0; }
-        .stat p{ margin:0; color:#666; }
-        footer{ text-align:center; padding:24px 0; background: rgba(0,0,0,0.35); margin-top:40px; }
-        @media (max-width:768px){ .container{ padding-top:90px; } }
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #ffd700;
+            --text-light: #e3e3e3;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: #fff;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(0, 0, 0, 0.3) ! important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0. 1);
+        }
+
+        . navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent-color) !important;
+            transition: transform 0.3s ease;
+        }
+
+        . navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Container */
+        .container {
+            padding-top: 120px;
+            padding-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Stats Cards */
+        .stat {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            color: var(--secondary-color);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .stat h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat p {
+            margin: 10px 0 0 0;
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-light);
+            margin-top: 60px;
+            backdrop-filter: blur(10px);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0. 95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding-top: 100px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            . stat h3 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -34,47 +152,58 @@
                 <li class="nav-item"><a class="nav-link active" href="/plantilla">Plantilla</a></li>
                 <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
 <div class="container">
-    <h1 class="mb-4" th:text="${mensaje}">Plantilla</h1>
-    <div class="row g-3">
-        <div class="col-md-3">
+    <h1 th:text="${mensaje}"><i class="fas fa-users"></i> Plantilla del Barça Atlètic</h1>
+
+    <div class="row">
+        <div class="col-md-4">
             <div class="stat">
-                <h3 th:text="${totalEventos}">0</h3>
-                <p>Eventos</p>
+                <h3><i class="fas fa-users me-3"></i>25</h3>
+                <p>Jugadores en Plantilla</p>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="stat">
-                <h3 th:text="${totalUsuarios}">0</h3>
-                <p>Usuarios</p>
+                <h3><i class="fas fa-trophy me-3"></i>12</h3>
+                <p>Victorias esta Temporada</p>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="stat">
-                <h3 th:text="${totalTickets}">0</h3>
-                <p>Tickets</p>
+                <h3><i class="fas fa-futbol me-3"></i>45</h3>
+                <p>Goles Anotados</p>
             </div>
         </div>
-        <div class="col-md-3">
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
             <div class="stat">
-                <h3 th:text="${totalRecordatorios}">0</h3>
-                <p>Recordatorios</p>
+                <h3 style="font-size: 1.5rem;"><i class="fas fa-info-circle me-3"></i>Información</h3>
+                <p style="margin-top: 15px; line-height: 1.8;">
+                    El Barça Atlètic es el equipo filial del FC Barcelona que compite en la Primera División RFEF.
+                    Aquí se forman las futuras estrellas del primer equipo con jugadores jóvenes de gran talento.
+                </p>
             </div>
         </div>
     </div>
 </div>
 
 <footer>
-    <div class="container"><p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p></div>
+    <div class="container">
+        <p>
+            <i class="fas fa-copyright"></i> 2025 Barça Athletic Hub.  Todos los derechos reservados.
+        </p>
+    </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min. js"></script>
 </body>
 </html>
