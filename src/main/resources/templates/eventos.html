@@ -237,7 +237,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <i class="fas fa-shield-alt"></i> Barça Atlètic
+            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;"> Barça Atlètic
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -291,10 +291,10 @@
                     </div>
                 </div>
 
-                <div th:if="${evento.codigoPromo != null}">
+                <div th:if="${evento.codigoPromo != null and !evento.codigoPromo.isEmpty()}">
                         <span class="promo-badge">
                             <i class="fas fa-tag"></i>
-                            <span th:text="'-' + ${evento.descuento} + '% ' + ${evento.codigoPromo}">-15% BLACKFRIDAY</span>
+                             <span th:text="${evento.codigoPromo}"></span>
                         </span>
                 </div>
             </div>
