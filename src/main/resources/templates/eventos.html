@@ -291,10 +291,10 @@
                     </div>
                 </div>
 
-                <div th:if="${evento.codigoPromo != null}">
+                <div th:if="${evento.codigoPromo != null and !evento.codigoPromo.isEmpty()}">
                         <span class="promo-badge">
                             <i class="fas fa-tag"></i>
-                            <span th:text="'-' + ${evento.descuento} + '% ' + ${evento.codigoPromo}">-15% BLACKFRIDAY</span>
+                            <span th:text="${evento.codigoPromo}">BLACKFRIDAY</span>
                         </span>
                 </div>
             </div>
