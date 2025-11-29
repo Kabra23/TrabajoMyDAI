@@ -135,6 +135,165 @@
                 font-size: 2rem;
             }
         }
+
+        /* Cards de jugadores */
+
+        .players-section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 40px 0 20px;
+        }
+
+        .player-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            color: var(--secondary-color);
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+            margin: 0 auto;
+            max-width: 340px;          /* evita que se estiren demasiado */
+        }
+
+
+        .player-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .player-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .player-card-body {
+            padding: 15px 18px 20px;
+        }
+
+        .player-card-body h5 {
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .player-meta {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .player-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+
+        /* Colores por posición */
+        .player-badge.pos-portero {
+            background: #ffd54f;
+            color: #333;
+        }
+
+        .player-badge.pos-defensa {
+            background: #42a5f5;
+            color: #fff;
+        }
+
+        .player-badge.pos-centrocampista {
+            background: #66bb6a;
+            color: #fff;
+        }
+
+        .player-badge.pos-delantero {
+            background: #ef5350;
+            color: #fff;
+        }
+
+        .team-banner {
+            max-width: 900px;
+            margin: 40px auto 10px;
+            padding: 20px 28px;
+            border-radius: 24px;
+            background: rgba(0, 0, 0, 0.25);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+        }
+
+        .team-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .team-banner-logo {
+            width: 110px;      /* ← aquí controlas el tamaño del escudo */
+            height: auto;
+            flex-shrink: 0;
+            border-radius: 18px;
+        }
+
+        .team-banner-title {
+            font-size: 2.3rem;  /* usa la misma tipografía que el body */
+            font-weight: 800;
+        }
+
+        .team-banner-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Opcional: en móviles, que se ponga en columna */
+        @media (max-width: 576px) {
+            .team-banner-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .team-banner-logo {
+                width: 90px;
+            }
+
+        }
+
+        .players-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-chip {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-chip:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .filter-chip.active {
+            background: #ffd700;
+            color: #1a237e;
+            border-color: #ffd700;
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -160,7 +319,10 @@
 </nav>
 
 <div class="container">
-    <h1 th:text="${mensaje}"><i class="fas fa-users"></i> Plantilla del Barça Atlètic</h1>
+    <h1>
+        <i class="fas fa-users"></i>
+        <span th:text="${mensaje}">Plantilla del Barça Atlètic</span>
+    </h1>
 
     <div class="row">
         <div class="col-md-4">
@@ -192,6 +354,114 @@
                     Aquí se forman las futuras estrellas del primer equipo con jugadores jóvenes de gran talento.
                 </p>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="team-banner mt-5">
+    <div class="team-banner-content">
+        <img src="/img/logo/logo.png"
+             alt="Escudo FC Barcelona"
+             class="team-banner-logo">
+
+        <div class="team-banner-text">
+            <h2 class="team-banner-title mb-1">Barça Atlètic</h2>
+            <p class="team-banner-subtitle mb-0">
+                Equipo filial del FC Barcelona · Primera Federación
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==========================
+     SECCIÓN DINÁMICA: JUGADORES
+========================== -->
+<div class="row mt-5 justify-content-center"
+     th:if="${jugadores != null and !#lists.isEmpty(jugadores)}">
+
+    <!-- Título centrado y contenido más estrecho -->
+    <div class="col-12 col-lg-10">
+        <h2 class="players-section-title text-center">
+            <i class="fas fa-shirt me-3"></i>Jugadores de la plantilla
+        </h2>
+
+        <!-- Para filtrar por posición -->
+        <div class="players-filter text-center mt-4 mb-3">
+            <a th:href="@{/plantilla}"
+               class="filter-chip"
+               th:classappend="${posicionSeleccionada} == 'Todos' ? ' active'">
+                Todos
+            </a>
+
+            <a th:href="@{/plantilla(posicion='Portero')}"
+               class="filter-chip"
+               th:classappend="${posicionSeleccionada} == 'Portero' ? ' active'">
+                Porteros
+            </a>
+
+            <a th:href="@{/plantilla(posicion='Defensa')}"
+               class="filter-chip"
+               th:classappend="${posicionSeleccionada} == 'Defensa' ? ' active'">
+                Defensas
+            </a>
+
+            <a th:href="@{/plantilla(posicion='Centrocampista')}"
+               class="filter-chip"
+               th:classappend="${posicionSeleccionada} == 'Centrocampista' ? ' active'">
+                Centrocampistas
+            </a>
+
+            <a th:href="@{/plantilla(posicion='Delantero')}"
+               class="filter-chip"
+               th:classappend="${posicionSeleccionada} == 'Delantero' ? ' active'">
+                Delanteros
+            </a>
+        </div>
+
+        <!-- Grid de jugadores centrado -->
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3"
+                 th:each="jugador : ${jugadores}">
+                <div class="player-card h-100">
+                    <img th:src="${jugador.imagenUrl}"
+                         th:alt="${jugador.nombre}">
+                    <div class="player-card-body">
+
+                        <span class="player-badge"
+                              th:classappend="' pos-' + ${#strings.toLowerCase(jugador.posicion)}"
+                              th:text="${jugador.posicion}">
+                            Centrocampista
+                        </span>
+
+                        <h5 th:text="${jugador.nombre}">Nombre jugador</h5>
+
+                        <p class="player-meta">
+                            <strong>Dorsal:</strong>
+                            <span th:text="${jugador.dorsal}">10</span>
+                        </p>
+                        <p class="player-meta">
+                            <strong>Edad:</strong>
+                            <span th:text="${jugador.edad}">21</span> años
+                        </p>
+                        <p class="player-meta">
+                            <strong>Nacionalidad:</strong>
+                            <span th:text="${jugador.nacionalidad}">España</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Mensaje si no hay jugadores -->
+<div class="row mt-5"
+     th:if="${jugadores == null or #lists.isEmpty(jugadores)}">
+    <div class="col-12">
+        <div class="stat text-center">
+            <p class="mb-0">No hay jugadores cargados todavía en la base de datos.</p>
         </div>
     </div>
 </div>
