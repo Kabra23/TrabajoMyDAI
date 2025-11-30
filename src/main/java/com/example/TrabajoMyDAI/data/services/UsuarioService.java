@@ -17,5 +17,10 @@ public interface UsuarioService {
     List<Usuario> buscarPorUsernameOEmail(String termino);
     Usuario actualizarUsuario(Long id, Usuario usuarioActualizado);
     boolean verificarPassword(Long id, String password);
+    
+    // New methods for admin protection
+    long contarAdmins();
+    boolean esUltimoAdmin(Long userId);
+    void eliminarUsuarioSeguro(Long idUsuarioAEliminar, Usuario usuarioSolicitante);
 
 }

@@ -239,7 +239,7 @@
             <a href="/cuenta/editar" class="btn btn-custom">
                 <i class="fas fa-edit me-2"></i>Editar Perfil
             </a>
-            <a href="/cuenta/eliminar" class="btn btn-danger-custom">
+            <a th:unless="${usuario.roles != null && usuario.roles.contains('ADMIN')}" href="/cuenta/eliminar" class="btn btn-danger-custom">
                 <i class="fas fa-trash-alt me-2"></i>Eliminar Cuenta
             </a>
         </div>
