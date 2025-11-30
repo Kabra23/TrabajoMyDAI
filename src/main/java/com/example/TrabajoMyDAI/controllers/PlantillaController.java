@@ -33,7 +33,7 @@ public class PlantillaController {
         // Verificar si el usuario está logueado
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
-
+        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());
         Iterable<Jugador> jugadores;
 
         if (posicion == null || posicion.isBlank() ||

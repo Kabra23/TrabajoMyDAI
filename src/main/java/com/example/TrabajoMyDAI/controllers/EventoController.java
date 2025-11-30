@@ -19,9 +19,9 @@ public class EventoController {
 
     @GetMapping("/noticias")
     public String noticias(Model model, HttpSession session) {
-        // Verificar si el usuario está logueado
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
+        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());  // ✅ AÑADIR ESTA LÍNEA
 
         model.addAttribute("noticias", eventoService.obtenerTodosLosEventos());
         model.addAttribute("mensaje", "Últimas noticias");
@@ -30,19 +30,17 @@ public class EventoController {
 
     @GetMapping("/eventos")
     public String eventos(Model model, HttpSession session) {
-        // Verificar si el usuario está logueado
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
+        model. addAttribute("esAdmin", usuario != null && usuario.isAdmin());  // ✅ AÑADIR ESTA LÍNEA
 
         model.addAttribute("eventos", eventoService.obtenerEventosFuturos());
         model.addAttribute("mensaje", "Lista de eventos");
         return "eventos";
     }
-
     @GetMapping("/eventos/{id}/comprar")
     public String mostrarFormularioCompra(@PathVariable("id") Long id, Model model, HttpSession session) {
-        // Verificar si el usuario está logueado
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session. getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
 
         var evento = eventoService.obtenerEventoPorId(id)
@@ -60,6 +58,7 @@ public class EventoController {
             model.addAttribute("tieneCapacidad", false);
         }
 
+        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());  // ✅ AÑADIR
         return "comprar-ticket";
     }
 }

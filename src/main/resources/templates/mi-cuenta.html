@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - Barça Athletic Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #ffd700;
+            --text-light: #e3e3e3;
+            --admin-color: #dc3545;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent-color) !important;
+        }
+
+        .nav-link {
+            color: #fff !important;
+            margin: 0 10px;
+        }
+
+        .nav-link.admin-link {
+            color: var(--admin-color) !important;
+            font-weight: 600;
+        }
+
+        .account-container {
+            padding: 120px 20px 50px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .account-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .account-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .account-header h1 {
+            color: var(--secondary-color);
+            font-weight: 800;
+        }
+
+        .avatar-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .profile-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .profile-value {
+            color: #555;
+        }
+
+        .badge-admin {
+            background: var(--admin-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .badge-user {
+            background: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #ffed4e 100%);
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            color: var(--primary-color);
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, var(--admin-color) 0%, #ff4757 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+            color: #fff;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;"> Barça Atlètic
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="/eventos">Eventos</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
+                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users"></i> Admin Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/cuenta/perfil"><i class="fas fa-user"></i> Mi Cuenta</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="account-container">
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="account-card">
+        <div class="account-header">
+            <div class="avatar-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h1>Mi Cuenta</h1>
+            <p class="text-muted">Información de tu perfil</p>
+        </div>
+
+        <div class="profile-info">
+            <div class="profile-row">
+                <span class="profile-label"><i class="fas fa-id-card me-2"></i>ID:</span>
+                <span class="profile-value" th:text="${usuario.dni}"></span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label"><i class="fas fa-user me-2"></i>Nombre:</span>
+                <span class="profile-value" th:text="${usuario.nombre}"></span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label"><i class="fas fa-at me-2"></i>Usuario:</span>
+                <span class="profile-value" th:text="${usuario.username}"></span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label"><i class="fas fa-envelope me-2"></i>Email:</span>
+                <span class="profile-value" th:text="${usuario.email}"></span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label"><i class="fas fa-shield-alt me-2"></i>Rol:</span>
+                <span class="profile-value">
+                    <span th:if="${usuario.roles != null && usuario.roles.contains('ADMIN')}" class="badge badge-admin text-white">
+                        <i class="fas fa-shield-alt"></i> Administrador
+                    </span>
+                    <span th:unless="${usuario.roles != null && usuario.roles.contains('ADMIN')}" class="badge badge-user text-white">
+                        <i class="fas fa-user"></i> Usuario
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/cuenta/editar" class="btn btn-custom">
+                <i class="fas fa-edit me-2"></i>Editar Perfil
+            </a>
+            <a href="/cuenta/eliminar" class="btn btn-danger-custom">
+                <i class="fas fa-trash-alt me-2"></i>Eliminar Cuenta
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

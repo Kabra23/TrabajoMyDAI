@@ -42,6 +42,11 @@
             transform: scale(1.05);
         }
 
+        .nav-link.admin-link {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+
         .nav-link {
             color: #fff !important;
             margin: 0 10px;
@@ -179,6 +184,7 @@
             margin: 0;
             font-size: 0.9rem;
         }
+
     </style>
 </head>
 <body>
@@ -192,10 +198,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/plantilla">Plantilla</a></li>
-                <li class="nav-item"><a class="nav-link" href="/eventos">Eventos</a></li>
-                <li class="nav-item"><a class="nav-link" href="/noticias">Noticias</a></li>
-                <li class="nav-item"><a class="nav-link" href="/registro">Registro</a></li>
+                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="/plantilla"><i class="fas fa-users"></i> Plantilla</a></li>
+                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
+                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
             </ul>
         </div>
     </div>

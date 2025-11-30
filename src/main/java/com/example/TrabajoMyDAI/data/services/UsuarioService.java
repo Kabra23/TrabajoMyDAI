@@ -10,4 +10,12 @@ public interface UsuarioService {
     Optional<Usuario> encontrarPorId(Long id);
     Usuario guardar(Usuario usuario);
     void eliminarPorId(Long id);
+
+    // Additional methods for admin and profile management
+    Optional<Usuario> encontrarPorUsername(String username);
+    Optional<Usuario> encontrarPorEmail(String email);
+    List<Usuario> buscarPorUsernameOEmail(String termino);
+    Usuario actualizarUsuario(Long id, Usuario usuarioActualizado);
+    boolean verificarPassword(Long id, String password);
+
 }
