@@ -247,8 +247,10 @@
                 <li class="nav-item"><a class="nav-link" href="/plantilla">Plantilla</a></li>
                 <li class="nav-item"><a class="nav-link active" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets">Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios">Recordatorios</a></li>
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login">Iniciar Sesión</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
             </ul>
         </div>
     </div>

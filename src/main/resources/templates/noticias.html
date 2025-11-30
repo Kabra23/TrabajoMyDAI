@@ -11,6 +11,9 @@
             --primary: #1a237e;
             --secondary: #283593;
             --accent: #ffd700;
+            --additional-color1: #color_value1; /* Replace with actual value from eventos.html */
+            --additional-color2: #color_value2; /* Replace with actual value from eventos.html */
+            /* Add more additional colors as needed */
         }
 
         * {
@@ -20,10 +23,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
         }
 
         /* Navbar */
@@ -62,7 +62,7 @@
             font-size: 3rem;
             font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 4px rgba(217, 6, 6, 0.3);
         }
 
         .page-header p {
@@ -177,8 +177,10 @@
                 <li class="nav-item"><a class="nav-link" href="/plantilla">Plantilla</a></li>
                 <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                 <li class="nav-item"><a class="nav-link active" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li class="nav-item"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                <li class="nav-item"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets">Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios">Recordatorios</a></li>
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login">Iniciar Sesión</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
             </ul>
         </div>
     </div>
