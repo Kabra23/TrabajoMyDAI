@@ -2,6 +2,7 @@ package com.example.TrabajoMyDAI.controllers;
 
 import com.example.TrabajoMyDAI.data.model.Usuario;
 import com.example.TrabajoMyDAI.data.services.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -117,13 +118,31 @@ public class AdminUsuarioController {
 
     @PostMapping("/usuarios/editar/{id}")
     public String editarUsuario(@PathVariable Long id, @ModelAttribute Usuario usuario,
-                                HttpSession session, RedirectAttributes redirectAttributes) {
+                                HttpSession session, RedirectAttributes redirectAttributes,
+                                HttpServletRequest request) {
         if (!esAdmin(session)) {
             return "redirect:/";
         }
 
         try {
-            usuarioService.actualizarUsuario(id, usuario);
+            Usuario actualizado = usuarioService.actualizarUsuario(id, usuario);
+
+            Usuario usuarioLogueado = getUsuarioLogueado(session);
+            if (usuarioLogueado != null && usuarioLogueado.getDni().equals(id)) {
+                session.setAttribute("usuario", actualizado);
+                session.setAttribute("esAdmin", actualizado.isAdmin());
+            }
+
+            // Si se está editando el usuario logueado actualmente
+            if (usuarioLogueado != null && usuarioLogueado.getDni().equals(id)) {
+                // Actualizar el usuario en sesión
+                Optional<Usuario> usuarioActualizado = usuarioService.encontrarPorId(id);
+                if (usuarioActualizado.isPresent()) {
+                    session.setAttribute("usuario", usuarioActualizado.get());
+                    session.setAttribute("esAdmin", usuarioActualizado.get().isAdmin());
+                }
+            }
+
             redirectAttributes.addFlashAttribute("success", "Usuario actualizado exitosamente");
             return "redirect:/admin/usuarios";
         } catch (IllegalArgumentException e) {
@@ -147,7 +166,7 @@ public class AdminUsuarioController {
         }
 
         try {
-            usuarioService.eliminarPorId(id);
+            usuarioService.eliminarUsuarioSeguro(id, usuarioLogueado);
             redirectAttributes.addFlashAttribute("success", "Usuario eliminado exitosamente");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

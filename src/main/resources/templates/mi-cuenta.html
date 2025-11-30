@@ -239,9 +239,14 @@
             <a href="/cuenta/editar" class="btn btn-custom">
                 <i class="fas fa-edit me-2"></i>Editar Perfil
             </a>
-            <a href="/cuenta/eliminar" class="btn btn-danger-custom">
+            <!-- Solo mostrar el botón de eliminar si NO es administrador -->
+            <a th:unless="${usuario.roles != null && usuario.roles.contains('ADMIN')}" href="/cuenta/eliminar" class="btn btn-danger-custom">
                 <i class="fas fa-trash-alt me-2"></i>Eliminar Cuenta
             </a>
+            <div th:if="${usuario.isAdmin()}" class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                Las cuentas de administrador no pueden ser eliminadas desde aquí por seguridad.
+            </div>
         </div>
     </div>
 </div>

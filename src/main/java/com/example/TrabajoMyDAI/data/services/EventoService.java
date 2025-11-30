@@ -67,10 +67,11 @@ public class EventoService {
         return eventoRepository.findById(id);
     }
 
-    /**
-     * Actualizar un evento existente
-     */
     public Evento actualizarEvento(Long id, Evento eventoActualizado) {
+        if (eventoActualizado == null) {
+            throw new ValidationException("Los datos del evento no pueden ser nulos.");
+        }
+
         Optional<Evento> eventoExistente = eventoRepository.findById(id);
 
         if (eventoExistente.isEmpty()) {
@@ -79,8 +80,8 @@ public class EventoService {
 
         Evento evento = eventoExistente.get();
 
-        // Validaciones y actualizaciones
-        if (eventoActualizado.getNombre() != null && ! eventoActualizado.getNombre().trim().isEmpty()) {
+        // Validaciones y actualizaciones con verificación de null
+        if (eventoActualizado.getNombre() != null && !eventoActualizado.getNombre().trim().isEmpty()) {
             evento.setNombre(eventoActualizado.getNombre());
         }
 
@@ -88,35 +89,33 @@ public class EventoService {
             if (eventoActualizado.getFecha().isBefore(LocalDateTime.now())) {
                 throw new ValidationException("La fecha del evento no puede ser anterior a la fecha actual.");
             }
-            evento. setFecha(eventoActualizado.getFecha());
+            evento.setFecha(eventoActualizado.getFecha());
         }
 
-        // 🔧 CORREGIDO: Usar setLugar() en lugar de setLugar_evento()
-        if (eventoActualizado.getLugar() != null && !eventoActualizado.getLugar().trim(). isEmpty()) {
+        if (eventoActualizado.getLugar() != null && !eventoActualizado.getLugar().trim().isEmpty()) {
             evento.setLugar(eventoActualizado.getLugar());
         }
 
         if (eventoActualizado.getDescripcion() != null) {
-            evento.setDescripcion(eventoActualizado. getDescripcion());
+            evento.setDescripcion(eventoActualizado.getDescripcion());
         }
 
-        if (eventoActualizado.getTipo() != null) {
+        // ✅ Protección adicional para tipo
+        if (eventoActualizado.getTipo() != null && !eventoActualizado.getTipo().trim().isEmpty()) {
             evento.setTipo(eventoActualizado.getTipo());
         }
 
-        if (eventoActualizado.getCodigoPromo() != null) {
+        if (eventoActualizado.getCodigoPromo() != null && !eventoActualizado.getCodigoPromo().trim().isEmpty()) {
             evento.setCodigoPromo(eventoActualizado.getCodigoPromo());
         }
 
-        if (eventoActualizado.getCapacidad() != null) {
-            if (eventoActualizado.getCapacidad() <= 0) {
-                throw new ValidationException("La capacidad debe ser mayor que 0.");
-            }
+        if (eventoActualizado.getCapacidad() != null && eventoActualizado.getCapacidad() > 0) {
             evento.setCapacidad(eventoActualizado.getCapacidad());
         }
 
         return eventoRepository.save(evento);
     }
+
 
     /**
      * Eliminar un evento por ID

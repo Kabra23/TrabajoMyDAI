@@ -18,4 +18,7 @@ public interface UsuarioService {
     Usuario actualizarUsuario(Long id, Usuario usuarioActualizado);
     boolean verificarPassword(Long id, String password);
 
+    long contarAdmins();
+    boolean esUltimoAdmin(Long userId);
+    void eliminarUsuarioSeguro(Long idUsuarioAEliminar, Usuario usuarioSolicitante);
 }

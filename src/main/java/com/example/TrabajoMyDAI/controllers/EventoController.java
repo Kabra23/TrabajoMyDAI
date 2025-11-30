@@ -1,5 +1,6 @@
 package com.example.TrabajoMyDAI.controllers;
 
+import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.model.Usuario;
 import com.example.TrabajoMyDAI.data.services.EventoService;
 import jakarta.servlet.http.HttpSession;
@@ -21,7 +22,7 @@ public class EventoController {
     public String noticias(Model model, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
-        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());  // ✅ AÑADIR ESTA LÍNEA
+        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());
 
         model.addAttribute("noticias", eventoService.obtenerTodosLosEventos());
         model.addAttribute("mensaje", "Últimas noticias");
@@ -32,15 +33,16 @@ public class EventoController {
     public String eventos(Model model, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
-        model. addAttribute("esAdmin", usuario != null && usuario.isAdmin());  // ✅ AÑADIR ESTA LÍNEA
+        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());
 
         model.addAttribute("eventos", eventoService.obtenerEventosFuturos());
         model.addAttribute("mensaje", "Lista de eventos");
         return "eventos";
     }
+
     @GetMapping("/eventos/{id}/comprar")
     public String mostrarFormularioCompra(@PathVariable("id") Long id, Model model, HttpSession session) {
-        Usuario usuario = (Usuario) session. getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
 
         var evento = eventoService.obtenerEventoPorId(id)
@@ -49,7 +51,6 @@ public class EventoController {
         model.addAttribute("evento", evento);
         model.addAttribute("zonas", java.util.List.of("Tribuna", "Grada Lateral", "Gol Nord", "Gol Sud"));
 
-        // Agregar información de capacidad si existe
         if (evento.getCapacidad() != null) {
             Integer plazasDisponibles = eventoService.obtenerPlazasDisponibles(id);
             model.addAttribute("plazasDisponibles", plazasDisponibles);
@@ -58,7 +59,7 @@ public class EventoController {
             model.addAttribute("tieneCapacidad", false);
         }
 
-        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());  // ✅ AÑADIR
+        model.addAttribute("esAdmin", usuario != null && usuario.isAdmin());
         return "comprar-ticket";
     }
 }

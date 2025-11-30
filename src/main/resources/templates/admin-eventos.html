@@ -128,8 +128,10 @@
     <div th:if="${param.success}" class="alert alert-success" role="alert">
         <i class="fas fa-check-circle"></i>
         <span th:if="${param.success[0] == 'creado'}">Evento creado exitosamente</span>
+        <span th:if="${param.success[0] == 'actualizado'}">Evento actualizado exitosamente</span>
         <span th:if="${param.success[0] == 'eliminado'}">Evento eliminado exitosamente</span>
     </div>
+
 
     <div class="eventos-table">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -163,6 +165,10 @@
                     <td th:text="${evento.lugar}"></td>
                     <td th:text="${evento.tipo}"></td>
                     <td>
+                        <a th:href="@{/admin/eventos/editar/{id}(id=${evento.id})}"
+                           class="btn btn-sm btn-warning me-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
                         <a th:href="@{/admin/eventos/eliminar/{id}(id=${evento.id})}"
                            class="btn btn-sm btn-danger"
                            onclick="return confirm('¿Estás seguro de eliminar este evento?')">

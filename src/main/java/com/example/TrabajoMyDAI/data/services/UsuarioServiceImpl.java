@@ -50,13 +50,28 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public void eliminarPorId(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID de usuario inválido: " + id);
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent() && usuarioOpt.get().isAdmin()) {
+            if (contarAdmins() <= 1) {
+                throw new IllegalArgumentException("No se puede eliminar el último administrador del sistema");
+            }
         }
-        if (!usuarioRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuario con ID " + id + " no encontrado");
+        if (usuarioOpt. isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado");
         }
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioOpt.get();
+
+        if (usuario. isAdmin()) {
+            long cantidadAdmins = usuarioRepository.findAll().stream()
+                    .filter(Usuario::isAdmin)
+                    .count();
+
+            if (cantidadAdmins <= 1) {
+                throw new IllegalArgumentException("No se puede eliminar el último administrador del sistema");
+            }
+        }
+
+        usuarioRepository. deleteById(id);
     }
 
     @Override
@@ -85,21 +100,42 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario actualizarUsuario(Long id, Usuario usuarioActualizado) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID de usuario inválido: " + id);
+        Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
+        if (usuarioOptional.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado");
         }
 
-        Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario con ID " + id + " no encontrado"));
 
-        // Update fields if provided
-        if (usuarioActualizado.getUsername() != null && !usuarioActualizado.getUsername().trim().isEmpty()) {
-            if (usuarioActualizado.getUsername().length() < 2) {
-                throw new IllegalArgumentException("El nombre de usuario debe tener al menos 2 caracteres");
+        Usuario usuarioExistente = usuarioOptional.get();
+
+
+        if (usuarioActualizado.getRoles() != null) {
+            boolean eraAdmin = usuarioExistente.isAdmin();
+            boolean seraAdmin = usuarioActualizado.getRoles().contains("ADMIN");
+
+            // If user was admin and will not be admin anymore
+            if (eraAdmin && !seraAdmin) {
+                if (contarAdmins() <= 1) {
+                    throw new IllegalArgumentException("No se puede quitar el rol de administrador al último admin del sistema");
+                }
             }
-            // Check if username is already taken by another user
-            Optional<Usuario> existingWithUsername = usuarioRepository.findByUsername(usuarioActualizado.getUsername());
-            if (existingWithUsername.isPresent() && !existingWithUsername.get().getDni().equals(id)) {
+        }
+
+        if (usuarioExistente.isAdmin() && usuarioActualizado.getRoles() != null
+                && ! usuarioActualizado.getRoles().contains("ADMIN")) {
+
+            long cantidadAdmins = usuarioRepository.findAll().stream()
+                    .filter(Usuario::isAdmin)
+                    .count();
+
+            if (cantidadAdmins <= 1) {
+                throw new IllegalArgumentException("No se puede quitar el rol de administrador al último admin del sistema");
+            }
+        }
+
+        // Resto del código de actualización...
+        if (usuarioActualizado.getUsername() != null && ! usuarioActualizado.getUsername().equals(usuarioExistente.getUsername())) {
+            if (usuarioRepository.findByUsername(usuarioActualizado.getUsername()).isPresent()) {
                 throw new IllegalArgumentException("El nombre de usuario ya está en uso");
             }
             usuarioExistente.setUsername(usuarioActualizado.getUsername());
@@ -110,8 +146,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         if (usuarioActualizado.getEmail() != null && !usuarioActualizado.getEmail().trim().isEmpty()) {
-            // Check if email is already taken by another user
-            Optional<Usuario> existingWithEmail = usuarioRepository.findByEmail(usuarioActualizado.getEmail());
+            Optional<Usuario> existingWithEmail = usuarioRepository.findByEmail(usuarioActualizado. getEmail());
             if (existingWithEmail.isPresent() && !existingWithEmail.get().getDni().equals(id)) {
                 throw new IllegalArgumentException("El email ya está en uso");
             }
@@ -119,11 +154,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         if (usuarioActualizado.getRoles() != null) {
-            usuarioExistente.setRoles(usuarioActualizado.getRoles());
+            usuarioExistente.setRoles(usuarioActualizado. getRoles());
         }
 
-        // Only update password if a new one is provided
-        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().trim().isEmpty()) {
+        if (usuarioActualizado. getPassword() != null && !usuarioActualizado.getPassword(). trim().isEmpty()) {
             if (usuarioActualizado.getPassword().length() < 6) {
                 throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
             }
@@ -140,6 +174,46 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         Optional<Usuario> usuario = usuarioRepository.findById(id);
         return usuario.isPresent() && usuario.get().getPassword().equals(password);
+    }
+
+    @Override
+    public long contarAdmins() {
+        return usuarioRepository.countAdmins();
+    }
+
+    @Override
+    public boolean esUltimoAdmin(Long userId) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(userId);
+        if (usuarioOpt.isEmpty() || !usuarioOpt.get().isAdmin()) {
+            return false;
+        }
+        return contarAdmins() <= 1;
+    }
+
+    @Override
+    public void eliminarUsuarioSeguro(Long idUsuarioAEliminar, Usuario usuarioSolicitante) {
+        if (idUsuarioAEliminar == null || idUsuarioAEliminar <= 0) {
+            throw new IllegalArgumentException("ID de usuario inválido: " + idUsuarioAEliminar);
+        }
+
+        Optional<Usuario> usuarioAEliminarOpt = usuarioRepository.findById(idUsuarioAEliminar);
+        if (usuarioAEliminarOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario con ID " + idUsuarioAEliminar + " no encontrado");
+        }
+
+        Usuario usuarioAEliminar = usuarioAEliminarOpt.get();
+
+        // Rule: Normal users cannot delete admin accounts
+        if (usuarioSolicitante != null && !usuarioSolicitante.isAdmin() && usuarioAEliminar.isAdmin()) {
+            throw new IllegalArgumentException("No tienes permisos para eliminar cuentas de administrador");
+        }
+
+        // Rule: Cannot delete last admin
+        if (usuarioAEliminar.isAdmin() && contarAdmins() <= 1) {
+            throw new IllegalArgumentException("No se puede eliminar el último administrador del sistema");
+        }
+
+        usuarioRepository.deleteById(idUsuarioAEliminar);
     }
 }
 
