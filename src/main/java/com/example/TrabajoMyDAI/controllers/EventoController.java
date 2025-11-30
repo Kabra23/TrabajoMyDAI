@@ -1,9 +1,11 @@
-package com. example.TrabajoMyDAI.controllers;
+package com.example.TrabajoMyDAI.controllers;
 
-import com.example.TrabajoMyDAI. data.services.EventoService;
+import com.example.TrabajoMyDAI.data.model.Usuario;
+import com.example.TrabajoMyDAI.data.services.EventoService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation. GetMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
@@ -16,21 +18,33 @@ public class EventoController {
     }
 
     @GetMapping("/noticias")
-    public String noticias(Model model) {
+    public String noticias(Model model, HttpSession session) {
+        // Verificar si el usuario está logueado
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("logueado", usuario != null);
+
         model.addAttribute("noticias", eventoService.obtenerTodosLosEventos());
         model.addAttribute("mensaje", "Últimas noticias");
         return "noticias";
     }
 
     @GetMapping("/eventos")
-    public String eventos(Model model) {
+    public String eventos(Model model, HttpSession session) {
+        // Verificar si el usuario está logueado
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("logueado", usuario != null);
+
         model.addAttribute("eventos", eventoService.obtenerEventosFuturos());
-        model. addAttribute("mensaje", "Lista de eventos");
+        model.addAttribute("mensaje", "Lista de eventos");
         return "eventos";
     }
 
     @GetMapping("/eventos/{id}/comprar")
-    public String mostrarFormularioCompra(@PathVariable("id") Long id, Model model) {
+    public String mostrarFormularioCompra(@PathVariable("id") Long id, Model model, HttpSession session) {
+        // Verificar si el usuario está logueado
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("logueado", usuario != null);
+
         var evento = eventoService.obtenerEventoPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 

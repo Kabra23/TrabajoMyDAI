@@ -1,4 +1,4 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -43,7 +43,7 @@
         }
 
         .nav-link {
-            color: #fff ! important;
+            color: #fff !important;
             margin: 0 10px;
             position: relative;
             transition: color 0.3s ease;
@@ -60,7 +60,7 @@
             transition: width 0.3s ease;
         }
 
-        . nav-link:hover::after {
+        .nav-link:hover::after {
             width: 100%;
         }
 
@@ -104,6 +104,24 @@
             box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
         }
 
+        /* Estilos para el botón de ver contraseña */
+        .password-toggle {
+            background: #f0f0f0;
+            color: var(--secondary-color);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .password-toggle:hover {
+            background: #e0e0e0;
+            color: var(--primary-color);
+        }
+
+        .password-toggle:focus {
+            box-shadow: none;
+        }
+
         .btn-custom {
             background: linear-gradient(135deg, var(--accent-color), #ffed4e);
             color: var(--primary-color);
@@ -140,7 +158,7 @@
             color: var(--primary-color);
         }
 
-        . alert {
+        .alert {
             margin-top: 15px;
             border-radius: 10px;
         }
@@ -177,7 +195,7 @@
                 <li class="nav-item"><a class="nav-link" href="/plantilla">Plantilla</a></li>
                 <li class="nav-item"><a class="nav-link" href="/eventos">Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" href="/noticias">Noticias</a></li>
-                <li class="nav-link" href="/registro">Registro</a></li>
+                <li class="nav-item"><a class="nav-link" href="/registro">Registro</a></li>
             </ul>
         </div>
     </div>
@@ -200,6 +218,9 @@
             <div class="input-group">
                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                 <input th:field="*{password}" type="password" class="form-control" id="password" required>
+                <button class="btn password-toggle" type="button" id="togglePassword">
+                    <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                </button>
             </div>
         </div>
         <button type="submit" class="btn btn-custom">
@@ -210,7 +231,7 @@
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
     <div class="extra-links">
-        <span>¿No tienes cuenta?  <a th:href="@{/registro}">Regístrate aquí</a></span>
+        <span>¿No tienes cuenta? <a th:href="@{/registro}">Regístrate aquí</a></span>
         <br>
         <a th:href="@{/}" class="btn btn-link">Volver a la página inicial</a>
     </div>
@@ -222,6 +243,27 @@
     </p>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3. 0/dist/js/bootstrap. bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Funcionalidad para mostrar/ocultar contraseña
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+    togglePassword.addEventListener('click', function() {
+        // Alternar entre tipo password y text
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+
+        // Cambiar el icono según el estado
+        if (type === 'text') {
+            togglePasswordIcon.classList.remove('fa-eye');
+            togglePasswordIcon.classList.add('fa-eye-slash');
+        } else {
+            togglePasswordIcon.classList.remove('fa-eye-slash');
+            togglePasswordIcon.classList.add('fa-eye');
+        }
+    });
+</script>
 </body>
 </html>

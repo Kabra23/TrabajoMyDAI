@@ -43,6 +43,7 @@ public class RecordatorioController {
         model.addAttribute("recordatorios", recordatorios);
         model.addAttribute("tickets", tickets);
         model.addAttribute("mensaje", "Lista de recordatorios");
+        model.addAttribute("logueado", true);  // ✅ AÑADIDO
         return "recordatorios/list";
     }
 
@@ -68,6 +69,7 @@ public class RecordatorioController {
         model.addAttribute("recordatorioForm", recordatorio);
         model.addAttribute("tickets", tickets);
         model.addAttribute("mensaje", "Crear recordatorio");
+        model.addAttribute("logueado", true);  // ✅ AÑADIDO
         return "recordatorios/crear";
     }
 
@@ -91,6 +93,7 @@ public class RecordatorioController {
             model.addAttribute("recordatorioForm", recordatorioForm);
             model.addAttribute("ticketId", ticketId);
             model.addAttribute("error", ve.getMessage());
+            model.addAttribute("logueado", true);  // ✅ AÑADIDO
             // asegurar minDate también cuando re-renderizamos la vista con error
             model.addAttribute("minDate", java.time.LocalDate.now().toString());
             return "recordatorios/crear";

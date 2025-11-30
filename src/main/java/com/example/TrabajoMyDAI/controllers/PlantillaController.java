@@ -1,9 +1,11 @@
 package com.example.TrabajoMyDAI.controllers;
 
 import com.example.TrabajoMyDAI.data.model.Evento;
+import com.example.TrabajoMyDAI.data.model.Usuario;
 import com.example.TrabajoMyDAI.data.repository.EventoRepository;
 import com.example.TrabajoMyDAI.data.repository.JugadorRepository;
 import com.example.TrabajoMyDAI.data.model.Jugador;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,30 +24,35 @@ public class PlantillaController {
 
     @GetMapping("/plantilla")
     public String verPlantilla(
-        @RequestParam(name = "posicion", required = false) String posicion,
-        Model model){
+            @RequestParam(name = "posicion", required = false) String posicion,
+            Model model,
+            HttpSession session) {
 
-            model.addAttribute("mensaje", "Plantilla del Barça Atlètic");
+        model.addAttribute("mensaje", "Plantilla del Barça Atlètic");
 
-            Iterable<Jugador> jugadores;
+        // Verificar si el usuario está logueado
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("logueado", usuario != null);
 
-            if (posicion == null || posicion.isBlank() ||
-                    posicion.equalsIgnoreCase("Todos")) {
+        Iterable<Jugador> jugadores;
 
-                jugadores = jugadorRepository.findAll();
-                model.addAttribute("posicionSeleccionada", "Todos");
-            } else {
-                jugadores = jugadorRepository.findByPosicionIgnoreCase(posicion);
-                model.addAttribute("posicionSeleccionada", posicion);
-            }
+        if (posicion == null || posicion.isBlank() ||
+                posicion.equalsIgnoreCase("Todos")) {
 
-            model.addAttribute("jugadores", jugadores);
-
-            Evento proximoEvento = obtenerProximoEvento();
-            model.addAttribute("proximoEvento", proximoEvento);
-
-            return "plantilla";
+            jugadores = jugadorRepository.findAll();
+            model.addAttribute("posicionSeleccionada", "Todos");
+        } else {
+            jugadores = jugadorRepository.findByPosicionIgnoreCase(posicion);
+            model.addAttribute("posicionSeleccionada", posicion);
         }
+
+        model.addAttribute("jugadores", jugadores);
+
+        Evento proximoEvento = obtenerProximoEvento();
+        model.addAttribute("proximoEvento", proximoEvento);
+
+        return "plantilla";
+    }
 
     private Evento obtenerProximoEvento() {
         Evento primero = null;
@@ -55,6 +62,4 @@ public class PlantillaController {
         }
         return primero;
     }
-    }
-
-
+}

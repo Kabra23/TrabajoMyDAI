@@ -30,6 +30,15 @@
             font-weight: 700;
         }
 
+        .nav-link {
+            color: #fff !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
         .container {
             padding-top: 110px;
         }
@@ -62,7 +71,6 @@
 </head>
 <body>
 
-<!-- Navbar inline -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -71,11 +79,14 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/plantilla">Plantilla</a></li>
-                <li class="nav-item"><a class="nav-link" href="/eventos">Eventos</a></li>
-                <li class="nav-item"><a class="nav-link" href="/noticias">Noticias</a></li>
-                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets">Tickets</a></li>
-                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios">Recordatorios</a></li>
+                <li class="nav-item"><a class="nav-link" href="/plantilla"><i class="fas fa-users"></i> Plantilla</a></li>
+                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
             </ul>
         </div>
     </div>
@@ -83,7 +94,7 @@
 
 <div class="container">
     <div class="card-form mt-4">
-        <h1 class="mb-3">Crear Recordatorio</h1>
+        <h1 class="mb-3"><i class="fas fa-bell-plus"></i> Crear Recordatorio</h1>
         <div th:if="${tickets != null and !#lists.isEmpty(tickets)}">
             <form th:action="@{/recordatorios}" th:object="${recordatorioForm}" method="post" class="mt-2" id="crearRecordatorioForm">
 
@@ -121,7 +132,6 @@
                     <div class="col-md-6 mb-3">
                         <label for="hora" class="form-label">Hora</label>
                         <input type="time" class="form-control" id="hora" name="hora" required th:value="${recordatorioForm.fecha != null ? #temporals.format(recordatorioForm.fecha,'HH:mm') : ''}">
-                        <!-- Hidden field combinado que enviará la fecha+hora en formato ISO para que Spring la convierta -->
                         <input type="hidden" id="fechaHidden" th:field="*{fecha}" />
                     </div>
                 </div>
@@ -145,7 +155,6 @@
 </footer>
 
 <script>
-    // Actualiza el atributo max del input fechaDate cuando se selecciona un ticket
     (function(){
         const ticketSelect = document.getElementById('ticketSelect');
         const fechaDateInput = document.getElementById('fechaDate');
@@ -160,29 +169,24 @@
             if(eventDate && eventDate.trim() !== ''){
                 fechaDateInput.max = eventDate;
             } else {
-                // si no hay ticket seleccionado, limpiar max para permitir cualquier fecha >= hoy
                 fechaDateInput.removeAttribute('max');
             }
         }
 
-        // Combina fecha y hora en ISO antes de enviar el formulario
         form.addEventListener('submit', function(){
             const dateVal = fechaDateInput.value;
             const timeVal = horaInput.value || '00:00';
             if(!dateVal){
-                // dejar que el navegador valide la ausencia de fecha
                 return;
             }
-            // Formato ISO simple: yyyy-MM-ddTHH:mm
             fechaHidden.value = dateVal + 'T' + timeVal;
         });
 
-        // aplicar al cargar (por si hay preselección)
         applyMaxFromSelected();
-
         ticketSelect.addEventListener('change', applyMaxFromSelected);
     })();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

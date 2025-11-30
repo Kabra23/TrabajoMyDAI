@@ -24,8 +24,7 @@
             padding: 20px;
         }
 
-        /* Navbar */
-        . navbar {
+        .navbar {
             background: rgba(0, 0, 0, 0.3) !important;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -64,7 +63,6 @@
             width: 100%;
         }
 
-        /* Card de Registro */
         .card-registro {
             background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
             border-radius: 20px;
@@ -104,6 +102,24 @@
             box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
         }
 
+        /* Estilos para el botón de ver contraseña */
+        .password-toggle {
+            background: #f0f0f0;
+            color: var(--secondary-color);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .password-toggle:hover {
+            background: #e0e0e0;
+            color: var(--primary-color);
+        }
+
+        .password-toggle:focus {
+            box-shadow: none;
+        }
+
         .btn-custom {
             background: linear-gradient(135deg, var(--accent-color), #ffed4e);
             color: var(--primary-color);
@@ -120,7 +136,7 @@
 
         .btn-custom:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0. 5);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
             color: var(--primary-color);
         }
 
@@ -133,7 +149,7 @@
             color: var(--secondary-color);
             font-weight: 600;
             text-decoration: none;
-            transition: color 0. 3s;
+            transition: color 0.3s;
         }
 
         .extra-links a:hover {
@@ -161,6 +177,20 @@
             margin: 0;
             font-size: 0.9rem;
         }
+
+        /* Estilos para mensajes de validación */
+        .password-strength {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+        }
     </style>
 </head>
 <body>
@@ -187,7 +217,7 @@
     <h2 class="registro-title">
         <i class="fa-solid fa-user-plus"></i> Registro de Usuario
     </h2>
-    <form th:action="@{/registro}" th:object="${usuario}" th:method="post">
+    <form th:action="@{/registro}" th:object="${usuario}" th:method="post" id="registroForm">
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
             <div class="input-group">
@@ -195,6 +225,7 @@
                 <input th:field="*{nombre}" type="text" class="form-control" id="nombre" required>
             </div>
         </div>
+
         <div class="mb-3">
             <label for="username" class="form-label">Usuario</label>
             <div class="input-group">
@@ -202,6 +233,7 @@
                 <input th:field="*{username}" type="text" class="form-control" id="username" required>
             </div>
         </div>
+
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <div class="input-group">
@@ -209,21 +241,39 @@
                 <input th:field="*{email}" type="email" class="form-control" id="email" required>
             </div>
         </div>
+
         <div class="mb-3">
             <label for="password" class="form-label">Contraseña</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                <input th:field="*{password}" type="password" class="form-control" id="password" required>
+                <input th:field="*{password}" type="password" class="form-control" id="password" required minlength="6">
+                <button class="btn password-toggle" type="button" id="togglePassword">
+                    <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                </button>
             </div>
+            <small class="password-strength text-muted">Mínimo 6 caracteres</small>
         </div>
-        <button type="submit" class="btn btn-custom">
+
+        <div class="mb-3">
+            <label for="confirmarPassword" class="form-label">Confirmar Contraseña</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" class="form-control" id="confirmarPassword" required minlength="6">
+                <button class="btn password-toggle" type="button" id="toggleConfirmPassword">
+                    <i class="fa-solid fa-eye" id="toggleConfirmPasswordIcon"></i>
+                </button>
+            </div>
+            <small id="passwordMatchMessage" class="password-strength"></small>
+        </div>
+
+        <button type="submit" class="btn btn-custom" id="submitBtn">
             <i class="fas fa-user-plus me-2"></i>Registrarse
         </button>
     </form>
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${registroExitoso}" class="alert alert-success">
-        <i class="fas fa-check-circle me-2"></i>¡Registro exitoso!  Ahora puedes iniciar sesión.
+        <i class="fas fa-check-circle me-2"></i>¡Registro exitoso! Ahora puedes iniciar sesión.
     </div>
 
     <div class="extra-links">
@@ -239,6 +289,90 @@
     </p>
 </footer>
 
-<script src="https://cdn. jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Funcionalidad para mostrar/ocultar contraseña principal
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+    togglePassword.addEventListener('click', function() {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+
+        // Cambiar icono
+        if (type === 'text') {
+            togglePasswordIcon.classList.remove('fa-eye');
+            togglePasswordIcon.classList.add('fa-eye-slash');
+        } else {
+            togglePasswordIcon.classList.remove('fa-eye-slash');
+            togglePasswordIcon.classList.add('fa-eye');
+        }
+    });
+
+    // Funcionalidad para mostrar/ocultar contraseña de confirmación
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const confirmPasswordField = document.getElementById('confirmarPassword');
+    const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
+
+    toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordField.setAttribute('type', type);
+
+        // Cambiar icono
+        if (type === 'text') {
+            toggleConfirmPasswordIcon.classList.remove('fa-eye');
+            toggleConfirmPasswordIcon.classList.add('fa-eye-slash');
+        } else {
+            toggleConfirmPasswordIcon.classList.remove('fa-eye-slash');
+            toggleConfirmPasswordIcon.classList.add('fa-eye');
+        }
+    });
+
+    // Validación de coincidencia de contraseñas
+    const form = document.getElementById('registroForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+
+    function checkPasswordMatch() {
+        const password = passwordField.value;
+        const confirmPassword = confirmPasswordField.value;
+
+        if (confirmPassword === '') {
+            passwordMatchMessage.textContent = '';
+            passwordMatchMessage.className = 'password-strength';
+            return;
+        }
+
+        if (password === confirmPassword) {
+            passwordMatchMessage.textContent = '✓ Las contraseñas coinciden';
+            passwordMatchMessage.className = 'password-strength text-success';
+        } else {
+            passwordMatchMessage.textContent = '✗ Las contraseñas no coinciden';
+            passwordMatchMessage.className = 'password-strength text-danger';
+        }
+    }
+
+    passwordField.addEventListener('input', checkPasswordMatch);
+    confirmPasswordField.addEventListener('input', checkPasswordMatch);
+
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(event) {
+        const password = passwordField.value;
+        const confirmPassword = confirmPasswordField.value;
+
+        if (password !== confirmPassword) {
+            event.preventDefault();
+            alert('Las contraseñas no coinciden. Por favor, verifica e intenta nuevamente.');
+            confirmPasswordField.focus();
+        }
+
+        if (password.length < 6) {
+            event.preventDefault();
+            alert('La contraseña debe tener al menos 6 caracteres.');
+            passwordField.focus();
+        }
+    });
+</script>
 </body>
 </html>
