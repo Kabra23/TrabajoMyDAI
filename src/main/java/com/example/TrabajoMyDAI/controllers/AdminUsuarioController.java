@@ -123,7 +123,15 @@ public class AdminUsuarioController {
         }
 
         try {
-            usuarioService.actualizarUsuario(id, usuario);
+            Usuario actualizado = usuarioService.actualizarUsuario(id, usuario);
+            
+            // Update session if the edited user is the logged-in user
+            Usuario usuarioLogueado = getUsuarioLogueado(session);
+            if (usuarioLogueado != null && usuarioLogueado.getDni().equals(id)) {
+                session.setAttribute("usuario", actualizado);
+                session.setAttribute("esAdmin", actualizado.isAdmin());
+            }
+            
             redirectAttributes.addFlashAttribute("success", "Usuario actualizado exitosamente");
             return "redirect:/admin/usuarios";
         } catch (IllegalArgumentException e) {
@@ -141,13 +149,14 @@ public class AdminUsuarioController {
 
         Usuario usuarioLogueado = getUsuarioLogueado(session);
 
+        // Admin cannot delete their own account from admin panel
         if (usuarioLogueado != null && usuarioLogueado.getDni().equals(id)) {
             redirectAttributes.addFlashAttribute("error", "No puedes eliminar tu propia cuenta desde el panel de administración");
             return "redirect:/admin/usuarios";
         }
 
         try {
-            usuarioService.eliminarPorId(id);
+            usuarioService.eliminarUsuarioSeguro(id, usuarioLogueado);
             redirectAttributes.addFlashAttribute("success", "Usuario eliminado exitosamente");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
