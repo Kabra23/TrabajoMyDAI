@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Cuenta - Barça Athletic Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #ffd700;
+            --text-light: #e3e3e3;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 100px 20px 40px;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent-color) !important;
+        }
+
+        .nav-link {
+            color: #fff !important;
+            margin: 0 10px;
+        }
+
+        .card-delete {
+            background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-top: 5px solid var(--danger-color);
+        }
+
+        .delete-title {
+            color: var(--danger-color);
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .warning-icon {
+            font-size: 4rem;
+            color: var(--danger-color);
+            text-align: center;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .warning-text {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .warning-text h5 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning-text ul {
+            color: #856404;
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-group-text {
+            background: #f0f0f0;
+            color: var(--secondary-color);
+            border: none;
+        }
+
+        .form-control {
+            border: 1px solid #ddd;
+        }
+
+        .form-control:focus {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, var(--danger-color), #ff4757);
+            color: #fff;
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-weight: 800;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+            color: #fff;
+        }
+
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            color: #fff;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .user-info strong {
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;"> Barça Atlètic
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="/cuenta/perfil"><i class="fas fa-user"></i> Mi Cuenta</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="card-delete">
+    <i class="fas fa-exclamation-triangle warning-icon"></i>
+    <h2 class="delete-title">Eliminar Cuenta</h2>
+
+    <!-- Error message -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="user-info">
+        <p>¿Estás seguro de que deseas eliminar la cuenta de <strong th:text="${usuario.username}"></strong>?</p>
+    </div>
+
+    <div class="warning-text">
+        <h5><i class="fas fa-exclamation-circle me-2"></i>¡Atención!</h5>
+        <p>Esta acción es <strong>irreversible</strong>. Al eliminar tu cuenta:</p>
+        <ul>
+            <li>Se eliminarán todos tus datos personales</li>
+            <li>Se eliminarán todos tus tickets</li>
+            <li>Se eliminarán todos tus recordatorios</li>
+            <li>No podrás recuperar la información</li>
+        </ul>
+    </div>
+
+    <form th:action="@{/cuenta/eliminar}" method="post">
+        <div class="mb-4">
+            <label for="passwordConfirmacion" class="form-label">
+                <i class="fas fa-lock me-1"></i>Introduce tu contraseña para confirmar:
+            </label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                <input name="passwordConfirmacion" type="password" class="form-control" id="passwordConfirmacion" required>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger-custom" onclick="return confirm('¿Estás COMPLETAMENTE seguro? Esta acción NO se puede deshacer.');">
+                <i class="fas fa-trash-alt me-2"></i>Eliminar mi cuenta permanentemente
+            </button>
+            <a href="/cuenta/perfil" class="btn btn-secondary-custom text-center">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar, volver a Mi Cuenta
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
