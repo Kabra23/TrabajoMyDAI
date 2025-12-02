@@ -88,7 +88,7 @@ public class GlobalTest {
         assertFalse(deletedOpt.isPresent());
 
         // COMPROBAR que Usuario y Evento siguen existiendo (no cascade delete esperado)
-        Optional<Usuario> persistedUserOpt = usuarioRepository.findByEmail("luis@example.com");
+        Optional<Usuario> persistedUserOpt = usuarioRepository.findById(savedUsuario.getDni());
         Optional<Evento> persistedEventOpt = eventoRepository.findById(savedEvento.getId());
 
         assertTrue(persistedUserOpt.isPresent(), "El usuario debe seguir existiendo tras borrar el recordatorio");
