@@ -2,11 +2,11 @@ package com.example.TrabajoMyDAI.TrabajoMyDAI;
 
 import com.example.TrabajoMyDAI.data.model.Ticket;
 import com.example.TrabajoMyDAI.data.model.Usuario;
+import com.example.TrabajoMyDAI.data.repository.TicketRepository;
 import com.example.TrabajoMyDAI.data.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 public class UsuarioRepositoryTest {
     @Autowired
-    private TestEntityManager em;
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private TicketRepository ticketRepository;
 
     @Test
     void testCreateUsuario() {
@@ -38,7 +38,8 @@ public class UsuarioRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Juan");
         u.setEmail("juan@example.com");
-        Usuario saved = em.persistFlushFind(u);
+        Usuario saved = usuarioRepository.save(u);
+        usuarioRepository.flush();
 
         Optional<Usuario> found = usuarioRepository.findById(saved.getDni());
         assertTrue(found.isPresent());
@@ -111,16 +112,18 @@ public class UsuarioRepositoryTest {
         u.getTickets().add(t1);
         u.getTickets().add(t2);
 
-        Usuario saved = em.persistFlushFind(u);
-        assertNotNull(saved.getDni());
-        assertEquals(2, saved.getTickets().size());
+        Usuario saved = usuarioRepository.save(u);
+        usuarioRepository.flush();
+        Optional<Usuario> foundOpt = usuarioRepository.findById(saved.getDni());
+        assertTrue(foundOpt.isPresent());
+        Usuario found = foundOpt.get();
+        assertNotNull(found.getDni());
+        assertEquals(2, found.getTickets().size());
 
-        em.remove(saved);
-        em.flush();
+        usuarioRepository.deleteById(found.getDni());
+        usuarioRepository.flush();
 
-        Long count = (Long) em.getEntityManager()
-                .createQuery("SELECT COUNT(t) FROM Ticket t")
-                .getSingleResult();
+        long count = ticketRepository.count();
         assertEquals(0L, count);
     }
 }

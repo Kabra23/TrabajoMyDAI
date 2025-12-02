@@ -3,11 +3,12 @@ package com.example.TrabajoMyDAI.TrabajoMyDAI;
 import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.model.Ticket;
 import com.example.TrabajoMyDAI.data.model.Usuario;
+import com.example.TrabajoMyDAI.data.repository.EventoRepository;
 import com.example.TrabajoMyDAI.data.repository.TicketRepository;
+import com.example.TrabajoMyDAI.data.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 public class TicketRepositoryTest {
     @Autowired
-    private TestEntityManager em;
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EventoRepository eventoRepository;
 
     @Autowired
     private TicketRepository ticketRepository;
@@ -28,23 +32,23 @@ public class TicketRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Ana");
         u.setEmail("ana@example.com");
-        em.persist(u);
+        Usuario savedUsuario = usuarioRepository.save(u);
 
         Evento e = new Evento();
         e.setNombre("Feria");
-        em.persist(e);
+        Evento savedEvento = eventoRepository.save(e);
 
         Ticket t = new Ticket();
         t.setPrecio(5.0);
         t.setAsiento(10L);
-        t.setUsuario(u);
-        t.setEvento(e);
+        t.setUsuario(savedUsuario);
+        t.setEvento(savedEvento);
 
         Ticket saved = ticketRepository.save(t);
         assertNotNull(saved.getId_ticket());
         assertEquals(5.0, saved.getPrecio());
-        assertEquals(u.getDni(), saved.getUsuario().getDni());
-        assertEquals(e.getId(), saved.getEvento().getId());
+        assertEquals(savedUsuario.getDni(), saved.getUsuario().getDni());
+        assertEquals(savedEvento.getId(), saved.getEvento().getId());
     }
 
     @Test
@@ -53,18 +57,19 @@ public class TicketRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Ana");
         u.setEmail("ana@example.com");
-        em.persist(u);
+        Usuario savedUsuario = usuarioRepository.save(u);
 
         Evento e = new Evento();
         e.setNombre("Feria");
-        em.persist(e);
+        Evento savedEvento = eventoRepository.save(e);
 
         Ticket t = new Ticket();
         t.setPrecio(5.0);
         t.setAsiento(10L);
-        t.setUsuario(u);
-        t.setEvento(e);
-        Ticket saved = em.persistFlushFind(t);
+        t.setUsuario(savedUsuario);
+        t.setEvento(savedEvento);
+        Ticket saved = ticketRepository.save(t);
+        ticketRepository.flush();
 
         // Test findById
         Optional<Ticket> found = ticketRepository.findById(saved.getId_ticket());
@@ -79,24 +84,24 @@ public class TicketRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Ana");
         u.setEmail("ana@example.com");
-        em.persist(u);
+        Usuario savedUsuario = usuarioRepository.save(u);
 
         Evento e = new Evento();
         e.setNombre("Feria");
-        em.persist(e);
+        Evento savedEvento = eventoRepository.save(e);
 
         Ticket t1 = new Ticket();
         t1.setPrecio(5.0);
         t1.setAsiento(10L);
-        t1.setUsuario(u);
-        t1.setEvento(e);
+        t1.setUsuario(savedUsuario);
+        t1.setEvento(savedEvento);
         ticketRepository.save(t1);
 
         Ticket t2 = new Ticket();
         t2.setPrecio(6.0);
         t2.setAsiento(11L);
-        t2.setUsuario(u);
-        t2.setEvento(e);
+        t2.setUsuario(savedUsuario);
+        t2.setEvento(savedEvento);
         ticketRepository.save(t2);
 
         // Test findAll
@@ -111,17 +116,17 @@ public class TicketRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Ana");
         u.setEmail("ana@example.com");
-        em.persist(u);
+        Usuario savedUsuario = usuarioRepository.save(u);
 
         Evento e = new Evento();
         e.setNombre("Feria");
-        em.persist(e);
+        Evento savedEvento = eventoRepository.save(e);
 
         Ticket t = new Ticket();
         t.setPrecio(5.0);
         t.setAsiento(10L);
-        t.setUsuario(u);
-        t.setEvento(e);
+        t.setUsuario(savedUsuario);
+        t.setEvento(savedEvento);
         Ticket saved = ticketRepository.save(t);
 
         // Update
@@ -141,17 +146,17 @@ public class TicketRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Ana");
         u.setEmail("ana@example.com");
-        em.persist(u);
+        Usuario savedUsuario = usuarioRepository.save(u);
 
         Evento e = new Evento();
         e.setNombre("Feria");
-        em.persist(e);
+        Evento savedEvento = eventoRepository.save(e);
 
         Ticket t = new Ticket();
         t.setPrecio(5.0);
         t.setAsiento(10L);
-        t.setUsuario(u);
-        t.setEvento(e);
+        t.setUsuario(savedUsuario);
+        t.setEvento(savedEvento);
         Ticket saved = ticketRepository.save(t);
 
         // Delete
@@ -167,32 +172,38 @@ public class TicketRepositoryTest {
         Usuario u = new Usuario();
         u.setNombre("Ana");
         u.setEmail("ana@example.com");
-        em.persist(u);
+        Usuario savedUsuario = usuarioRepository.save(u);
 
         Evento e = new Evento();
         e.setNombre("Feria");
-        em.persist(e);
+        Evento savedEvento = eventoRepository.save(e);
 
         Ticket t = new Ticket();
         t.setPrecio(5.0);
         t.setAsiento(10L);
-        t.setUsuario(u);
-        t.setEvento(e);
+        t.setUsuario(savedUsuario);
+        t.setEvento(savedEvento);
 
-        Ticket saved = em.persistFlushFind(t);
-        assertNotNull(saved.getId_ticket());
-        assertEquals(u.getDni(), saved.getUsuario().getDni());
-        assertEquals(e.getId(), saved.getEvento().getId());
+        Ticket saved = ticketRepository.save(t);
+        ticketRepository.flush();
+        Optional<Ticket> foundOpt = ticketRepository.findById(saved.getId_ticket());
+        assertTrue(foundOpt.isPresent());
+        Ticket found = foundOpt.get();
+        assertNotNull(found.getId_ticket());
+        assertEquals(savedUsuario.getDni(), found.getUsuario().getDni());
+        assertEquals(savedEvento.getId(), found.getEvento().getId());
 
         // update
-        saved.setPrecio(6.0);
-        em.persistAndFlush(saved);
-        Ticket updated = em.find(Ticket.class, saved.getId_ticket());
-        assertEquals(6.0, updated.getPrecio());
+        found.setPrecio(6.0);
+        ticketRepository.save(found);
+        ticketRepository.flush();
+        Optional<Ticket> updatedOpt = ticketRepository.findById(found.getId_ticket());
+        assertTrue(updatedOpt.isPresent());
+        assertEquals(6.0, updatedOpt.get().getPrecio());
 
-        em.remove(updated);
-        em.flush();
-        Ticket deleted = em.find(Ticket.class, saved.getId_ticket());
-        assertNull(deleted);
+        ticketRepository.deleteById(found.getId_ticket());
+        ticketRepository.flush();
+        Optional<Ticket> deletedOpt = ticketRepository.findById(found.getId_ticket());
+        assertFalse(deletedOpt.isPresent());
     }
 }
