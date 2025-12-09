@@ -105,9 +105,6 @@ public class EventoService {
             evento.setTipo(eventoActualizado.getTipo());
         }
 
-        if (eventoActualizado.getCodigoPromo() != null && !eventoActualizado.getCodigoPromo().trim().isEmpty()) {
-            evento.setCodigoPromo(eventoActualizado.getCodigoPromo());
-        }
 
         if (eventoActualizado.getCapacidad() != null && eventoActualizado.getCapacidad() > 0) {
             evento.setCapacidad(eventoActualizado.getCapacidad());

@@ -1,21 +1,26 @@
 package com.example.TrabajoMyDAI.controllers;
 
-import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.model.Usuario;
+import com.example.TrabajoMyDAI.data.model.Zona;
 import com.example.TrabajoMyDAI.data.services.EventoService;
+import com.example.TrabajoMyDAI.data.services.ZonaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 @Controller
 public class EventoController {
 
     private final EventoService eventoService;
+    private final ZonaService zonaService;
 
-    public EventoController(EventoService eventoService) {
+    public EventoController(EventoService eventoService, ZonaService zonaService) {
         this.eventoService = eventoService;
+        this.zonaService = zonaService;
     }
 
     @GetMapping("/noticias")
@@ -49,11 +54,25 @@ public class EventoController {
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 
         model.addAttribute("evento", evento);
-        model.addAttribute("zonas", java.util.List.of("Tribuna", "Grada Lateral", "Gol Nord", "Gol Sud"));
 
-        if (evento.getCapacidad() != null) {
-            Integer plazasDisponibles = eventoService.obtenerPlazasDisponibles(id);
-            model.addAttribute("plazasDisponibles", plazasDisponibles);
+        // Obtener zonas con su disponibilidad
+        List<Zona> zonasEvento = zonaService.obtenerZonasPorEvento(id);
+        model.addAttribute("zonasDisponibilidad", zonasEvento);
+
+        // Si no hay zonas creadas, crear las zonas predeterminadas
+        if (zonasEvento.isEmpty()) {
+            zonaService.crearZonasParaEvento(evento);
+            zonasEvento = zonaService.obtenerZonasPorEvento(id);
+            model.addAttribute("zonasDisponibilidad", zonasEvento);
+        }
+
+        // Lista de nombres de zonas para el select
+        model.addAttribute("zonas", zonasEvento.stream().map(Zona::getNombre).toList());
+
+        // Calcular entradas disponibles totales
+        Integer entradasDisponiblesTotales = zonaService.obtenerEntradasDisponiblesTotales(id);
+        if (entradasDisponiblesTotales != null) {
+            model.addAttribute("plazasDisponibles", entradasDisponiblesTotales);
             model.addAttribute("tieneCapacidad", true);
         } else {
             model.addAttribute("tieneCapacidad", false);

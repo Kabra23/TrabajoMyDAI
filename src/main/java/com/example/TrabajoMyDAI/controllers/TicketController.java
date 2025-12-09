@@ -1,10 +1,13 @@
 package com.example.TrabajoMyDAI.controllers;
 
+import com.example.TrabajoMyDAI.data.exceptions.ValidationException;
 import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.model.Ticket;
 import com.example.TrabajoMyDAI.data.model.Usuario;
+import com.example.TrabajoMyDAI.data.model.Zona;
 import com.example.TrabajoMyDAI.data.repository.EventoRepository;
 import com.example.TrabajoMyDAI.data.repository.TicketRepository;
+import com.example.TrabajoMyDAI.data.services.ZonaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +23,12 @@ public class TicketController {
 
     private final TicketRepository ticketRepository;
     private final EventoRepository eventoRepository;
+    private final ZonaService zonaService;
 
-    public TicketController(TicketRepository ticketRepository, EventoRepository eventoRepository) {
+    public TicketController(TicketRepository ticketRepository, EventoRepository eventoRepository, ZonaService zonaService) {
         this.ticketRepository = ticketRepository;
         this.eventoRepository = eventoRepository;
+        this.zonaService = zonaService;
     }
 
     @GetMapping("/tickets")
@@ -55,10 +60,20 @@ public class TicketController {
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 
-        // VALIDACIÓN: Verificar si el asiento ya está ocupado
-        if (ticketRepository.findByEventoAndAsiento(evento, asiento).isPresent()) {
+        // VALIDACIÓN: Verificar disponibilidad de la zona
+        Zona zonaSeleccionada = zonaService.obtenerZonaPorEventoYNombre(id, zona)
+                .orElseThrow(() -> new ValidationException("Zona no encontrada."));
+
+        // VALIDACIÓN: Verificar si el asiento ya está ocupado EN ESTA ZONA ESPECÍFICA
+        if (ticketRepository.findByZonaAndAsiento(zonaSeleccionada, asiento).isPresent()) {
             redirectAttributes.addFlashAttribute("error",
-                    "El asiento " + asiento + " ya está ocupado para este evento. Por favor, selecciona otro.");
+                    "El asiento " + asiento + " ya está ocupado en la zona " + zona + ". Por favor, selecciona otro.");
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        if (!zonaSeleccionada.hayDisponibilidad()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Lo sentimos, no hay entradas disponibles en la zona " + zona + ".");
             return "redirect:/eventos/" + id + "/comprar";
         }
 
@@ -72,13 +87,17 @@ public class TicketController {
         Ticket ticket = new Ticket();
         ticket.setUsuario(usuario);
         ticket.setEvento(evento);
+        ticket.setZona(zonaSeleccionada);
         ticket.setAsiento(asiento);
         ticket.setPrecio(precio);
 
         ticketRepository.save(ticket);
 
+        // Incrementar el contador de entradas vendidas en la zona
+        zonaService.incrementarEntradasVendidas(zonaSeleccionada.getId());
+
         redirectAttributes.addFlashAttribute("success",
-                "¡Compra realizada con éxito! Asiento " + asiento + " reservado.");
+                "¡Compra realizada con éxito! Asiento " + asiento + " reservado en zona " + zona + ".");
 
         return "redirect:/tickets";
     }

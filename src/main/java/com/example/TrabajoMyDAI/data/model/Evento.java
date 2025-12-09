@@ -24,10 +24,11 @@ public class Evento {
     @ManyToMany(mappedBy = "eventos")
     private List<Usuario> usuarios = new LinkedList<>();
 
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Zona> zonas = new LinkedList<>();
+
     private String tipo_evento;
 
-    // Nuevo campo para codigo promocional esperado por Thymeleaf
-    private String codigoPromo;
 
     // NUEVO: Campo para capacidad máxima del evento
     private Integer capacidad;
@@ -54,14 +55,14 @@ public class Evento {
     public List<Usuario> getUsuarios() { return usuarios; }
     public void setUsuarios(List<Usuario> usuarios) { this. usuarios = usuarios; }
 
+    public List<Zona> getZonas() { return zonas; }
+    public void setZonas(List<Zona> zonas) { this.zonas = zonas; }
+
     public String getTipo() { return tipo_evento; }
     public void setTipo(String tipo_evento) { this.tipo_evento = tipo_evento; }
 
     public void addUsuario(Usuario usuario) { this.usuarios.add(usuario); }
 
-    // Getter y setter para codigoPromo
-    public String getCodigoPromo() { return codigoPromo; }
-    public void setCodigoPromo(String codigoPromo) { this.codigoPromo = codigoPromo; }
 
     // Getter y setter para capacidad
     public Integer getCapacidad() { return capacidad; }
@@ -78,13 +79,12 @@ public class Evento {
                 Objects.equals(lugar_evento, evento.lugar_evento) &&
                 Objects.equals(descripcion_evento, evento.descripcion_evento) &&
                 Objects.equals(tipo_evento, evento.tipo_evento) &&
-                Objects.equals(codigoPromo, evento.codigoPromo) &&
                 Objects.equals(capacidad, evento.capacidad);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id_evento, nombre_evento, fecha_evento, lugar_evento, descripcion_evento, tipo_evento, codigoPromo, capacidad);
+        return Objects.hash(id_evento, nombre_evento, fecha_evento, lugar_evento, descripcion_evento, tipo_evento, capacidad);
     }
 
     @Override
@@ -97,7 +97,6 @@ public class Evento {
                 ", descripcion_evento='" + descripcion_evento + '\'' +
                 ", usuarios=" + usuarios +
                 ", tipo_evento='" + tipo_evento + '\'' +
-                ", codigoPromo='" + codigoPromo + '\'' +
                 ", capacidad=" + capacidad +
                 '}';
     }

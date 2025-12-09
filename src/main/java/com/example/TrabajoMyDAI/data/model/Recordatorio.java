@@ -11,10 +11,10 @@ public class Recordatorio
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_recordatorio;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @ManyToOne
@@ -28,11 +28,11 @@ public class Recordatorio
 
     // Getters y setters
     public Long getId_recordatorio() {
-        return id_recordatorio;
+        return id;
     }
 
     public void setId_recordatorio(Long id_recordatorio) {
-        this.id_recordatorio = id_recordatorio;
+        this.id = id_recordatorio;
     }
 
     public Usuario getUsuario() {
@@ -70,7 +70,7 @@ public class Recordatorio
     @Override
     public String toString() {
         return "Recordatorio{" +
-                "id_recordatorio=" + id_recordatorio +
+                "id_recordatorio=" + id +
                 ", id_usuario=" + (usuario != null ? usuario.getDni() : null) +
                 ", id_evento=" + (evento != null ? evento.getId() : null) +
                 ", mensaje='" + mensaje + '\'' +

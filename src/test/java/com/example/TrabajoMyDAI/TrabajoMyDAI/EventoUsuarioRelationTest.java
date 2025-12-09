@@ -5,14 +5,20 @@ import com.example.TrabajoMyDAI.data.model.Usuario;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import java.util.Optional;
+import com.example.TrabajoMyDAI.data.repository.EventoRepository;
+import com.example.TrabajoMyDAI.data.repository.UsuarioRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 public class EventoUsuarioRelationTest {
+
     @Autowired
-    private TestEntityManager em;
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EventoRepository eventoRepository;
 
     @Test
     void manyToManyAddAndRemove() {
@@ -31,9 +37,9 @@ public class EventoUsuarioRelationTest {
 
         // Es mejor persistir el lado inverso (Evento) primero y luego el Dueño (Usuario)
         // para manejar posibles Cascade.PERSIST, pero en este caso no importa si ya están enlazados.
-        em.persist(e);
-        em.persist(u);
-        em.flush();
+        Evento savedEvento = eventoRepository.save(e);
+        Usuario savedUsuario = usuarioRepository.save(u);
+        usuarioRepository.flush();
 
         // -------------------------------------------------------------
         // VERIFICACIÓN DE ADICIÓN (Línea 35 original)
@@ -43,7 +49,9 @@ public class EventoUsuarioRelationTest {
         // y para forzar la lectura de la tabla de unión.
         // Dado que u.addEvento(e) YA sincronizó el objeto 'e' en memoria,
         // y el em.find carga la relación, la aserción debería pasar.
-        Evento foundEvento = em.find(Evento.class, e.getId());
+        Optional<Evento> foundEventoOpt = eventoRepository.findById(savedEvento.getId());
+        assertTrue(foundEventoOpt.isPresent());
+        Evento foundEvento = foundEventoOpt.get();
         assertNotNull(foundEvento);
 
         // Si Usuario tiene 1 Evento, entonces el Evento debe tener 1 Usuario.
@@ -59,13 +67,13 @@ public class EventoUsuarioRelationTest {
         // debido a la configuración de CASCADE en el lado dueño.
         // Eliminamos la relación explícitamente y verificamos que desaparece
         u.removeEvento(e);
-        em.persist(u);
-        em.flush();
-        // Limpiar el contexto de persistencia para forzar la recarga desde la BD
-        em.clear();
+        usuarioRepository.save(u);
+        usuarioRepository.flush();
 
         // Recuperar el Evento después de eliminar la relación
-        Evento afterDelete = em.find(Evento.class, e.getId());
+        Optional<Evento> afterDeleteOpt = eventoRepository.findById(savedEvento.getId());
+        assertTrue(afterDeleteOpt.isPresent());
+        Evento afterDelete = afterDeleteOpt.get();
         assertNotNull(afterDelete);
         // Depuración: mostrar contenidos para entender por qué seguiría habiendo usuarios
         System.out.println("Usuarios en afterDelete: " + afterDelete.getUsuarios());
@@ -75,11 +83,12 @@ public class EventoUsuarioRelationTest {
         assertTrue(afterDelete.getUsuarios().isEmpty());
 
         // Finalmente, eliminar el Usuario por completo y comprobar que sigue vacío
-        em.remove(em.find(Usuario.class, u.getDni()));
-        em.flush();
-        em.clear();
+        usuarioRepository.deleteById(savedUsuario.getDni());
+        usuarioRepository.flush();
 
-        Evento afterUserRemove = em.find(Evento.class, e.getId());
+        Optional<Evento> afterUserRemoveOpt = eventoRepository.findById(savedEvento.getId());
+        assertTrue(afterUserRemoveOpt.isPresent());
+        Evento afterUserRemove = afterUserRemoveOpt.get();
         assertNotNull(afterUserRemove);
         assertTrue(afterUserRemove.getUsuarios().isEmpty());
     }

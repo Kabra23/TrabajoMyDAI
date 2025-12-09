@@ -2,6 +2,7 @@ package com.example.TrabajoMyDAI.data.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +26,8 @@ public class Usuario {
     @ManyToMany
     private List<Evento> eventos = new LinkedList<>();
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Recordatorio> recordatorios = new ArrayList<>();
 
     // helper methods to keep both sides in sync (optional)
     public void addEvento(Evento evento) {

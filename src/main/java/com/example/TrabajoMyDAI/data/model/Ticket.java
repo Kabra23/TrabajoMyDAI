@@ -18,6 +18,10 @@ public class Ticket {
     @JoinColumn(name = "evento_id")
     private Evento evento;
 
+    @ManyToOne
+    @JoinColumn(name = "zona_id")
+    private Zona zona;
+
     private double precio;
     private Long asiento;
 
@@ -51,6 +55,14 @@ public class Ticket {
         this.evento = id_evento;
     }
 
+    //Zona
+    public Zona getZona() {
+        return zona;
+    }
+
+    public void setZona(Zona zona) {
+        this.zona = zona;
+    }
 
     //Precio
 

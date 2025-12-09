@@ -2,6 +2,7 @@ package com.example.TrabajoMyDAI.data.init;
 
 import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.repository.EventoRepository;
+import com.example.TrabajoMyDAI.data.services.ZonaService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +14,11 @@ public class EventoDataLoader {
     public static class EventoLoader implements CommandLineRunner {
 
         private final EventoRepository eventoRepository;
+        private final ZonaService zonaService;
 
-        public EventoLoader(EventoRepository eventoRepository) {
+        public EventoLoader(EventoRepository eventoRepository, ZonaService zonaService) {
             this.eventoRepository = eventoRepository;
+            this.zonaService = zonaService;
         }
 
         @Override
@@ -49,9 +52,14 @@ public class EventoDataLoader {
             e3.setLugar("Ciutat Esportiva Joan Gamper");
             e3.setTipo("Amistoso");
 
-            eventoRepository.save(e1);
-            eventoRepository.save(e2);
-            eventoRepository.save(e3);
+            Evento evento1 = eventoRepository.save(e1);
+            Evento evento2 = eventoRepository.save(e2);
+            Evento evento3 = eventoRepository.save(e3);
+
+            // Crear zonas para cada evento
+            zonaService.crearZonasParaEvento(evento1);
+            zonaService.crearZonasParaEvento(evento2);
+            zonaService.crearZonasParaEvento(evento3);
         }
     }
 }

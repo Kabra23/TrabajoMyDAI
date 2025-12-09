@@ -5,7 +5,7 @@ import com.example.TrabajoMyDAI.data.repository.EventoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 public class EventoRepositoryTest {
     @Autowired
-    private TestEntityManager em;
-
-    @Autowired
     private EventoRepository eventoRepository;
 
     @Test
@@ -26,7 +23,7 @@ public class EventoRepositoryTest {
         Evento e = new Evento();
         e.setNombre("Concierto");
         e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
-        e.setLugar_evento("Teatro Principal");
+        e.setLugar("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
 
@@ -41,10 +38,10 @@ public class EventoRepositoryTest {
         Evento e = new Evento();
         e.setNombre("Concierto");
         e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
-        e.setLugar_evento("Teatro Principal");
+        e.setLugar("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
-        Evento saved = em.persistFlushFind(e);
+        Evento saved = eventoRepository.save(e);
 
         Optional<Evento> found = eventoRepository.findById(saved.getId());
         assertTrue(found.isPresent());
@@ -57,7 +54,7 @@ public class EventoRepositoryTest {
         Evento e1 = new Evento();
         e1.setNombre("Concierto");
         e1.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
-        e1.setLugar_evento("Teatro Principal");
+        e1.setLugar("Teatro Principal");
         e1.setDescripcion("Un gran concierto");
         e1.setTipo("Musical");
         eventoRepository.save(e1);
@@ -65,7 +62,7 @@ public class EventoRepositoryTest {
         Evento e2 = new Evento();
         e2.setNombre("Teatro");
         e2.setFecha(LocalDateTime.parse("2025-12-02T00:00"));
-        e2.setLugar_evento("Teatro Secundario");
+        e2.setLugar("Teatro Secundario");
         e2.setDescripcion("Obra de teatro");
         e2.setTipo("Teatro");
         eventoRepository.save(e2);
@@ -80,7 +77,7 @@ public class EventoRepositoryTest {
         Evento e = new Evento();
         e.setNombre("Concierto");
         e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
-        e.setLugar_evento("Teatro Principal");
+        e.setLugar("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
         Evento saved = eventoRepository.save(e);
@@ -99,7 +96,7 @@ public class EventoRepositoryTest {
         Evento e = new Evento();
         e.setNombre("Concierto");
         e.setFecha(LocalDateTime.parse("2025-12-01T00:00"));
-        e.setLugar_evento("Teatro Principal");
+        e.setLugar("Teatro Principal");
         e.setDescripcion("Un gran concierto");
         e.setTipo("Musical");
         Evento saved = eventoRepository.save(e);
