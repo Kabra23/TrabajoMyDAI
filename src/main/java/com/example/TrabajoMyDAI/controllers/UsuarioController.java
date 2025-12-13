@@ -30,6 +30,13 @@ public class UsuarioController {
     // Crear usuario admin al iniciar la aplicación
     @PostConstruct
     public void init() {
+        // Reiniciar la secuencia de IDs de Usuario (solo para H2)
+        try {
+            usuarioRepository.resetSequence();
+        } catch (Exception e) {
+            // Si falla, continuar sin problemas (puede ser que la tabla aún no exista)
+        }
+
         Optional<Usuario> adminExistente = usuarioRepository.findByUsername("admin");
         if (adminExistente.isEmpty()) {
             Usuario admin = new Usuario();

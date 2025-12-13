@@ -57,6 +57,13 @@ public class TicketController {
             return "redirect:/login";
         }
 
+        // VALIDACIÓN: Verificar que el usuario NO sea administrador
+        if (usuario.isAdmin()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Los administradores no pueden comprar entradas.");
+            return "redirect:/eventos";
+        }
+
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
 

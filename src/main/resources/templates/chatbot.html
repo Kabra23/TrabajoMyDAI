@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual - Barça Atlètic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #004D98, #A50044);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #004D98, #A50044);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 140px);
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #004D98, #A50044);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .chat-header i {
+            margin-right: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin: 0 10px;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #A50044, #CC0055);
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #004D98;
+        }
+
+        .send-button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 77, 152, 0.4);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            border: 1px solid #e0e0e0;
+        }
+
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            background: #004D98;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .suggested-questions {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .suggested-question {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .suggested-question:hover {
+            background: #004D98;
+            color: white;
+            border-color: #004D98;
+        }
+
+        .scroll-to-bottom {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background: #004D98;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .scroll-to-bottom:hover {
+            background: #0066CC;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <i class="fas fa-robot"></i> Asistente Virtual del Barça Atlètic
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-bubble">
+                    ¡Hola! Soy tu asistente virtual del FC Barcelona Atlètic.
+                    ¿En qué puedo ayudarte hoy? Puedo darte información sobre jugadores,
+                    eventos, noticias y ayudarte con tus tickets. 😊
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="suggested-questions">
+            <div class="suggested-question" onclick="sendSuggestedQuestion('¿Cuál es el próximo evento?')">
+                📅 Próximo evento
+            </div>
+            <div class="suggested-question" onclick="sendSuggestedQuestion('Información sobre un jugador')">
+                ⚽ Info jugadores
+            </div>
+            <div class="suggested-question" onclick="sendSuggestedQuestion('¿Cuáles son mis tickets?')">
+                🎫 Mis tickets
+            </div>
+            <div class="suggested-question" onclick="sendSuggestedQuestion('Últimas noticias del Barça Atlètic')">
+                📰 Noticias
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text"
+                   id="chatInput"
+                   class="chat-input"
+                   placeholder="Escribe tu pregunta aquí..."
+                   autocomplete="off"
+                   autofocus
+                   aria-label="Campo de mensaje del chatbot"
+                   onkeypress="handleKeyPress(event)">
+            <button class="send-button" onclick="sendMessage()" id="sendButton">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+        </div>
+    </div>
+
+    <button class="scroll-to-bottom" id="scrollToBottom" onclick="scrollToBottom()">
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sessionId = 'session_' + Date.now();
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const scrollToBottomBtn = document.getElementById('scrollToBottom');
+
+        // Verificar que los elementos existen
+        console.log('Elementos del chat:', {
+            chatMessages: chatMessages !== null,
+            chatInput: chatInput !== null,
+            sendButton: sendButton !== null,
+            typingIndicator: typingIndicator !== null,
+            scrollToBottomBtn: scrollToBottomBtn !== null
+        });
+
+        // Verificar estado inicial del input
+        console.log('Estado inicial del input:', {
+            disabled: chatInput.disabled,
+            readOnly: chatInput.readOnly,
+            value: chatInput.value
+        });
+
+        // Auto-scroll cuando hay nuevos mensajes
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Mostrar/ocultar botón de scroll
+        chatMessages.addEventListener('scroll', function() {
+            const isAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop === chatMessages.clientHeight;
+            scrollToBottomBtn.style.display = isAtBottom ? 'none' : 'flex';
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Agregar listener adicional para asegurar que funcione
+        document.addEventListener('DOMContentLoaded', function() {
+            chatInput.addEventListener('keydown', function(event) {
+                console.log('Tecla presionada:', event.key, 'Input disabled:', chatInput.disabled);
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Detectar cuando el usuario escribe
+            chatInput.addEventListener('input', function() {
+                console.log('Usuario escribiendo:', chatInput.value);
+            });
+        });
+
+        function sendSuggestedQuestion(question) {
+            chatInput.value = question;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Deshabilitar input y botón
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+
+            // Agregar mensaje del usuario
+            addMessage(message, 'user');
+            chatInput.value = '';
+
+            // Mostrar indicador de escritura
+            typingIndicator.style.display = 'block';
+            scrollToBottom();
+
+            try {
+                const response = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                // Ocultar indicador de escritura
+                typingIndicator.style.display = 'none';
+
+                if (response.ok) {
+                    addMessage(data.reply, 'bot');
+                } else {
+                    addMessage('Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo.', 'bot');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.style.display = 'none';
+                addMessage('Lo siento, no pude conectarme con el servidor. Por favor, verifica tu conexión.', 'bot');
+            } finally {
+                // Rehabilitar input y botón SIEMPRE
+                setTimeout(() => {
+                    chatInput.disabled = false;
+                    sendButton.disabled = false;
+                    chatInput.focus();
+                }, 100);
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = text;
+
+            if (sender === 'user') {
+                messageDiv.appendChild(bubble);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(bubble);
+            }
+
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Cargar historial al iniciar
+        async function loadHistory() {
+            try {
+                const response = await fetch(`/api/chat/history/${sessionId}`);
+                if (response.ok) {
+                    const history = await response.json();
+                    // El historial ya está en la base de datos, pero para esta sesión nueva no hay nada
+                }
+            } catch (error) {
+                console.error('Error al cargar historial:', error);
+            }
+        }
+
+        // Asegurar que los inputs estén habilitados al cargar
+        window.addEventListener('DOMContentLoaded', function() {
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            chatInput.focus();
+            console.log('Chatbot inicializado correctamente');
+        });
+
+        // Inicializar
+        loadHistory();
+        chatInput.focus();
+    </script>
+</body>
+</html>
+

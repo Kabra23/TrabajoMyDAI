@@ -394,6 +394,372 @@
             }
         }
 
+        /* Chatbot flotante */
+        .chatbot-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #004D98, #A50044);
+            color: white;
+            border: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .chatbot-float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 77, 152, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 6px 30px rgba(165, 0, 68, 0.6);
+            }
+        }
+
+        .chatbot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        /* Modal del chatbot */
+        .chatbot-modal {
+            display: none;
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 400px;
+            max-height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbot-modal.active {
+            display: flex;
+        }
+
+        .chatbot-modal-header {
+            background: linear-gradient(90deg, #004D98, #A50044);
+            color: white;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-modal-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chatbot-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .chatbot-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            max-height: 400px;
+        }
+
+        .chatbot-message {
+            display: flex;
+            margin-bottom: 12px;
+            animation: fadeInMsg 0.3s ease-in;
+        }
+
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chatbot-message.user {
+            justify-content: flex-end;
+        }
+
+        .chatbot-message.bot {
+            justify-content: flex-start;
+        }
+
+        .chatbot-bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .chatbot-message.user .chatbot-bubble {
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chatbot-message.bot .chatbot-bubble {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chatbot-bubble strong {
+            font-weight: 700;
+            color: #004D98;
+        }
+
+        .chatbot-message.user .chatbot-bubble strong {
+            color: #FFD700;
+        }
+
+        .chatbot-video-container {
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            position: relative;
+            padding-bottom: 56.25%; /* Aspect ratio 16:9 */
+            height: 0;
+        }
+
+        .chatbot-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .chatbot-input-area {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .chatbot-input:focus {
+            border-color: #004D98;
+        }
+
+        .chatbot-send-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .chatbot-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 77, 152, 0.4);
+        }
+
+        .chatbot-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chatbot-typing {
+            display: none;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 15px;
+            width: fit-content;
+            border: 1px solid #e0e0e0;
+        }
+
+        .chatbot-typing span {
+            height: 8px;
+            width: 8px;
+            background: #004D98;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .chatbot-typing span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .chatbot-typing span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Botones de opciones interactivas */
+        .chatbot-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .chatbot-option-btn {
+            background: linear-gradient(135deg, #f0f0f0, #ffffff);
+            border: 2px solid #004D98;
+            color: #004D98;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chatbot-option-btn:hover {
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 77, 152, 0.3);
+        }
+
+        .chatbot-option-btn:active {
+            transform: translateX(3px) scale(0.98);
+        }
+
+        .chatbot-option-btn i {
+            font-size: 1.1rem;
+        }
+
+        .chatbot-option-btn.selected {
+            background: linear-gradient(135deg, #004D98, #0066CC);
+            color: white;
+            cursor: default;
+        }
+
+        .chatbot-option-btn.selected:hover {
+            transform: none;
+        }
+
+        /* Botón Volver */
+        .chatbot-back-btn {
+            background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
+            border: 2px solid #666;
+            color: #333;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .chatbot-back-btn:hover {
+            background: linear-gradient(135deg, #666, #888);
+            color: white;
+            transform: translateX(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .chatbot-back-btn i {
+            font-size: 0.9rem;
+        }
+
+        /* Mensaje de error/advertencia */
+        .chatbot-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #856404;
+        }
+
+        .chatbot-error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #721c24;
+        }
+
+        @media (max-width: 576px) {
+            .chatbot-modal {
+                width: calc(100vw - 20px);
+                right: 10px;
+                bottom: 100px;
+            }
+
+            .chatbot-float-btn {
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -412,12 +778,16 @@
                 <li class="nav-item"><a class="nav-link" href="/plantilla"><i class="fas fa-users"></i> Plantilla</a></li>
                 <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <!-- Opciones solo para usuarios normales (no admin) -->
+                <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <!-- Opciones solo para admin -->
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a></li>
+                <!-- Opciones para no logueados -->
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a></li>
+                <!-- Cerrar sesión para todos los logueados -->
                 <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
             </ul>
         </div>
@@ -572,41 +942,47 @@
 
         <!-- Para filtrar por posición -->
         <div class="players-filter text-center mt-4 mb-3">
-            <a th:href="@{/plantilla}"
-               class="filter-chip"
-               th:classappend="${posicionSeleccionada} == 'Todos' ? ' active'">
+            <button type="button"
+                    class="filter-chip active"
+                    data-posicion="Todos"
+                    onclick="filtrarJugadores('Todos', this)">
                 Todos
-            </a>
+            </button>
 
-            <a th:href="@{/plantilla(posicion='Portero')}"
-               class="filter-chip"
-               th:classappend="${posicionSeleccionada} == 'Portero' ? ' active'">
+            <button type="button"
+                    class="filter-chip"
+                    data-posicion="Portero"
+                    onclick="filtrarJugadores('Portero', this)">
                 Porteros
-            </a>
+            </button>
 
-            <a th:href="@{/plantilla(posicion='Defensa')}"
-               class="filter-chip"
-               th:classappend="${posicionSeleccionada} == 'Defensa' ? ' active'">
+            <button type="button"
+                    class="filter-chip"
+                    data-posicion="Defensa"
+                    onclick="filtrarJugadores('Defensa', this)">
                 Defensas
-            </a>
+            </button>
 
-            <a th:href="@{/plantilla(posicion='Centrocampista')}"
-               class="filter-chip"
-               th:classappend="${posicionSeleccionada} == 'Centrocampista' ? ' active'">
+            <button type="button"
+                    class="filter-chip"
+                    data-posicion="Centrocampista"
+                    onclick="filtrarJugadores('Centrocampista', this)">
                 Centrocampistas
-            </a>
+            </button>
 
-            <a th:href="@{/plantilla(posicion='Delantero')}"
-               class="filter-chip"
-               th:classappend="${posicionSeleccionada} == 'Delantero' ? ' active'">
+            <button type="button"
+                    class="filter-chip"
+                    data-posicion="Delantero"
+                    onclick="filtrarJugadores('Delantero', this)">
                 Delanteros
-            </a>
+            </button>
         </div>
 
         <!-- Grid de jugadores centrado -->
-        <div class="row g-4 justify-content-center">
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3"
-                 th:each="jugador : ${jugadores}">
+        <div class="row g-4 justify-content-center" id="jugadoresGrid">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 jugador-item"
+                 th:each="jugador : ${jugadores}"
+                 th:attr="data-posicion=${jugador.posicion}">
                 <div class="player-card h-100">
                     <img th:src="${jugador.imagenUrl}"
                          th:alt="${jugador.nombre}">
@@ -632,12 +1008,6 @@
                             <strong>Nacionalidad:</strong>
                             <span th:text="${jugador.nacionalidad}">España</span>
                         </p>
-
-                        <!-- Botón para generar foto con IA -->
-                        <a th:href="@{/jugadores/{id}/foto(id=${jugador.id})}"
-                           class="btn btn-warning btn-sm mt-3 w-100">
-                            <i class="fas fa-camera"></i> Foto conmigo
-                        </a>
                     </div>
                 </div>
             </div>
@@ -663,6 +1033,456 @@
     </div>
 </footer>
 
+<!-- Botón flotante del chatbot -->
+<button class="chatbot-float-btn" id="chatbotFloatBtn" onclick="toggleChatbot()">
+    <i class="fas fa-robot"></i>
+    <span class="chatbot-badge" id="chatbotBadge" style="display: none;">1</span>
+</button>
+
+<!-- Modal del chatbot -->
+<div class="chatbot-modal" id="chatbotModal">
+    <div class="chatbot-modal-header">
+        <h3><i class="fas fa-robot me-2"></i>Asistente de Jugadores</h3>
+        <button class="chatbot-close-btn" onclick="toggleChatbot()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="chatbot-messages" id="chatbotMessages">
+        <div class="chatbot-message bot">
+            <div class="chatbot-bubble" id="initialMessage">
+                ¡Hola! 👋 Soy tu asistente <strong>BarçAI</strong>.<br><br>
+                <strong>Esto es lo que me puedes pedir:</strong>
+                <br><br>
+                <strong>Cargando opciones...</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="chatbot-typing" id="chatbotTyping">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Input de texto eliminado - Solo interacción por botones -->
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const chatbotSessionId = 'plantilla_' + Date.now();
+
+    function toggleChatbot() {
+        const modal = document.getElementById('chatbotModal');
+        const badge = document.getElementById('chatbotBadge');
+        modal.classList.toggle('active');
+
+        if (modal.classList.contains('active')) {
+            badge.style.display = 'none';
+            console.log('Chatbot abierto');
+        }
+    }
+
+    function scrollChatbotToBottom() {
+        const messages = document.getElementById('chatbotMessages');
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+
+    function addChatbotMessage(text, sender, videoUrl = null) {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chatbot-message ${sender}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chatbot-bubble';
+
+        // Convertir saltos de línea a <br> y preservar formato
+        const formattedText = text.replace(/\n/g, '<br>');
+        bubble.innerHTML = formattedText;
+
+        // Si hay video, agregarlo
+        if (videoUrl) {
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'chatbot-video-container';
+            videoContainer.innerHTML = `
+                <iframe
+                    src="${videoUrl}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+            `;
+            bubble.appendChild(videoContainer);
+
+            // Agregar botón para abrir en YouTube
+            const youtubeLink = document.createElement('div');
+            youtubeLink.style.marginTop = '8px';
+            youtubeLink.style.textAlign = 'center';
+            youtubeLink.innerHTML = `
+                <a href="${videoUrl.replace('/embed?listType=search&list=', '/results?search_query=')}"
+                   target="_blank"
+                   style="color: #004D98; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fab fa-youtube" style="color: #FF0000;"></i> Ver más en YouTube →
+                </a>
+            `;
+            bubble.appendChild(youtubeLink);
+        }
+
+        messageDiv.appendChild(bubble);
+        messagesDiv.appendChild(messageDiv);
+        scrollChatbotToBottom();
+    }
+
+    // Variable global para almacenar jugadores
+    let jugadoresData = [];
+    let jugadoresPorPosicion = {};
+
+    // Cargar lista de jugadores al iniciar
+    window.addEventListener('load', async function() {
+        try {
+            const response = await fetch('/api/chat/plantilla/jugadores');
+            if (response.ok) {
+                jugadoresData = await response.json();
+
+                // Agrupar por posición
+                jugadoresData.forEach(j => {
+                    if (!jugadoresPorPosicion[j.posicion]) {
+                        jugadoresPorPosicion[j.posicion] = [];
+                    }
+                    jugadoresPorPosicion[j.posicion].push(j);
+                });
+
+                // Mostrar menú principal
+                mostrarMenuPrincipal();
+
+                console.log('Chatbot de plantilla inicializado correctamente');
+                console.log('Total jugadores cargados:', jugadoresData.length);
+            }
+        } catch (error) {
+            console.error('Error cargando jugadores:', error);
+
+            const initialMsg = document.getElementById('initialMessage');
+            if (initialMsg) {
+                initialMsg.innerHTML = '¡Hola! 👋 Soy tu asistente <strong>BarçAI</strong>.<br><br>⚠️ Hubo un error al cargar los jugadores. Por favor, recarga la página.';
+            }
+        }
+    });
+
+    // Función para agregar botón "Volver al menú"
+    function agregarBotonVolver() {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const btnDiv = document.createElement('div');
+        btnDiv.className = 'chatbot-message bot';
+        btnDiv.style.marginTop = '10px';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chatbot-bubble';
+        bubble.style.textAlign = 'center';
+        bubble.style.padding = '5px';
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'chatbot-back-btn';
+        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Volver al menú principal';
+        backBtn.onclick = () => {
+            // Limpiar TODOS los mensajes
+            messagesDiv.innerHTML = '';
+
+            // Recrear mensaje inicial
+            const initialDiv = document.createElement('div');
+            initialDiv.className = 'chatbot-message bot';
+
+            const initialBubble = document.createElement('div');
+            initialBubble.className = 'chatbot-bubble';
+            initialBubble.id = 'initialMessage';
+
+            initialDiv.appendChild(initialBubble);
+            messagesDiv.appendChild(initialDiv);
+
+            // Mostrar menú principal nuevamente
+            mostrarMenuPrincipal();
+            scrollChatbotToBottom();
+        };
+
+        bubble.appendChild(backBtn);
+        btnDiv.appendChild(bubble);
+        messagesDiv.appendChild(btnDiv);
+        scrollChatbotToBottom();
+    }
+
+    function mostrarMenuPrincipal() {
+        const initialMsg = document.getElementById('initialMessage');
+
+        let mensaje = '¡Hola! 👋 Soy tu asistente <strong>BarçAI</strong>.<br><br>';
+        mensaje += '<strong>Esto es lo que me puedes pedir:</strong>';
+
+        // Crear botones de opciones
+        const opcionesDiv = document.createElement('div');
+        opcionesDiv.className = 'chatbot-options';
+
+        const opciones = [
+            { icon: 'fa-user', text: '1. Información de un jugador', action: 'info-jugador' },
+            { icon: 'fa-users', text: '2. Jugadores por posición', action: 'por-posicion' },
+            { icon: 'fa-chart-bar', text: '3. Información general de la plantilla', action: 'info-general' }
+        ];
+
+        opciones.forEach(opcion => {
+            const btn = document.createElement('button');
+            btn.className = 'chatbot-option-btn';
+            btn.innerHTML = `<i class="fas ${opcion.icon}"></i> ${opcion.text}`;
+            btn.onclick = () => seleccionarOpcion(opcion.action);
+            opcionesDiv.appendChild(btn);
+        });
+
+        initialMsg.innerHTML = mensaje;
+        initialMsg.appendChild(opcionesDiv);
+    }
+
+    function seleccionarOpcion(accion) {
+        // Deshabilitar todos los botones del menú actual
+        const botones = document.querySelectorAll('.chatbot-option-btn');
+        botones.forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.6';
+        });
+
+        switch(accion) {
+            case 'info-jugador':
+                mostrarListaJugadores();
+                break;
+            case 'por-posicion':
+                mostrarListaPosiciones();
+                break;
+            case 'info-general':
+                mostrarInfoGeneral();
+                break;
+        }
+    }
+
+    function mostrarListaJugadores() {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message bot';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chatbot-bubble';
+
+        let mensaje = '<strong>📋 Selecciona un jugador:</strong>';
+
+        const opcionesDiv = document.createElement('div');
+        opcionesDiv.className = 'chatbot-options';
+        opcionesDiv.style.maxHeight = '300px';
+        opcionesDiv.style.overflowY = 'auto';
+
+        // Ordenar jugadores alfabéticamente
+        const jugadoresOrdenados = [...jugadoresData].sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+        jugadoresOrdenados.forEach(jugador => {
+            const btn = document.createElement('button');
+            btn.className = 'chatbot-option-btn';
+            btn.innerHTML = `<i class="fas fa-user"></i> ${jugador.nombre} (#${jugador.dorsal}) - ${jugador.posicion}`;
+            btn.onclick = () => consultarJugador(jugador.nombre, btn);
+            opcionesDiv.appendChild(btn);
+        });
+
+        bubble.innerHTML = mensaje;
+        bubble.appendChild(opcionesDiv);
+        messageDiv.appendChild(bubble);
+        messagesDiv.appendChild(messageDiv);
+        scrollChatbotToBottom();
+    }
+
+    function mostrarListaPosiciones() {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message bot';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chatbot-bubble';
+
+        let mensaje = '<strong>⚽ Selecciona una posición:</strong>';
+
+        const opcionesDiv = document.createElement('div');
+        opcionesDiv.className = 'chatbot-options';
+
+        const iconos = {
+            'Portero': 'fa-shield-alt',
+            'Defensa': 'fa-user-shield',
+            'Centrocampista': 'fa-running',
+            'Delantero': 'fa-futbol'
+        };
+
+        Object.keys(jugadoresPorPosicion).sort().forEach(posicion => {
+            const btn = document.createElement('button');
+            btn.className = 'chatbot-option-btn';
+            const count = jugadoresPorPosicion[posicion].length;
+            btn.innerHTML = `<i class="fas ${iconos[posicion] || 'fa-user'}"></i> ${posicion}s (${count})`;
+            btn.onclick = () => mostrarJugadoresPorPosicion(posicion, btn);
+            opcionesDiv.appendChild(btn);
+        });
+
+        bubble.innerHTML = mensaje;
+        bubble.appendChild(opcionesDiv);
+        messageDiv.appendChild(bubble);
+        messagesDiv.appendChild(messageDiv);
+        scrollChatbotToBottom();
+    }
+
+    function mostrarJugadoresPorPosicion(posicion, botonSeleccionado) {
+        // Marcar botón como seleccionado
+        botonSeleccionado.classList.add('selected');
+
+        const jugadores = jugadoresPorPosicion[posicion];
+        let mensaje = `<strong>${posicion}s de la plantilla:</strong><br><br>`;
+
+        jugadores.forEach(j => {
+            mensaje += `• <strong>${j.nombre}</strong> (#${j.dorsal}) - ${j.edad} años - ${j.nacionalidad}<br>`;
+        });
+
+        addChatbotMessage(mensaje, 'bot');
+
+        // Agregar botón volver
+        agregarBotonVolver();
+    }
+
+    function mostrarInfoGeneral() {
+        const totalJugadores = jugadoresData.length;
+        const edadMedia = (jugadoresData.reduce((sum, j) => sum + j.edad, 0) / totalJugadores).toFixed(1);
+
+        let mensaje = '<strong>📊 Información General de la Plantilla:</strong><br><br>';
+        mensaje += `👥 <strong>Total de jugadores:</strong> ${totalJugadores}<br>`;
+        mensaje += `📅 <strong>Edad media:</strong> ${edadMedia} años<br><br>`;
+        mensaje += '<strong>Por posición:</strong><br>';
+
+        Object.keys(jugadoresPorPosicion).sort().forEach(posicion => {
+            const count = jugadoresPorPosicion[posicion].length;
+            mensaje += `• ${posicion}s: ${count}<br>`;
+        });
+
+        // Jugador más joven y más veterano
+        const masJoven = jugadoresData.reduce((min, j) => j.edad < min.edad ? j : min);
+        const masVeterano = jugadoresData.reduce((max, j) => j.edad > max.edad ? j : max);
+
+        mensaje += `<br>👶 <strong>Más joven:</strong> ${masJoven.nombre} (${masJoven.edad} años)<br>`;
+        mensaje += `🎖️ <strong>Más veterano:</strong> ${masVeterano.nombre} (${masVeterano.edad} años)`;
+
+        addChatbotMessage(mensaje, 'bot');
+
+        // Agregar botón volver
+        agregarBotonVolver();
+    }
+
+    function consultarJugador(nombreJugador, botonSeleccionado) {
+        // Marcar botón como seleccionado
+        if (botonSeleccionado) {
+            botonSeleccionado.classList.add('selected');
+        }
+
+        // Simular que el usuario escribió el mensaje
+        addChatbotMessage(`Información de ${nombreJugador}`, 'user');
+
+        // Enviar al servidor
+        enviarConsultaJugador(nombreJugador);
+    }
+
+    async function enviarConsultaJugador(nombreJugador) {
+        const typing = document.getElementById('chatbotTyping');
+        typing.style.display = 'block';
+        scrollChatbotToBottom();
+
+        try {
+            const response = await fetch('/api/chat/plantilla/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sessionId: chatbotSessionId,
+                    message: `Información de ${nombreJugador}`
+                })
+            });
+
+            const data = await response.json();
+            typing.style.display = 'none';
+
+            if (response.ok) {
+                addChatbotMessage(data.reply, 'bot', data.videoUrl);
+                // Agregar botón volver después de la respuesta
+                agregarBotonVolver();
+            } else {
+                addChatbotMessage('Lo siento, hubo un error. Inténtalo de nuevo.', 'bot');
+                agregarBotonVolver();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            typing.style.display = 'none';
+            addChatbotMessage('Error de conexión. Por favor, verifica tu conexión.', 'bot');
+            agregarBotonVolver();
+        }
+    }
+
+    // ========================================
+    // FUNCIÓN PARA FILTRAR JUGADORES SIN RECARGAR LA PÁGINA
+    // ========================================
+    function filtrarJugadores(posicion, botonClickeado) {
+        // 1. Actualizar clases activas en los botones
+        const todosLosBotones = document.querySelectorAll('.filter-chip');
+        todosLosBotones.forEach(btn => btn.classList.remove('active'));
+        botonClickeado.classList.add('active');
+
+        // 2. Obtener todas las tarjetas de jugadores
+        const jugadores = document.querySelectorAll('.jugador-item');
+
+        // 3. Filtrar según la posición seleccionada
+        jugadores.forEach(jugador => {
+            const posicionJugador = jugador.getAttribute('data-posicion');
+
+            if (posicion === 'Todos' || posicionJugador === posicion) {
+                // Mostrar jugador con animación
+                jugador.style.display = 'block';
+                jugador.style.opacity = '0';
+                jugador.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    jugador.style.transition = 'all 0.3s ease';
+                    jugador.style.opacity = '1';
+                    jugador.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                // Ocultar jugador
+                jugador.style.transition = 'all 0.2s ease';
+                jugador.style.opacity = '0';
+                jugador.style.transform = 'translateY(-10px)';
+
+                setTimeout(() => {
+                    jugador.style.display = 'none';
+                }, 200);
+            }
+        });
+
+        // 4. Actualizar URL sin recargar (opcional, para mantener el estado en el historial)
+        const url = new URL(window.location);
+        if (posicion === 'Todos') {
+            url.searchParams.delete('posicion');
+        } else {
+            url.searchParams.set('posicion', posicion);
+        }
+        window.history.pushState({}, '', url);
+    }
+
+    // Al cargar la página, aplicar el filtro si hay un parámetro en la URL
+    window.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const posicionParam = urlParams.get('posicion');
+
+        if (posicionParam) {
+            const boton = document.querySelector(`.filter-chip[data-posicion="${posicionParam}"]`);
+            if (boton) {
+                filtrarJugadores(posicionParam, boton);
+            }
+        }
+    });
+</script>
 </body>
 </html>

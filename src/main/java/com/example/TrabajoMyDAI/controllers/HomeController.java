@@ -26,4 +26,19 @@ public class HomeController {
 
         return "index";
     }
+
+    @GetMapping("/chatbot")
+    public String chatbot(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario != null) {
+            model.addAttribute("logueado", true);
+            model.addAttribute("esAdmin", usuario.isAdmin());
+        } else {
+            model.addAttribute("logueado", false);
+            model.addAttribute("esAdmin", false);
+        }
+
+        return "chatbot";
+    }
 }
