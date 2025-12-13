@@ -20,6 +20,8 @@ public class Zona {
 
     private Integer entradasVendidas = 0; // Número de entradas ya vendidas
 
+    private Double precio; // Precio base de la zona
+
     @OneToMany(mappedBy = "zona", cascade = CascadeType.ALL)
     private List<Ticket> tickets = new ArrayList<>();
 
@@ -32,6 +34,15 @@ public class Zona {
         this.evento = evento;
         this.capacidadTotal = capacidadTotal;
         this.entradasVendidas = 0;
+    }
+
+    // Constructor con precio
+    public Zona(String nombre, Evento evento, Integer capacidadTotal, Double precio) {
+        this.nombre = nombre;
+        this.evento = evento;
+        this.capacidadTotal = capacidadTotal;
+        this.entradasVendidas = 0;
+        this.precio = precio;
     }
 
     // Getters y Setters
@@ -81,6 +92,14 @@ public class Zona {
 
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    public Double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(Double precio) {
+        this.precio = precio;
     }
 
     // Métodos auxiliares

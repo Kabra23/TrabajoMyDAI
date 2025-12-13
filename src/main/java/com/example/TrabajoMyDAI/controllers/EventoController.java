@@ -88,4 +88,33 @@ public class EventoController {
         model.addAttribute("esAdmin", false);
         return "comprar-ticket";
     }
+
+    @GetMapping("/eventos/{id}/comprar-3d")
+    public String mostrarFormularioCompra3D(@PathVariable("id") Long id, Model model, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("logueado", usuario != null);
+
+        // Verificar si el usuario es admin y bloquear acceso a compra
+        if (usuario != null && usuario.isAdmin()) {
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("error", "Los administradores no pueden comprar entradas");
+            return "redirect:/eventos?error=admin_no_puede_comprar";
+        }
+
+        var evento = eventoService.obtenerEventoPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
+
+        model.addAttribute("evento", evento);
+
+        // Obtener zonas con su disponibilidad
+        List<Zona> zonasEvento = zonaService.obtenerZonasPorEvento(id);
+
+        // Si no hay zonas creadas, crear las zonas predeterminadas
+        if (zonasEvento.isEmpty()) {
+            zonaService.crearZonasParaEvento(evento);
+        }
+
+        model.addAttribute("esAdmin", false);
+        return "comprar-tickets-3d";
+    }
 }
