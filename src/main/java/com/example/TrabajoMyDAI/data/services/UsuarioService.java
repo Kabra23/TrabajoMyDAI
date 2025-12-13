@@ -21,4 +21,10 @@ public interface UsuarioService {
     long contarAdmins();
     boolean esUltimoAdmin(Long userId);
     void eliminarUsuarioSeguro(Long idUsuarioAEliminar, Usuario usuarioSolicitante);
+    void reorganizarIds();
+
+    // Métodos para gestión de saldo
+    void agregarSaldo(Long usuarioId, Double cantidad);
+    boolean descontarSaldo(Long usuarioId, Double cantidad);
+    Double consultarSaldo(Long usuarioId);
 }

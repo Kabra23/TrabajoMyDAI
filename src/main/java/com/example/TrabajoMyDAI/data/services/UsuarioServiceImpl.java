@@ -119,6 +119,11 @@ public class UsuarioServiceImpl implements UsuarioService {
                     throw new IllegalArgumentException("No se puede quitar el rol de administrador al último admin del sistema");
                 }
             }
+
+            // Si el usuario se convierte en admin, resetear el saldo a 0
+            if (!eraAdmin && seraAdmin) {
+                usuarioExistente.setSaldo(0.0);
+            }
         }
 
         if (usuarioExistente.isAdmin() && usuarioActualizado.getRoles() != null
@@ -214,6 +219,119 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         usuarioRepository.deleteById(idUsuarioAEliminar);
+
+        // Reorganizar IDs después de eliminar
+        reorganizarIds();
+    }
+
+    @Override
+    public void reorganizarIds() {
+        List<Usuario> todosLosUsuarios = usuarioRepository.findAll();
+
+        if (todosLosUsuarios.isEmpty()) {
+            // Si no hay usuarios, reiniciar la secuencia a 1
+            usuarioRepository.resetSequence();
+            return;
+        }
+
+        // Ordenar usuarios por ID actual (menor a mayor)
+        todosLosUsuarios.sort(java.util.Comparator.comparingLong(Usuario::getDni));
+
+        // Reorganizar IDs de forma compacta: 1, 2, 3, 4, ...
+        // Esto elimina "huecos" en la secuencia
+        for (int i = 0; i < todosLosUsuarios.size(); i++) {
+            Usuario usuario = todosLosUsuarios.get(i);
+            long idActual = usuario.getDni();
+            long nuevoId = i + 1;
+
+            // Solo actualizar si el ID debe cambiar
+            if (idActual != nuevoId) {
+                // Usar un ID temporal grande para evitar conflictos
+                long idTemporal = 10000L + idActual;
+
+                // Paso 1: Mover a ID temporal
+                usuarioRepository.actualizarId(idActual, idTemporal);
+                usuarioRepository.flush();
+
+                // Actualizar el objeto en memoria
+                usuario.setDni(idTemporal);
+            }
+        }
+
+        // Paso 2: Ahora asignar los IDs finales
+        for (int i = 0; i < todosLosUsuarios.size(); i++) {
+            Usuario usuario = todosLosUsuarios.get(i);
+            long idActual = usuario.getDni();
+            long nuevoId = i + 1;
+
+            if (idActual != nuevoId) {
+                usuarioRepository.actualizarId(idActual, nuevoId);
+                usuarioRepository.flush();
+                usuario.setDni(nuevoId);
+            }
+        }
+
+        // Paso 3: Reiniciar la secuencia al siguiente ID disponible
+        long proximoId = todosLosUsuarios.size() + 1;
+        usuarioRepository.resetSequenceToNextId(proximoId);
+    }
+
+    @Override
+    public void agregarSaldo(Long usuarioId, Double cantidad) {
+        if (usuarioId == null || cantidad == null || cantidad <= 0) {
+            throw new IllegalArgumentException("ID de usuario y cantidad deben ser válidos y positivos");
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (usuario.isAdmin()) {
+            throw new IllegalArgumentException("Los administradores no pueden tener saldo");
+        }
+
+        usuario.agregarSaldo(cantidad);
+        usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public boolean descontarSaldo(Long usuarioId, Double cantidad) {
+        if (usuarioId == null || cantidad == null || cantidad <= 0) {
+            return false;
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
+        if (usuarioOpt.isEmpty()) {
+            return false;
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (usuario.isAdmin()) {
+            return false;
+        }
+
+        if (usuario.descontarSaldo(cantidad)) {
+            usuarioRepository.save(usuario);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Double consultarSaldo(Long usuarioId) {
+        if (usuarioId == null) {
+            return 0.0;
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
+        if (usuarioOpt.isEmpty()) {
+            return 0.0;
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        return usuario.isAdmin() ? 0.0 : usuario.getSaldo();
     }
 }
 

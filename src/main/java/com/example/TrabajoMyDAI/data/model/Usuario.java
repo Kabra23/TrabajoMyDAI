@@ -18,6 +18,9 @@ public class Usuario {
     private String password;
     private String roles;
 
+    // Saldo de la cuenta (solo para usuarios normales, no admin)
+    private Double saldo = 0.0;
+
     // Relación con Ticket
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets = new LinkedList<>();
@@ -94,6 +97,34 @@ public class Usuario {
     }
     public void setRoles(String roles) {
         this.roles = roles;
+    }
+
+    public Double getSaldo() {
+        return saldo != null ? saldo : 0.0;
+    }
+
+    public void setSaldo(Double saldo) {
+        // Si el usuario es admin, no puede tener saldo
+        if (this.isAdmin()) {
+            this.saldo = 0.0;
+        } else {
+            this.saldo = saldo != null ? saldo : 0.0;
+        }
+    }
+
+    // Métodos auxiliares para gestión de saldo
+    public void agregarSaldo(Double cantidad) {
+        if (!this.isAdmin() && cantidad != null && cantidad > 0) {
+            this.saldo = this.getSaldo() + cantidad;
+        }
+    }
+
+    public boolean descontarSaldo(Double cantidad) {
+        if (!this.isAdmin() && cantidad != null && cantidad > 0 && this.getSaldo() >= cantidad) {
+            this.saldo = this.getSaldo() - cantidad;
+            return true;
+        }
+        return false;
     }
 
     public List<Ticket> getTickets() {

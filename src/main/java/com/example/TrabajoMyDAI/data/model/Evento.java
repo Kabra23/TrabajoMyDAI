@@ -29,9 +29,14 @@ public class Evento {
 
     private String tipo_evento;
 
-
     // NUEVO: Campo para capacidad máxima del evento
     private Integer capacidad;
+
+    // NUEVO: Precios personalizados por zona
+    private Double precioTribuna;
+    private Double precioGolNord;
+    private Double precioGolSud;
+    private Double precioGradaLateral;
 
     public Evento() { }
 
@@ -67,6 +72,30 @@ public class Evento {
     // Getter y setter para capacidad
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
+
+    // Getters y setters para precios personalizados
+    public Double getPrecioTribuna() { return precioTribuna != null ? precioTribuna : 35.0; }
+    public void setPrecioTribuna(Double precioTribuna) { this.precioTribuna = precioTribuna; }
+
+    public Double getPrecioGolNord() { return precioGolNord != null ? precioGolNord : 25.0; }
+    public void setPrecioGolNord(Double precioGolNord) { this.precioGolNord = precioGolNord; }
+
+    public Double getPrecioGolSud() { return precioGolSud != null ? precioGolSud : 25.0; }
+    public void setPrecioGolSud(Double precioGolSud) { this.precioGolSud = precioGolSud; }
+
+    public Double getPrecioGradaLateral() { return precioGradaLateral != null ? precioGradaLateral : 20.0; }
+    public void setPrecioGradaLateral(Double precioGradaLateral) { this.precioGradaLateral = precioGradaLateral; }
+
+    // Método helper para obtener precio por nombre de zona
+    public Double getPrecioPorZona(String nombreZona) {
+        return switch (nombreZona) {
+            case "Tribuna" -> getPrecioTribuna();
+            case "Gol Nord" -> getPrecioGolNord();
+            case "Gol Sud" -> getPrecioGolSud();
+            case "Grada Lateral" -> getPrecioGradaLateral();
+            default -> 20.0;
+        };
+    }
 
     @Override
     public boolean equals(Object o) {

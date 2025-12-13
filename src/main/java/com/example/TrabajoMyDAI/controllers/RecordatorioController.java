@@ -123,4 +123,54 @@ public class RecordatorioController {
         recordatorioRepository.deleteById(id);
         return "redirect:/recordatorios";
     }
+
+    @GetMapping("/editar/{id}")
+    public String mostrarEditar(@PathVariable Long id, Model model, HttpSession session) {
+        if (session.getAttribute("usuario") == null) {
+            return "redirect:/";
+        }
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        Optional<Recordatorio> optionalRecordatorio = recordatorioRepository.findById(id);
+        if (optionalRecordatorio.isEmpty()) {
+            model.addAttribute("error", "Recordatorio no encontrado");
+            return "redirect:/recordatorios";
+        }
+
+        Recordatorio recordatorio = optionalRecordatorio.get();
+        if (!recordatorio.getUsuario().getDni().equals(usuario.getDni())) {
+            model.addAttribute("error", "No tienes permiso para editar este recordatorio");
+            return "redirect:/recordatorios";
+        }
+
+        model.addAttribute("recordatorio", recordatorio);
+        model.addAttribute("minDate", LocalDate.now().toString());
+        model.addAttribute("logueado", true);
+        model.addAttribute("esAdmin", usuario.isAdmin());
+        return "recordatorios/editar";
+    }
+
+    @PostMapping("/editar/{id}")
+    public String editar(@PathVariable Long id,
+                        @ModelAttribute("recordatorio") Recordatorio recordatorioForm,
+                        Model model,
+                        HttpSession session) {
+        if (session.getAttribute("usuario") == null) {
+            return "redirect:/";
+        }
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        try {
+            recordatorioService.editarRecordatorio(id, recordatorioForm, usuario);
+        } catch (ValidationException ve) {
+            model.addAttribute("recordatorio", recordatorioForm);
+            model.addAttribute("error", ve.getMessage());
+            model.addAttribute("minDate", LocalDate.now().toString());
+            model.addAttribute("logueado", true);
+            model.addAttribute("esAdmin", usuario.isAdmin());
+            return "recordatorios/editar";
+        }
+
+        return "redirect:/recordatorios";
+    }
 }

@@ -26,7 +26,7 @@
             background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
         }
 
-        /* Navbar */
+        /* Navbar mejorado */
         .navbar {
             background: rgba(0, 0, 0, 0.4) !important;
             backdrop-filter: blur(10px);
@@ -35,12 +35,35 @@
 
         .navbar-brand {
             font-weight: bold;
+            font-size: 1.5rem;
             color: var(--accent) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
         }
 
         .nav-link {
             color: #fff !important;
-            transition: color 0.3s;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
         }
 
         .nav-link:hover {
@@ -50,6 +73,33 @@
         .nav-link.admin-link {
             color: #dc3545 !important;
             font-weight: 600;
+        }
+
+        /* Contador de saldo en navbar */
+        .nav-link.saldo-badge {
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            color: var(--primary) !important;
+            padding: 8px 18px !important;
+            border-radius: 25px;
+            font-weight: 700;
+            margin: 0 5px;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.saldo-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 18px rgba(255, 215, 0, 0.5);
+        }
+
+        .nav-link.saldo-badge::after {
+            display: none;
+        }
+
+        .saldo-amount {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-left: 8px;
         }
 
         /* Container */
@@ -190,6 +240,15 @@
                 <!-- Opciones solo para admin -->
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a></li>
+                <!-- Contador de saldo para usuarios normales -->
+                <li class="nav-item" th:if="${logueado == true && esAdmin == false}">
+                    <a class="nav-link saldo-badge" href="/cuenta/perfil">
+                        <i class="fas fa-wallet"></i>
+                        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                    </a>
+                </li>
+                <!-- Opciones para todos los usuarios logueados -->
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/cuenta/perfil"><i class="fas fa-user-circle"></i> Mi Cuenta</a></li>
                 <!-- Opciones para no logueados -->
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a></li>

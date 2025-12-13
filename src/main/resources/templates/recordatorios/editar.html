@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Recordatorio - Barça Atlètic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #ffd700;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        .nav-link.admin-link {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+
+        .container {
+            padding-top: 110px;
+            max-width: 600px;
+        }
+
+        .card-form {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            color: var(--secondary);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        }
+
+        .card-form h2 {
+            color: var(--primary);
+            margin-bottom: 24px;
+            font-weight: 800;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            color: var(--primary);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 30px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px 0;
+            background: rgba(0,0,0,0.35);
+            margin-top: 40px;
+            backdrop-filter: blur(8px);
+        }
+
+        .help-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width:768px) {
+            .container {
+                padding-top: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;"> Barça Atlètic
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="/plantilla"><i class="fas fa-users"></i> Plantilla</a></li>
+                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
+                <!-- Opciones solo para usuarios normales (no admin) -->
+                <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
+                <!-- Opciones solo para admin -->
+                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
+                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a></li>
+                <!-- Opciones para todos los usuarios logueados -->
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/mi-cuenta"><i class="fas fa-user-circle"></i> Mi Cuenta</a></li>
+                <!-- Opciones para no logueados -->
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
+                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a></li>
+                <!-- Cerrar sesión -->
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card-form">
+        <h2><i class="fas fa-edit"></i> Editar Recordatorio</h2>
+
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <form th:action="@{/recordatorios/editar/{id}(id=${recordatorio.id_recordatorio})}" method="post" th:object="${recordatorio}">
+            <div class="mb-3">
+                <label for="mensaje" class="form-label"><i class="fas fa-comment-dots"></i> Mensaje del recordatorio</label>
+                <input type="text" class="form-control" id="mensaje" name="mensaje" th:field="*{mensaje}"
+                       placeholder="Ej: No olvidar asistir al partido" required>
+                <div class="help-text">Describe brevemente de qué trata este recordatorio</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="fecha" class="form-label"><i class="fas fa-calendar-alt"></i> Fecha y Hora del Recordatorio</label>
+                <input type="datetime-local" class="form-control" id="fecha" name="fecha"
+                       th:field="*{fecha}" th:min="${minDate}" required>
+                <div class="help-text">Selecciona cuándo deseas recibir el recordatorio</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-futbol"></i> Evento asociado</label>
+                <input type="text" class="form-control" th:value="${recordatorio.evento != null ? recordatorio.evento.nombre : 'Sin evento'}" readonly disabled>
+                <div class="help-text">El evento asociado a este recordatorio no se puede cambiar</div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <a href="/recordatorios" class="btn btn-cancel me-md-2">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-update">
+                    <i class="fas fa-save"></i> Actualizar Recordatorio
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -16,11 +16,14 @@ public class RecordatorioService {
 
     private final RecordatorioRepository recordatorioRepository;
     private final TicketRepository ticketRepository;
+    private final NotificationService notificationService;
 
     public RecordatorioService(RecordatorioRepository recordatorioRepository,
-                               TicketRepository ticketRepository) {
+                               TicketRepository ticketRepository,
+                               NotificationService notificationService) {
         this.recordatorioRepository = recordatorioRepository;
         this.ticketRepository = ticketRepository;
+        this.notificationService = notificationService;
     }
 
     public Recordatorio crearRecordatorio(Recordatorio recordatorio, Long ticketId, Usuario usuario) {
@@ -61,6 +64,60 @@ public class RecordatorioService {
         recordatorio.setUsuario(usuario);
         recordatorio.setEvento(ticket.getEvento());
 
-        return recordatorioRepository.save(recordatorio);
+        Recordatorio recordatorioGuardado = recordatorioRepository.save(recordatorio);
+
+        // Mostrar notificación de Windows cuando se crea el recordatorio
+        try {
+            String fechaFormateada = recordatorio.getFecha()
+                .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+            notificationService.notificarRecordatorioCreado(
+                recordatorio.getMensaje() != null ? recordatorio.getMensaje() : "Recordatorio creado",
+                fechaFormateada
+            );
+        } catch (Exception e) {
+            // Si falla la notificación, no afecta al guardado del recordatorio
+            System.err.println("Error al mostrar notificación: " + e.getMessage());
+        }
+
+        return recordatorioGuardado;
+    }
+
+    public Recordatorio editarRecordatorio(Long recordatorioId, Recordatorio recordatorioActualizado, Usuario usuario) {
+        Optional<Recordatorio> recordatorioOpt = recordatorioRepository.findById(recordatorioId);
+        if (recordatorioOpt.isEmpty()) {
+            throw new ValidationException("Recordatorio no encontrado.");
+        }
+
+        Recordatorio recordatorioExistente = recordatorioOpt.get();
+
+        // Verificar que el recordatorio pertenece al usuario
+        if (!recordatorioExistente.getUsuario().getDni().equals(usuario.getDni())) {
+            throw new ValidationException("No tienes permiso para editar este recordatorio.");
+        }
+
+        // Validar fecha
+        if (recordatorioActualizado.getFecha() == null) {
+            throw new ValidationException("Fecha del recordatorio requerida.");
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+        if (recordatorioActualizado.getFecha().isBefore(ahora)) {
+            throw new ValidationException("La fecha del recordatorio no puede ser anterior a ahora.");
+        }
+
+        // Validar que la fecha del recordatorio no sea posterior a la fecha del evento
+        if (recordatorioExistente.getEvento() != null && recordatorioExistente.getEvento().getFecha() != null) {
+            if (recordatorioActualizado.getFecha().isAfter(recordatorioExistente.getEvento().getFecha())) {
+                throw new ValidationException("La fecha del recordatorio no puede ser posterior a la fecha del evento.");
+            }
+        }
+
+        // Actualizar campos
+        recordatorioExistente.setFecha(recordatorioActualizado.getFecha());
+        if (recordatorioActualizado.getMensaje() != null) {
+            recordatorioExistente.setMensaje(recordatorioActualizado.getMensaje());
+        }
+
+        return recordatorioRepository.save(recordatorioExistente);
     }
 }

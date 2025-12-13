@@ -38,10 +38,64 @@ public class PerfilController {
         }
 
         Usuario usuario = getUsuarioLogueado(session);
+        // Recargar usuario desde BD para tener datos actualizados (especialmente el saldo)
+        Optional<Usuario> usuarioActualizado = usuarioService.encontrarPorId(usuario.getDni());
+        if (usuarioActualizado.isPresent()) {
+            usuario = usuarioActualizado.get();
+            session.setAttribute("usuario", usuario);
+        }
+
         model.addAttribute("usuario", usuario);
         model.addAttribute("logueado", true);
         model.addAttribute("esAdmin", usuario.isAdmin());
         return "mi-cuenta";
+    }
+
+    @PostMapping("/agregar-saldo")
+    public String agregarSaldo(@RequestParam Double cantidad,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        if (!estaLogueado(session)) {
+            return "redirect:/login";
+        }
+
+        Usuario usuario = getUsuarioLogueado(session);
+
+        // Validar que el usuario no sea admin
+        if (usuario.isAdmin()) {
+            redirectAttributes.addFlashAttribute("error", "Los administradores no pueden tener saldo");
+            return "redirect:/cuenta/perfil";
+        }
+
+        try {
+            // Validar cantidad
+            if (cantidad == null || cantidad <= 0) {
+                redirectAttributes.addFlashAttribute("error", "La cantidad debe ser mayor que 0");
+                return "redirect:/cuenta/perfil";
+            }
+
+            if (cantidad > 1000) {
+                redirectAttributes.addFlashAttribute("error", "No puedes agregar más de 1000€ a la vez");
+                return "redirect:/cuenta/perfil";
+            }
+
+            // Agregar saldo
+            usuarioService.agregarSaldo(usuario.getDni(), cantidad);
+
+            // Actualizar usuario en sesión
+            Optional<Usuario> usuarioActualizado = usuarioService.encontrarPorId(usuario.getDni());
+            if (usuarioActualizado.isPresent()) {
+                session.setAttribute("usuario", usuarioActualizado.get());
+            }
+
+            redirectAttributes.addFlashAttribute("success",
+                String.format("Se han agregado %.2f€ a tu saldo correctamente", cantidad));
+            return "redirect:/cuenta/perfil";
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cuenta/perfil";
+        }
     }
 
     @GetMapping("/editar")

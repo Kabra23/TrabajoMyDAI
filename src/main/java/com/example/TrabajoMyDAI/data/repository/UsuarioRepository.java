@@ -20,4 +20,14 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Transactional
     @Query(value = "ALTER TABLE USUARIO ALTER COLUMN DNI RESTART WITH 1", nativeQuery = true)
     void resetSequence();
+
+    @Modifying
+    @Transactional
+    @Query(value = "ALTER TABLE USUARIO ALTER COLUMN DNI RESTART WITH :nextId", nativeQuery = true)
+    void resetSequenceToNextId(long nextId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE USUARIO SET DNI = :nuevoId WHERE DNI = :idActual", nativeQuery = true)
+    void actualizarId(Long idActual, Long nuevoId);
 }
