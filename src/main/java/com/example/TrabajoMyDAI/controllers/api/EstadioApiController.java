@@ -59,7 +59,10 @@ public class EstadioApiController {
             Map<String, List<Long>> asientosOcupados = zonaService.obtenerAsientosOcupadosPorEvento(eventoId);
             return ResponseEntity.ok(asientosOcupados);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new HashMap<>());
+            Map<String, List<Long>> errorMap = new HashMap<>();
+            // Return empty lists for each zone in case of error
+            errorMap.put("error", new java.util.ArrayList<>());
+            return ResponseEntity.internalServerError().body(errorMap);
         }
     }
 

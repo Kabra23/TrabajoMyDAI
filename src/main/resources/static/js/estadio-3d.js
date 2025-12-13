@@ -104,7 +104,7 @@ function crearEstadio() {
     crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 30, 25, Math.PI / 2);
     crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 30, 25, -Math.PI / 2);
     crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 20, 40, Math.PI);
-    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: 60 }, 20, 40, Math.PI);
+    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 20, 40, 0);
 }
 
 /**
@@ -261,7 +261,6 @@ function actualizarPanelInfo() {
     let html = '<h3>Información del Estadio</h3>';
     
     zonasData.forEach(zona => {
-        const porcentajeOcupacion = ((zona.entradasVendidas / zona.capacidadTotal) * 100).toFixed(1);
         html += `
             <div class="info-row">
                 <span class="info-label">${zona.nombre}</span>
