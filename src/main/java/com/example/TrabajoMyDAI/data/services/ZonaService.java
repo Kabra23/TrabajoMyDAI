@@ -39,10 +39,15 @@ public class ZonaService {
 
         // Crear zonas con capacidades y precios predeterminados optimizados
         // Los precios coinciden con los mostrados en el front-end
-        Zona tribuna = new Zona("Tribuna", evento, 1000, evento.getPrecioTribuna());
-        Zona gradaLateral = new Zona("Grada Lateral", evento, 1500, evento.getPrecioGradaLateral());
-        Zona golNord = new Zona("Gol Nord", evento, 800, evento.getPrecioGolNord());
-        Zona golSud = new Zona("Gol Sud", evento, 800, evento.getPrecioGolSud());
+        // Usar valores por defecto si getPrecio*() retorna null
+        Zona tribuna = new Zona("Tribuna", evento, 1000, 
+            evento.getPrecioTribuna() != null ? evento.getPrecioTribuna() : 35.0);
+        Zona gradaLateral = new Zona("Grada Lateral", evento, 1500, 
+            evento.getPrecioGradaLateral() != null ? evento.getPrecioGradaLateral() : 20.0);
+        Zona golNord = new Zona("Gol Nord", evento, 800, 
+            evento.getPrecioGolNord() != null ? evento.getPrecioGolNord() : 25.0);
+        Zona golSud = new Zona("Gol Sud", evento, 800, 
+            evento.getPrecioGolSud() != null ? evento.getPrecioGolSud() : 25.0);
 
         zonaRepository.save(tribuna);
         zonaRepository.save(gradaLateral);

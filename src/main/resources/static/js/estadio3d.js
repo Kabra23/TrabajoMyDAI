@@ -172,7 +172,7 @@ function crearEstadio() {
     crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 10, 8, Math.PI / 2);
     crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 10, 8, -Math.PI / 2);
     crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 6, 12, Math.PI);
-    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 6, 12, 0);}
+    crearZonaAsientos('Gol Sud', { x: 35, y: 0, z: -45 }, 6, 12, Math.PI / -4);}
 
 /**
  * Crear líneas del campo de fútbol
