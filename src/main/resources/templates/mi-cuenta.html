@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -341,17 +341,17 @@
                     <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
                     <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
                         <i class="fas fa-wallet"></i>
-                        <span class="saldo-amount" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
                         <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
                     </button>
 
                     <div class="saldo-menu">
                         <div class="saldo-menu-header">
                             <h4>Tu Saldo Disponible</h4>
-                            <div class="saldo-display" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
+                            <div class="saldo-display" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
                             <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
                                 <i class="fas fa-user-circle me-1"></i>
-                                <span th:text="${usuario != null ? usuario.username : 'Usuario'}">Usuario</span>
+                                <span th:text="${session.usuario != null ? session.usuario.username : 'Usuario'}">Usuario</span>
                             </p>
                         </div>
 

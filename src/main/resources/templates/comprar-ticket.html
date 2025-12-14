@@ -509,17 +509,17 @@
                     <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
                     <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
                         <i class="fas fa-wallet"></i>
-                        <span class="saldo-amount" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
                         <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
                     </button>
 
                     <div class="saldo-menu">
                         <div class="saldo-menu-header">
                             <h4>Tu Saldo Disponible</h4>
-                            <div class="saldo-display" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
+                            <div class="saldo-display" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
                             <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
                                 <i class="fas fa-user-circle me-1"></i>
-                                <span th:text="${usuario != null ? usuario.username : 'Usuario'}">Usuario</span>
+                                <span th:text="${session.usuario != null ? session.usuario.username : 'Usuario'}">Usuario</span>
                             </p>
                         </div>
 
@@ -656,7 +656,7 @@
                     <span th:text="${success}"></span>
                 </div>
 
-                <form th:action="@{/eventos/{id}/comprar(id=${evento.id})}" method="post" id="formCompra">
+                <form th:action="@{/eventos/{id}/comprar-multiple(id=${evento.id})}" method="post" id="formCompra">
                     <div class="mb-4">
                         <label for="zona" class="form-label">
                             <i class="fas fa-map-marked-alt me-2"></i>Zona del Estadio
@@ -679,13 +679,29 @@
 
                     <div class="mb-4">
                         <label for="asiento" class="form-label">
-                            <i class="fas fa-chair me-2"></i>Número de Asiento
+                            <i class="fas fa-chair me-2"></i>Número de Asiento Inicial
                         </label>
-                        <input type="number" id="asiento" name="asiento" class="form-control"
-                               min="1" max="1500" placeholder="Ej: 42" required>
+                        <input type="number" id="asiento" name="asientoInicial" class="form-control"
+                               min="1" max="1500" placeholder="Ej: 42" required step="1">
                         <small class="form-text text-muted mt-2 d-block" id="asiento-info">
                             <i class="fas fa-lightbulb me-1"></i>
                             Los asientos se numeran de forma independiente en cada zona
+                        </small>
+                        <div id="asiento-warning" class="form-text text-danger mt-1" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <span id="asiento-warning-text"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="cantidad" class="form-label">
+                            <i class="fas fa-ticket-alt me-2"></i>Cantidad de Entradas
+                        </label>
+                        <input type="number" id="cantidad" name="cantidad" class="form-control"
+                               min="1" max="10" value="1" placeholder="1" required step="1">
+                        <small class="form-text text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Puedes comprar hasta 10 entradas consecutivas a la vez
                         </small>
                     </div>
 
@@ -699,8 +715,16 @@
                             <strong id="resumen-zona">-</strong>
                         </div>
                         <div class="resumen-item">
-                            <span>Asiento:</span>
+                            <span>Asiento inicial:</span>
                             <strong id="resumen-asiento">-</strong>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Cantidad:</span>
+                            <strong id="resumen-cantidad">1</strong>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Precio unitario:</span>
+                            <strong id="resumen-precio-unitario">0.00€</strong>
                         </div>
                         <div class="resumen-item">
                             <span>TOTAL:</span>
@@ -728,9 +752,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         const zonaSelect = document.getElementById('zona');
         const asientoInput = document.getElementById('asiento');
+        const cantidadInput = document.getElementById('cantidad');
         const asientoInfo = document.getElementById('asiento-info');
+        const asientoWarning = document.getElementById('asiento-warning');
+        const asientoWarningText = document.getElementById('asiento-warning-text');
         const resumenCompra = document.getElementById('resumenCompra');
         const precioCards = document.querySelectorAll('.precio-card');
+        const formCompra = document.getElementById('formCompra');
 
         // Actualizar resumen cuando cambie la zona
         zonaSelect.addEventListener('change', function() {
@@ -760,35 +788,96 @@
                 activeCard.classList.add('active');
             }
 
-            // Actualizar resumen
-            updateResumen(zonaNombre, asientoInput.value, precio);
+            // Validar asiento actual
+            validateAsiento();
 
-            // Resetear asiento si excede el máximo
-            if (asientoInput.value && parseInt(asientoInput.value) > parseInt(asientoInput.max)) {
-                asientoInput.value = '';
-                updateResumen(zonaNombre, '', precio);
-            }
+            // Actualizar resumen
+            updateResumen(zonaNombre, asientoInput.value, parseInt(cantidadInput.value) || 1, precio);
         });
 
-        // Actualizar resumen cuando cambie el asiento
+        // Validación de asiento en tiempo real
         asientoInput.addEventListener('input', function() {
+            validateAsiento();
+
             const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
             const precio = selectedOption.getAttribute('data-precio');
             const zonaNombre = zonaSelect.value;
-            updateResumen(zonaNombre, this.value, precio);
+            const cantidad = parseInt(cantidadInput.value) || 1;
+            updateResumen(zonaNombre, this.value, cantidad, precio);
         });
 
+        // Actualizar cuando cambie la cantidad
+        cantidadInput.addEventListener('input', function() {
+            const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
+            const precio = selectedOption.getAttribute('data-precio');
+            const zonaNombre = zonaSelect.value;
+            updateResumen(zonaNombre, asientoInput.value, parseInt(this.value) || 1, precio);
+        });
+
+        // Función para validar el asiento
+        function validateAsiento() {
+            const asientoValue = parseInt(asientoInput.value);
+            const maxAsiento = parseInt(asientoInput.max);
+
+            if (asientoInput.value === '') {
+                asientoWarning.style.display = 'none';
+                return true;
+            }
+
+            if (asientoValue < 1) {
+                asientoWarningText.textContent = 'El número de asiento debe ser mayor que 0';
+                asientoWarning.style.display = 'block';
+                return false;
+            }
+
+            if (asientoValue > maxAsiento) {
+                asientoWarningText.textContent = `El asiento debe estar entre 1 y ${maxAsiento}`;
+                asientoWarning.style.display = 'block';
+                return false;
+            }
+
+            asientoWarning.style.display = 'none';
+            return true;
+        }
+
         // Función para actualizar el resumen
-        function updateResumen(zona, asiento, precio) {
-            if (zona && asiento && precio) {
+        function updateResumen(zona, asiento, cantidad, precioUnitario) {
+            if (zona && asiento && precioUnitario && validateAsiento() && cantidad > 0) {
                 document.getElementById('resumen-zona').textContent = zona;
                 document.getElementById('resumen-asiento').textContent = '#' + asiento;
-                document.getElementById('resumen-precio').textContent = parseFloat(precio).toFixed(2) + '€';
+                document.getElementById('resumen-cantidad').textContent = cantidad + (cantidad === 1 ? ' entrada' : ' entradas');
+                document.getElementById('resumen-precio-unitario').textContent = parseFloat(precioUnitario).toFixed(2) + '€';
+                const total = parseFloat(precioUnitario) * cantidad;
+                document.getElementById('resumen-precio').textContent = total.toFixed(2) + '€';
                 resumenCompra.classList.add('show');
             } else {
                 resumenCompra.classList.remove('show');
             }
         }
+
+        // Validación antes de enviar el formulario
+        formCompra.addEventListener('submit', function(e) {
+            if (!validateAsiento()) {
+                e.preventDefault();
+                asientoInput.focus();
+                return false;
+            }
+
+            if (!zonaSelect.value) {
+                e.preventDefault();
+                alert('Por favor, selecciona una zona');
+                zonaSelect.focus();
+                return false;
+            }
+
+            const cantidad = parseInt(cantidadInput.value);
+            if (cantidad < 1 || cantidad > 10) {
+                e.preventDefault();
+                alert('La cantidad debe estar entre 1 y 10');
+                cantidadInput.focus();
+                return false;
+            }
+        });
 
         // Click en tarjetas de precio para seleccionar zona
         precioCards.forEach(card => {
@@ -804,7 +893,7 @@
     });
 </script>
 
-<!-- Control de mÃºsica de fondo flotante -->
+<!-- Control de música de fondo flotante -->
 <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
     <audio id="backgroundMusic" loop>
         <source src="/Ser-del-Barca-es.mp3" type="audio/mpeg">
