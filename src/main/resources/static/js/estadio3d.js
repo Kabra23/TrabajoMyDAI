@@ -381,9 +381,10 @@ async function cargarDatosEstadio() {
     try {
         // Mostrar loading
         updateLoadingProgress('Cargando información de zonas...', 85);
-        // Crear promesa con timeout
+        // Crear promesa con timeout mejorado
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout: La carga tardó demasiado. Verifica tu conexión.')), 5000)    );
+            setTimeout(() => reject(new Error('Tiempo de espera agotado. El servidor no responde.')), 10000)
+        );
 
         // Cargar zonas con timeout
         const zonasResponse = await Promise.race([
@@ -438,15 +439,21 @@ async function cargarDatosEstadio() {
             '<div style="color: white; text-align: center; padding: 40px; max-width: 600px;">' +
             '<i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #FFC107; margin-bottom: 20px;"></i>' +
             '<h3 style="margin-bottom: 20px;">⚠️ Error al cargar el estadio 3D</h3>' +
-            '<p style="margin: 15px 0; font-size: 1.1rem; line-height: 1.5;">' + error.message + '</p>' +
-            '<p style="margin: 15px 0; color: #ccc;">El servidor puede estar temporalmente no disponible.</p>' +
-            '<button onclick="location.reload()" style="margin-top: 20px; padding: 12px 30px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; transition: all 0.3s;">' +
+            '<p style="margin: 15px 0; font-size: 1.1rem; line-height: 1.5; color: #fff;">' + error.message + '</p>' +
+            '<p style="margin: 15px 0; color: #ccc; font-size: 0.95rem;">Posibles causas:</p>' +
+            '<ul style="text-align: left; color: #ccc; max-width: 400px; margin: 15px auto; font-size: 0.9rem;">' +
+            '<li>El servidor está temporalmente no disponible</li>' +
+            '<li>Problemas de conexión a Internet</li>' +
+            '<li>El evento no tiene zonas configuradas</li>' +
+            '</ul>' +
+            '<div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">' +
+            '<button onclick="location.reload()" style="padding: 12px 30px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; transition: all 0.3s;">' +
             '<i class="fas fa-sync-alt me-2"></i>Reintentar' +
             '</button>' +
-            '<br><br>' +
-            '<a href="/eventos/' + eventoId + '/comprar" style="color: #FFC107; text-decoration: underline; font-size: 1.1rem; margin-top: 20px; display: inline-block;">' +
-            '<i class="fas fa-arrow-left me-2"></i>Volver a la vista 2D tradicional' +
+            '<a href="/eventos/' + eventoId + '/comprar" style="padding: 12px 30px; background: #FFC107; color: #1a237e; text-decoration: none; border-radius: 25px; font-size: 16px; font-weight: 600; display: inline-block;">' +
+            '<i class="fas fa-arrow-left me-2"></i>Vista 2D' +
             '</a>' +
+            '</div>' +
             '</div>';
     }
 }

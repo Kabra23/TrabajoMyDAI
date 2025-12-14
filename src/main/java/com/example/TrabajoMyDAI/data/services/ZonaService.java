@@ -37,11 +37,12 @@ public class ZonaService {
             return; // Ya existen zonas, no crear duplicados
         }
 
-        // Crear zonas con capacidades predeterminadas
-        Zona tribuna = new Zona("Tribuna", evento, 1000, 80.0);
-        Zona gradaLateral = new Zona("Grada Lateral", evento, 1500, 60.0);
-        Zona golNord = new Zona("Gol Nord", evento, 800, 45.0);
-        Zona golSud = new Zona("Gol Sud", evento, 800, 45.0);
+        // Crear zonas con capacidades y precios predeterminados optimizados
+        // Los precios coinciden con los mostrados en el front-end
+        Zona tribuna = new Zona("Tribuna", evento, 1000, evento.getPrecioTribuna());
+        Zona gradaLateral = new Zona("Grada Lateral", evento, 1500, evento.getPrecioGradaLateral());
+        Zona golNord = new Zona("Gol Nord", evento, 800, evento.getPrecioGolNord());
+        Zona golSud = new Zona("Gol Sud", evento, 800, evento.getPrecioGolSud());
 
         zonaRepository.save(tribuna);
         zonaRepository.save(gradaLateral);
@@ -96,7 +97,7 @@ public class ZonaService {
     }
 
     /**
-     * Incrementar el contador de entradas vendidas de una zona
+     * Incrementar el contador de entradas vendidas de una zona (optimizado)
      */
     @Transactional
     public void incrementarEntradasVendidas(Long zonaId) {
