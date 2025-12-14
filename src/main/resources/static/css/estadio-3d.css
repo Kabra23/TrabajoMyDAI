@@ -8,6 +8,7 @@
     --primary-color: #1a237e;
     --secondary-color: #283593;
     --accent-color: #ffd700;
+    --text-light: #e3e3e3;
 }
 
 body {
@@ -16,6 +17,210 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     overflow-x: hidden;
+}
+
+/* Navbar mejorado */
+.navbar {
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--accent-color) !important;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+.nav-link {
+    color: #fff !important;
+    margin: 0 10px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+}
+
+.nav-link.admin-link {
+    color: #dc3545 !important;
+    font-weight: 600;
+}
+
+/* Dropdown de saldo */
+.saldo-dropdown {
+    position: relative;
+}
+
+.saldo-trigger {
+    background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+    color: #1a237e !important;
+    font-weight: 700;
+    padding: 8px 18px !important;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.saldo-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.saldo-amount {
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.saldo-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    min-width: 300px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.saldo-dropdown.show .saldo-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.saldo-menu-header {
+    background: linear-gradient(135deg, #1a237e, #283593);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.saldo-menu-header h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.saldo-menu-header .saldo-display {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 10px 0;
+    color: #ffd700;
+}
+
+.saldo-menu-body {
+    padding: 20px;
+}
+
+.saldo-info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.saldo-info-item:last-child {
+    border-bottom: none;
+}
+
+.saldo-info-label {
+    color: #666;
+    font-weight: 600;
+}
+
+.saldo-info-value {
+    color: #1a237e;
+    font-weight: 700;
+}
+
+.saldo-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.saldo-btn {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+}
+
+.saldo-btn-primary {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #1a237e;
+}
+
+.saldo-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    color: #1a237e;
+}
+
+.saldo-btn-secondary {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.saldo-btn-secondary:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.saldo-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 999;
+    display: none;
+}
+
+.saldo-dropdown.show .saldo-overlay {
+    display: block;
 }
 
 #canvas-container {
@@ -182,16 +387,28 @@ body {
     align-items: center;
     z-index: 1000;
     color: white;
+    transition: opacity 0.3s ease;
 }
 
 #loading .spinner {
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-top: 4px solid var(--accent-color);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     animation: spin 1s linear infinite;
     margin-bottom: 20px;
+}
+
+#loading h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+#loading p {
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
 
 @keyframes spin {
