@@ -682,11 +682,15 @@
                             <i class="fas fa-chair me-2"></i>Número de Asiento
                         </label>
                         <input type="number" id="asiento" name="asiento" class="form-control"
-                               min="1" max="1500" placeholder="Ej: 42" required>
+                               min="1" max="1500" placeholder="Ej: 42" required step="1">
                         <small class="form-text text-muted mt-2 d-block" id="asiento-info">
                             <i class="fas fa-lightbulb me-1"></i>
                             Los asientos se numeran de forma independiente en cada zona
                         </small>
+                        <div id="asiento-warning" class="form-text text-danger mt-1" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <span id="asiento-warning-text"></span>
+                        </div>
                     </div>
 
                     <!-- Resumen de compra -->
@@ -729,8 +733,11 @@
         const zonaSelect = document.getElementById('zona');
         const asientoInput = document.getElementById('asiento');
         const asientoInfo = document.getElementById('asiento-info');
+        const asientoWarning = document.getElementById('asiento-warning');
+        const asientoWarningText = document.getElementById('asiento-warning-text');
         const resumenCompra = document.getElementById('resumenCompra');
         const precioCards = document.querySelectorAll('.precio-card');
+        const formCompra = document.getElementById('formCompra');
 
         // Actualizar resumen cuando cambie la zona
         zonaSelect.addEventListener('change', function() {
@@ -760,27 +767,52 @@
                 activeCard.classList.add('active');
             }
 
+            // Validar asiento actual
+            validateAsiento();
+
             // Actualizar resumen
             updateResumen(zonaNombre, asientoInput.value, precio);
-
-            // Resetear asiento si excede el máximo
-            if (asientoInput.value && parseInt(asientoInput.value) > parseInt(asientoInput.max)) {
-                asientoInput.value = '';
-                updateResumen(zonaNombre, '', precio);
-            }
         });
 
-        // Actualizar resumen cuando cambie el asiento
+        // Validación de asiento en tiempo real
         asientoInput.addEventListener('input', function() {
+            validateAsiento();
+            
             const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
             const precio = selectedOption.getAttribute('data-precio');
             const zonaNombre = zonaSelect.value;
             updateResumen(zonaNombre, this.value, precio);
         });
 
+        // Función para validar el asiento
+        function validateAsiento() {
+            const asientoValue = parseInt(asientoInput.value);
+            const maxAsiento = parseInt(asientoInput.max);
+            
+            if (asientoInput.value === '') {
+                asientoWarning.style.display = 'none';
+                return true;
+            }
+            
+            if (asientoValue < 1) {
+                asientoWarningText.textContent = 'El número de asiento debe ser mayor que 0';
+                asientoWarning.style.display = 'block';
+                return false;
+            }
+            
+            if (asientoValue > maxAsiento) {
+                asientoWarningText.textContent = `El asiento debe estar entre 1 y ${maxAsiento}`;
+                asientoWarning.style.display = 'block';
+                return false;
+            }
+            
+            asientoWarning.style.display = 'none';
+            return true;
+        }
+
         // Función para actualizar el resumen
         function updateResumen(zona, asiento, precio) {
-            if (zona && asiento && precio) {
+            if (zona && asiento && precio && validateAsiento()) {
                 document.getElementById('resumen-zona').textContent = zona;
                 document.getElementById('resumen-asiento').textContent = '#' + asiento;
                 document.getElementById('resumen-precio').textContent = parseFloat(precio).toFixed(2) + '€';
@@ -789,6 +821,22 @@
                 resumenCompra.classList.remove('show');
             }
         }
+
+        // Validación antes de enviar el formulario
+        formCompra.addEventListener('submit', function(e) {
+            if (!validateAsiento()) {
+                e.preventDefault();
+                asientoInput.focus();
+                return false;
+            }
+            
+            if (!zonaSelect.value) {
+                e.preventDefault();
+                alert('Por favor, selecciona una zona');
+                zonaSelect.focus();
+                return false;
+            }
+        });
 
         // Click en tarjetas de precio para seleccionar zona
         precioCards.forEach(card => {
@@ -804,7 +852,7 @@
     });
 </script>
 
-<!-- Control de mÃºsica de fondo flotante -->
+<!-- Control de música de fondo flotante -->
 <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
     <audio id="backgroundMusic" loop>
         <source src="/Ser-del-Barca-es.mp3" type="audio/mpeg">

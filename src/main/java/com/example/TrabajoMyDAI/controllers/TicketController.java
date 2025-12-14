@@ -10,6 +10,7 @@ import com.example.TrabajoMyDAI.data.repository.TicketRepository;
 import com.example.TrabajoMyDAI.data.repository.UsuarioRepository;
 import com.example.TrabajoMyDAI.data.services.ZonaService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,7 @@ public class TicketController {
     }
 
     @PostMapping("/eventos/{id}/comprar")
+    @Transactional // Asegurar atomicidad de la transacción
     public String procesarCompra(@PathVariable("id") Long id,
                                  @RequestParam String zona,
                                  @RequestParam Long asiento,
@@ -67,6 +69,13 @@ public class TicketController {
                     "Los administradores no pueden comprar entradas.");
             return "redirect:/eventos";
         }
+        
+        // VALIDACIÓN: Asiento debe ser positivo
+        if (asiento <= 0) {
+            redirectAttributes.addFlashAttribute("error",
+                    "El número de asiento debe ser mayor que 0.");
+            return "redirect:/eventos/" + id + "/comprar";
+        }
 
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
@@ -74,6 +83,14 @@ public class TicketController {
         // VALIDACIÓN: Verificar disponibilidad de la zona
         Zona zonaSeleccionada = zonaService.obtenerZonaPorEventoYNombre(id, zona)
                 .orElseThrow(() -> new ValidationException("Zona no encontrada."));
+        
+        // VALIDACIÓN: Verificar que el asiento esté dentro del rango de la zona
+        if (zonaSeleccionada.getCapacidadTotal() != null && asiento > zonaSeleccionada.getCapacidadTotal()) {
+            redirectAttributes.addFlashAttribute("error",
+                    String.format("El asiento %d no existe en la zona %s. El rango válido es de 1 a %d.",
+                            asiento, zona, zonaSeleccionada.getCapacidadTotal()));
+            return "redirect:/eventos/" + id + "/comprar";
+        }
 
         // VALIDACIÓN: Verificar si el asiento ya está ocupado EN ESTA ZONA ESPECÍFICA
         if (ticketRepository.findByZonaAndAsiento(zonaSeleccionada, asiento).isPresent()) {

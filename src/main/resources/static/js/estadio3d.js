@@ -6,12 +6,14 @@ let asientoSeleccionado = null;
 let asientosOcupados = {};
 let zonasData = [];
 let eventoId;
-let lastMouseMoveTime = 0;
 let hoveredAsiento = null;
+let isMouseMoving = false;
 
-// Constantes de rendimiento
-const MOUSE_THROTTLE_MS = 50;
-// Colores
+// Constantes de rendimiento mejoradas
+const MOUSE_THROTTLE_MS = 100; // Aumentado para mejor rendimiento
+const MAX_RAYCAST_DISTANCE = 150; // Limitar distancia de raycasting
+
+// Colores optimizados
 const COLORS = {
     disponible: 0x4CAF50,
     ocupado: 0xf44336,
@@ -48,22 +50,31 @@ function init(idEvento) {
 
     updateLoadingProgress('Configurando renderizado...', 30);
 
-    // Crear renderer (optimizado para rendimiento)
-    renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    // Crear renderer (optimizado para rendimiento mejorado)
+    renderer = new THREE.WebGLRenderer({ 
+        antialias: false, 
+        powerPreference: "high-performance",
+        precision: "lowp", // Precisión baja para mejor rendimiento
+        alpha: false // No necesitamos transparencia en el fondo
+    });
     renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limitar pixel ratio
     renderer.shadowMap.enabled = false; // Deshabilitado para mejor rendimiento
     container.appendChild(renderer.domElement);
 
-    // Controles de cámara
+    // Controles de cámara optimizados
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.dampingFactor = 0.08; // Más fluido
     controls.minDistance = 30;
     controls.maxDistance = 200;
     controls.maxPolarAngle = Math.PI / 2.1;
+    controls.enablePan = true; // Permitir paneo
+    controls.panSpeed = 0.5; // Velocidad de paneo reducida
 
-    // Raycaster para detección de clicks
+    // Raycaster para detección de clicks (optimizado)
     raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = 0.5; // Reducir área de detección
     mouse = new THREE.Vector2();
 
     updateLoadingProgress('Creando iluminación...', 50);
@@ -81,9 +92,20 @@ function init(idEvento) {
     // Crear el estadio
     crearEstadio();
 
-    // Eventos
+    // Eventos con throttling mejorado
     window.addEventListener('resize', onWindowResize, false);
-    renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+    
+    // Throttle para mousemove para mejor rendimiento
+    let mouseMoveTimeout;
+    renderer.domElement.addEventListener('mousemove', (event) => {
+        if (!mouseMoveTimeout) {
+            mouseMoveTimeout = setTimeout(() => {
+                onMouseMove(event);
+                mouseMoveTimeout = null;
+            }, MOUSE_THROTTLE_MS);
+        }
+    }, false);
+    
     renderer.domElement.addEventListener('click', onClick, false);
 
     updateLoadingProgress('Cargando información...', 80);
@@ -146,11 +168,11 @@ function crearEstadio() {
 
     // Crear zonas de asientos con nombres reales
     // Crear zonas de asientos (optimizado para mejor rendimiento)
-    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 10, 15, 0);
-    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 12, 10, Math.PI / 2);
-    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 12, 10, -Math.PI / 2);
-    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 8, 15, Math.PI);
-    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 8, 15, 0);}
+    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 8, 12, 0);
+    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 10, 8, Math.PI / 2);
+    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 10, 8, -Math.PI / 2);
+    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 6, 12, Math.PI);
+    crearZonaAsientos('Gol Sud', { x: 35, y: 0, z: -45 }, 6, 12, Math.PI / -4);}
 
 /**
  * Crear líneas del campo de fútbol
@@ -359,9 +381,10 @@ async function cargarDatosEstadio() {
     try {
         // Mostrar loading
         updateLoadingProgress('Cargando información de zonas...', 85);
-        // Crear promesa con timeout
+        // Crear promesa con timeout mejorado
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout: La carga tardó demasiado. Verifica tu conexión.')), 5000)    );
+            setTimeout(() => reject(new Error('Tiempo de espera agotado. El servidor no responde.')), 10000)
+        );
 
         // Cargar zonas con timeout
         const zonasResponse = await Promise.race([
@@ -416,15 +439,21 @@ async function cargarDatosEstadio() {
             '<div style="color: white; text-align: center; padding: 40px; max-width: 600px;">' +
             '<i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #FFC107; margin-bottom: 20px;"></i>' +
             '<h3 style="margin-bottom: 20px;">⚠️ Error al cargar el estadio 3D</h3>' +
-            '<p style="margin: 15px 0; font-size: 1.1rem; line-height: 1.5;">' + error.message + '</p>' +
-            '<p style="margin: 15px 0; color: #ccc;">El servidor puede estar temporalmente no disponible.</p>' +
-            '<button onclick="location.reload()" style="margin-top: 20px; padding: 12px 30px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; transition: all 0.3s;">' +
+            '<p style="margin: 15px 0; font-size: 1.1rem; line-height: 1.5; color: #fff;">' + error.message + '</p>' +
+            '<p style="margin: 15px 0; color: #ccc; font-size: 0.95rem;">Posibles causas:</p>' +
+            '<ul style="text-align: left; color: #ccc; max-width: 400px; margin: 15px auto; font-size: 0.9rem;">' +
+            '<li>El servidor está temporalmente no disponible</li>' +
+            '<li>Problemas de conexión a Internet</li>' +
+            '<li>El evento no tiene zonas configuradas</li>' +
+            '</ul>' +
+            '<div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">' +
+            '<button onclick="location.reload()" style="padding: 12px 30px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; transition: all 0.3s;">' +
             '<i class="fas fa-sync-alt me-2"></i>Reintentar' +
             '</button>' +
-            '<br><br>' +
-            '<a href="/eventos/' + eventoId + '/comprar" style="color: #FFC107; text-decoration: underline; font-size: 1.1rem; margin-top: 20px; display: inline-block;">' +
-            '<i class="fas fa-arrow-left me-2"></i>Volver a la vista 2D tradicional' +
+            '<a href="/eventos/' + eventoId + '/comprar" style="padding: 12px 30px; background: #FFC107; color: #1a237e; text-decoration: none; border-radius: 25px; font-size: 16px; font-weight: 600; display: inline-block;">' +
+            '<i class="fas fa-arrow-left me-2"></i>Vista 2D' +
             '</a>' +
+            '</div>' +
             '</div>';
     }
 }
@@ -475,7 +504,7 @@ function actualizarPanelInfo() {
 }
 
 /**
- * Manejar movimiento del mouse
+ * Manejar movimiento del mouse (optimizado)
  */
 function onMouseMove(event) {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -483,25 +512,29 @@ function onMouseMove(event) {
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
+    raycaster.far = MAX_RAYCAST_DISTANCE; // Limitar distancia de raycasting
     const intersects = raycaster.intersectObjects(asientos);
-
-    // Resetear colores de hover
-    asientos.forEach(asiento => {
-        if (asiento !== asientoSeleccionado) {
-            asiento.material.color.setHex(
-                asiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
-            );
-        }
-    });
 
     // Tooltip
     const tooltip = document.getElementById('tooltip');
 
     if (intersects.length > 0) {
         const asiento = intersects[0].object;
-
-        if (asiento.userData.disponible && asiento !== asientoSeleccionado) {
-            asiento.material.color.setHex(COLORS.hover);
+        
+        // Solo actualizar si cambió el asiento hover
+        if (hoveredAsiento !== asiento) {
+            // Resetear asiento anterior
+            if (hoveredAsiento && hoveredAsiento !== asientoSeleccionado) {
+                hoveredAsiento.material.color.setHex(
+                    hoveredAsiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
+                );
+            }
+            
+            hoveredAsiento = asiento;
+            
+            if (asiento.userData.disponible && asiento !== asientoSeleccionado) {
+                asiento.material.color.setHex(COLORS.hover);
+            }
         }
 
         // Mostrar tooltip
@@ -517,6 +550,14 @@ function onMouseMove(event) {
 
         renderer.domElement.style.cursor = asiento.userData.disponible ? 'pointer' : 'not-allowed';
     } else {
+        // Resetear hover cuando no hay intersección
+        if (hoveredAsiento && hoveredAsiento !== asientoSeleccionado) {
+            hoveredAsiento.material.color.setHex(
+                hoveredAsiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
+            );
+            hoveredAsiento = null;
+        }
+        
         tooltip.style.display = 'none';
         renderer.domElement.style.cursor = 'default';
     }
