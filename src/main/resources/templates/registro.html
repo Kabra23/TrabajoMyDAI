@@ -391,5 +391,23 @@
         }
     });
 </script>
+<script src="/js/audio-control.js"></script>
+
+<!-- Control de música de fondo -->
+<div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 30px; backdrop-filter: blur(10px);">
+    <audio id="backgroundMusic" loop>
+        <source src="/Ser-del-Barca-es.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <div class="d-flex justify-content-center align-items-center gap-2">
+        <button id="playPauseBtn" class="btn btn-sm btn-outline-light">
+            <i class="fas fa-play"></i> Música
+        </button>
+        <input type="range" id="volumeControl" min="0" max="100" value="20"
+               class="form-range" style="width: 120px;">
+        <span id="volumeValue" class="small text-white">20%</span>
+    </div>
+</div>
+
 </body>
 </html>

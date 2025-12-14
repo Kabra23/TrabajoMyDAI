@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style th:fragment="saldo-styles">
+        /* Dropdown de saldo */
+        .saldo-dropdown {
+            position: relative;
+        }
+
+        .saldo-trigger {
+            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+            color: #1a237e !important;
+            font-weight: 700;
+            padding: 8px 18px !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .saldo-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .saldo-amount {
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+
+        .saldo-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .saldo-dropdown.show .saldo-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .saldo-menu-header {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .saldo-menu-header h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .saldo-menu-header .saldo-display {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+            color: #ffd700;
+        }
+
+        .saldo-menu-body {
+            padding: 20px;
+        }
+
+        .saldo-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        .saldo-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .saldo-info-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .saldo-info-value {
+            color: #1a237e;
+            font-weight: 700;
+        }
+
+        .saldo-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .saldo-btn {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .saldo-btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a237e;
+        }
+
+        .saldo-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            color: #1a237e;
+        }
+
+        .saldo-btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .saldo-btn-secondary:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        /* Overlay para cerrar al hacer click fuera */
+        .saldo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+
+        .saldo-dropdown.show .saldo-overlay {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .saldo-menu {
+                right: -20px;
+                min-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fragment del dropdown de saldo -->
+<div th:fragment="saldo-dropdown" class="saldo-dropdown" th:if="${logueado == true && esAdmin == false}">
+    <div class="saldo-overlay" onclick="document.querySelector('.saldo-dropdown').classList.remove('show')"></div>
+    <button class="nav-link saldo-trigger" onclick="document.querySelector('.saldo-dropdown').classList.toggle('show')">
+        <i class="fas fa-wallet"></i>
+        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+        <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
+    </button>
+
+    <div class="saldo-menu">
+        <div class="saldo-menu-header">
+            <h4>Tu Saldo Disponible</h4>
+            <div class="saldo-display" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
+            <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
+                <i class="fas fa-user-circle me-1"></i>
+                <span th:text="${session.usuario != null ? session.usuario.username : 'Usuario'}">Usuario</span>
+            </p>
+        </div>
+
+        <div class="saldo-menu-body">
+            <div class="saldo-info-item">
+                <span class="saldo-info-label">
+                    <i class="fas fa-ticket-alt me-2"></i>Tickets comprados
+                </span>
+                <span class="saldo-info-value" th:text="${session.usuario != null && session.usuario.tickets != null ? session.usuario.tickets.size() : 0}">0</span>
+            </div>
+
+            <div class="saldo-info-item">
+                <span class="saldo-info-label">
+                    <i class="fas fa-bell me-2"></i>Recordatorios activos
+                </span>
+                <span class="saldo-info-value" th:text="${session.usuario != null && session.usuario.recordatorios != null ? session.usuario.recordatorios.size() : 0}">0</span>
+            </div>
+
+            <div class="saldo-actions">
+                <a href="/tickets" class="saldo-btn saldo-btn-primary">
+                    <i class="fas fa-ticket-alt me-1"></i> Mis Tickets
+                </a>
+                <a href="/cuenta/perfil" class="saldo-btn saldo-btn-secondary">
+                    <i class="fas fa-user-circle me-1"></i> Mi Cuenta
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

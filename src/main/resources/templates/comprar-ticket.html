@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +12,8 @@
             --secondary-color: #283593;
             --accent-color: #ffd700;
             --text-dark: #222;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
         }
 
         body {
@@ -33,82 +35,201 @@
             font-weight: 600;
         }
 
-        .container { padding-top: 110px; max-width: 900px; }
+        .container { padding-top: 110px; max-width: 1200px; }
 
-        .card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
-            color: var(--secondary-color);
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        /* Vista 3D Banner */
+        .vista-3d-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        label { font-weight: 700; color: var(--secondary-color); }
+        .vista-3d-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
 
-        .form-text { color: #666; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .vista-3d-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .vista-3d-text h3 {
+            color: white;
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .vista-3d-text p {
+            color: rgba(255,255,255,0.9);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .btn-3d {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 35px;
+            font-weight: 700;
+            border-radius: 50px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .btn-3d:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .btn-3d i {
+            animation: rotate3d 2s linear infinite;
+        }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* Cards principales */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+            color: var(--secondary-color);
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+            border: none;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card-header-custom h3 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .card-header-custom p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+
+        label { font-weight: 700; color: var(--secondary-color); margin-bottom: 8px; }
+
+        .form-select, .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+        }
 
         .btn-custom {
             background: linear-gradient(135deg, var(--accent-color), #ffed4e);
             color: var(--primary-color);
             border: none;
-            padding: 10px 18px;
-            font-weight: 700;
-            border-radius: 40px;
-            width: 100%;
-            box-shadow: 0 6px 18px rgba(255,215,0,0.25);
-        }
-
-        .btn-custom:hover { transform: translateY(-3px); }
-
-        /* Sección de precios */
-        .precio-section {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 25px;
-            border-radius: 16px;
-            border: 3px solid var(--accent-color);
-        }
-
-        .precio-title {
-            color: var(--primary-color);
-            margin-bottom: 20px;
+            padding: 15px 18px;
             font-weight: 800;
+            border-radius: 50px;
+            width: 100%;
+            box-shadow: 0 8px 25px rgba(255,215,0,0.3);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
         }
 
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255,215,0,0.5);
+        }
+
+        /* Sección de precios interactiva */
         .precios-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            padding: 20px;
         }
 
         .precio-card {
-            background: white;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             gap: 15px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
         }
 
         .precio-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .precio-card.active {
+            border-color: var(--accent-color);
+            background: linear-gradient(135deg, #fff9c4, #fff59d);
         }
 
         .precio-icon {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
         }
 
         .precio-zona {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #666;
             font-weight: 600;
             text-transform: uppercase;
@@ -116,10 +237,77 @@
         }
 
         .precio-cantidad {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 900;
-            color: var(--accent-color);
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--accent-color), #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .precio-disponibles {
+            font-size: 0.8rem;
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        /* Info box */
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 5px solid #2196F3;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-left-color: var(--warning-color);
+        }
+
+        .info-box.success {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-left-color: var(--success-color);
+        }
+
+        /* Resumen de compra */
+        .resumen-compra {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            padding: 25px;
+            border-radius: 16px;
+            margin-top: 20px;
+            border: 3px dashed var(--accent-color);
+            display: none;
+        }
+
+        .resumen-compra.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .resumen-item:last-child {
+            border-bottom: none;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--primary-color);
         }
 
         footer {
@@ -133,6 +321,9 @@
 
         @media (max-width:768px) {
             .container { padding-top: 90px; }
+            .main-grid { grid-template-columns: 1fr; }
+            .precios-grid { grid-template-columns: 1fr; }
+            .vista-3d-content { flex-direction: column; text-align: center; }
         }
 
     </style>
@@ -170,17 +361,34 @@
 </nav>
 
 <div class="container">
-    <div class="card mt-4">
-        <div class="card-body">
-            <h2 class="card-title mb-3" th:text="${evento.nombre}">Nombre Evento</h2>
-            <p class="mb-1"><strong>Fecha:</strong> <span th:text="${#temporals.format(evento.fecha,'dd MMM yyyy HH:mm')}">Fecha</span></p>
-            <p class="mb-3"><strong>Estadio:</strong> <span th:text="${evento.lugar}">Lugar</span></p>
+    <!-- Banner Vista 3D -->
+    <div class="vista-3d-banner">
+        <div class="vista-3d-content">
+            <div class="vista-3d-text">
+                <h3><i class="fas fa-cube me-2"></i>¡Prueba la Vista 3D!</h3>
+                <p>Explora el estadio en 360° y selecciona tu asiento de forma interactiva</p>
+            </div>
+            <a th:href="@{/eventos/{id}/comprar-3d(id=${evento.id})}" class="btn btn-3d">
+                <i class="fas fa-vr-cardboard me-2"></i>Ver Estadio 3D
+            </a>
+        </div>
+    </div>
 
-            <!-- Tabla de Precios por Zona -->
-            <div class="precio-section mb-4">
-                <h4 class="precio-title"><i class="fas fa-tags me-2"></i>Precios por Zona</h4>
+    <!-- Grid principal -->
+    <div class="main-grid">
+        <!-- Información del evento -->
+        <div class="card">
+            <div class="card-header-custom">
+                <h3><i class="fas fa-calendar-check me-2"></i><span th:text="${evento.nombre}">Evento</span></h3>
+                <p><i class="fas fa-clock me-2"></i><span th:text="${#temporals.format(evento.fecha,'dd MMM yyyy HH:mm')}">Fecha</span></p>
+                <p><i class="fas fa-map-marker-alt me-2"></i><span th:text="${evento.lugar}">Estadio</span></p>
+            </div>
+            <div class="card-body">
+                <h5 style="color: var(--primary-color); font-weight: 800; margin-bottom: 15px;">
+                    <i class="fas fa-tags me-2"></i>Precios por Zona
+                </h5>
                 <div class="precios-grid">
-                    <div class="precio-card">
+                    <div class="precio-card" data-zona="Tribuna">
                         <div class="precio-icon">
                             <i class="fas fa-crown"></i>
                         </div>
@@ -189,7 +397,7 @@
                             <div class="precio-cantidad" th:text="${#numbers.formatDecimal(evento.precioTribuna, 1, 2)} + '€'">35.00€</div>
                         </div>
                     </div>
-                    <div class="precio-card">
+                    <div class="precio-card" data-zona="Gol Nord">
                         <div class="precio-icon">
                             <i class="fas fa-bullhorn"></i>
                         </div>
@@ -198,7 +406,7 @@
                             <div class="precio-cantidad" th:text="${#numbers.formatDecimal(evento.precioGolNord, 1, 2)} + '€'">25.00€</div>
                         </div>
                     </div>
-                    <div class="precio-card">
+                    <div class="precio-card" data-zona="Gol Sud">
                         <div class="precio-icon">
                             <i class="fas fa-bullhorn"></i>
                         </div>
@@ -207,7 +415,7 @@
                             <div class="precio-cantidad" th:text="${#numbers.formatDecimal(evento.precioGolSud, 1, 2)} + '€'">25.00€</div>
                         </div>
                     </div>
-                    <div class="precio-card">
+                    <div class="precio-card" data-zona="Grada Lateral">
                         <div class="precio-icon">
                             <i class="fas fa-users"></i>
                         </div>
@@ -217,62 +425,89 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Info de entradas disponibles -->
+                <div th:if="${tieneCapacidad}" class="info-box success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Entradas disponibles:</strong> <span th:text="${plazasDisponibles}">0</span> en total
+                </div>
             </div>
+        </div>
 
-            <h4 class="mt-3">Selecciona tu asiento</h4>
-
-            <!-- Información de entradas disponibles totales -->
-            <div th:if="${tieneCapacidad}" class="alert alert-info mb-3">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Entradas disponibles totales:</strong> <span th:text="${plazasDisponibles}">0</span>
+        <!-- Formulario de compra -->
+        <div class="card">
+            <div class="card-header-custom">
+                <h3><i class="fas fa-ticket-alt me-2"></i>Selecciona tu Entrada</h3>
             </div>
+            <div class="card-body">
+                <!-- Mensajes de error y éxito -->
+                <div th:if="${error}" class="info-box warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}"></span>
+                </div>
 
-            <!-- Mensajes de error y éxito -->
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                <span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+                <div th:if="${success}" class="info-box success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}"></span>
+                </div>
 
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                <span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+                <form th:action="@{/eventos/{id}/comprar(id=${evento.id})}" method="post" id="formCompra">
+                    <div class="mb-4">
+                        <label for="zona" class="form-label">
+                            <i class="fas fa-map-marked-alt me-2"></i>Zona del Estadio
+                        </label>
+                        <select id="zona" name="zona" class="form-select" required>
+                            <option value="">-- Selecciona una zona --</option>
+                            <option th:each="zonaObj : ${zonasDisponibilidad}"
+                                    th:value="${zonaObj.nombre}"
+                                    th:attr="data-capacidad=${zonaObj.capacidadTotal},data-precio=${evento.getPrecioPorZona(zonaObj.nombre)},data-disponibles=${zonaObj.entradasDisponibles}"
+                                    th:text="${zonaObj.nombre + ' (' + zonaObj.entradasDisponibles + ' disponibles)'}"
+                                    th:disabled="${!zonaObj.hayDisponibilidad()}">
+                                Tribuna (100 disponibles)
+                            </option>
+                        </select>
+                        <small class="form-text text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Cada zona ofrece una experiencia diferente del partido
+                        </small>
+                    </div>
 
-            <form th:action="@{/eventos/{id}/comprar(id=${evento.id})}" method="post" class="mt-3">
-                <div class="mb-3">
-                    <label for="zona" class="form-label">Zona</label>
-                    <select id="zona" name="zona" class="form-select" required>
-                        <option value="">Selecciona una zona</option>
-                        <option th:each="zonaObj : ${zonasDisponibilidad}"
-                                th:value="${zonaObj.nombre}"
-                                th:attr="data-capacidad=${zonaObj.capacidadTotal},data-precio=${evento.getPrecioPorZona(zonaObj.nombre)}"
-                                th:text="${zonaObj.nombre + ' - Disponibles: ' + zonaObj.entradasDisponibles + '/' + zonaObj.capacidadTotal}"
-                                th:disabled="${!zonaObj.hayDisponibilidad()}">
-                            Tribuna - Disponibles: 1000/1000
-                        </option>
-                    </select>
-                    <div class="form-text">Tribuna = mejor visión · Gol Nord/Sud = ambiente de animación · Grada Lateral = vista equilibrada.</div>
-                    <div id="precio-seleccionado" class="mt-2" style="display: none;">
-                        <div class="alert alert-success d-flex align-items-center">
-                            <i class="fas fa-euro-sign me-2"></i>
-                            <strong>Precio: <span id="precio-valor">0.00</span>€</strong>
+                    <div class="mb-4">
+                        <label for="asiento" class="form-label">
+                            <i class="fas fa-chair me-2"></i>Número de Asiento
+                        </label>
+                        <input type="number" id="asiento" name="asiento" class="form-control"
+                               min="1" max="1500" placeholder="Ej: 42" required>
+                        <small class="form-text text-muted mt-2 d-block" id="asiento-info">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            Los asientos se numeran de forma independiente en cada zona
+                        </small>
+                    </div>
+
+                    <!-- Resumen de compra -->
+                    <div class="resumen-compra" id="resumenCompra">
+                        <h5 style="color: var(--primary-color); font-weight: 800; margin-bottom: 15px;">
+                            <i class="fas fa-receipt me-2"></i>Resumen de Compra
+                        </h5>
+                        <div class="resumen-item">
+                            <span>Zona:</span>
+                            <strong id="resumen-zona">-</strong>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Asiento:</span>
+                            <strong id="resumen-asiento">-</strong>
+                        </div>
+                        <div class="resumen-item">
+                            <span>TOTAL:</span>
+                            <strong id="resumen-precio">0.00€</strong>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="asiento" class="form-label">Número de asiento</label>
-                    <input type="number" id="asiento" name="asiento" class="form-control" min="1" max="1500" required>
-                    <div class="form-text" id="asiento-info">Cada zona tiene sus propios asientos numerados. El asiento #1 puede existir en todas las zonas de forma independiente.</div>
-                </div>
-
-                <button type="submit" class="btn btn-custom">
-                    <i class="fas fa-check me-2"></i>Confirmar compra
-                </button>
-            </form>
-
+                    <button type="submit" class="btn btn-custom mt-3">
+                        <i class="fas fa-shopping-cart me-2"></i>Confirmar Compra
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -285,41 +520,101 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Actualizar el valor máximo del campo de asiento según la zona seleccionada
     document.addEventListener('DOMContentLoaded', function() {
         const zonaSelect = document.getElementById('zona');
         const asientoInput = document.getElementById('asiento');
         const asientoInfo = document.getElementById('asiento-info');
-        const precioSeleccionado = document.getElementById('precio-seleccionado');
-        const precioValor = document.getElementById('precio-valor');
+        const resumenCompra = document.getElementById('resumenCompra');
+        const precioCards = document.querySelectorAll('.precio-card');
 
+        // Actualizar resumen cuando cambie la zona
         zonaSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             const capacidad = selectedOption.getAttribute('data-capacidad');
             const precio = selectedOption.getAttribute('data-precio');
+            const disponibles = selectedOption.getAttribute('data-disponibles');
+            const zonaNombre = this.value;
 
+            // Actualizar límite de asientos
             if (capacidad && capacidad !== 'null') {
                 asientoInput.max = capacidad;
-                asientoInfo.innerHTML = `Cada zona tiene sus propios asientos numerados. El asiento #1 puede existir en todas las zonas de forma independiente. <strong>Esta zona tiene ${capacidad} asientos (1-${capacidad}).</strong>`;
+                asientoInfo.innerHTML = `
+                    <i class="fas fa-lightbulb me-1"></i>
+                    Esta zona tiene <strong>${capacidad} asientos</strong> (números del 1 al ${capacidad}).
+                    <strong style="color: var(--success-color);">${disponibles} disponibles</strong>
+                `;
             } else {
-                asientoInput.max = 1500; // Valor por defecto
-                asientoInfo.innerHTML = 'Cada zona tiene sus propios asientos numerados. El asiento #1 puede existir en todas las zonas de forma independiente.';
+                asientoInput.max = 1500;
+                asientoInfo.innerHTML = '<i class="fas fa-lightbulb me-1"></i>Los asientos se numeran de forma independiente en cada zona';
             }
 
-            // Mostrar precio si hay zona seleccionada
-            if (precio && this.value) {
-                precioValor.textContent = parseFloat(precio).toFixed(2);
-                precioSeleccionado.style.display = 'block';
-            } else {
-                precioSeleccionado.style.display = 'none';
+            // Marcar tarjeta de precio como activa
+            precioCards.forEach(card => card.classList.remove('active'));
+            const activeCard = Array.from(precioCards).find(card => card.dataset.zona === zonaNombre);
+            if (activeCard) {
+                activeCard.classList.add('active');
             }
 
-            // Resetear el valor del input si excede el nuevo máximo
+            // Actualizar resumen
+            updateResumen(zonaNombre, asientoInput.value, precio);
+
+            // Resetear asiento si excede el máximo
             if (asientoInput.value && parseInt(asientoInput.value) > parseInt(asientoInput.max)) {
                 asientoInput.value = '';
+                updateResumen(zonaNombre, '', precio);
             }
+        });
+
+        // Actualizar resumen cuando cambie el asiento
+        asientoInput.addEventListener('input', function() {
+            const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
+            const precio = selectedOption.getAttribute('data-precio');
+            const zonaNombre = zonaSelect.value;
+            updateResumen(zonaNombre, this.value, precio);
+        });
+
+        // Función para actualizar el resumen
+        function updateResumen(zona, asiento, precio) {
+            if (zona && asiento && precio) {
+                document.getElementById('resumen-zona').textContent = zona;
+                document.getElementById('resumen-asiento').textContent = '#' + asiento;
+                document.getElementById('resumen-precio').textContent = parseFloat(precio).toFixed(2) + '€';
+                resumenCompra.classList.add('show');
+            } else {
+                resumenCompra.classList.remove('show');
+            }
+        }
+
+        // Click en tarjetas de precio para seleccionar zona
+        precioCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const zonaNombre = this.dataset.zona;
+                const option = Array.from(zonaSelect.options).find(opt => opt.value === zonaNombre);
+                if (option && !option.disabled) {
+                    zonaSelect.value = zonaNombre;
+                    zonaSelect.dispatchEvent(new Event('change'));
+                }
+            });
         });
     });
 </script>
+
+<!-- Control de mÃºsica de fondo flotante -->
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+    <audio id="backgroundMusic" loop>
+        <source src="/Ser-del-Barca-es.mp3" type="audio/mpeg">
+    </audio>
+    <div class="d-flex justify-content-center align-items-center gap-2">
+        <button id="playPauseBtn" class="btn btn-sm btn-outline-light" style="border-radius: 20px;">
+            <i class="fas fa-play"></i> MÃºsica
+        </button>
+        <input type="range" id="volumeControl" min="0" max="100" value="20"
+               class="form-range" style="width: 100px;">
+        <span id="volumeValue" class="small text-white">20%</span>
+    </div>
+</div>
+
+<script src="/js/audio-control.js"></script>
+
 </body>
 </html>

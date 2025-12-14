@@ -12,6 +12,8 @@ public class Zona {
 
     private String nombre; // "Tribuna", "Grada Lateral", "Gol Nord", "Gol Sud"
 
+    private Double precio;
+
     @ManyToOne
     @JoinColumn(name = "evento_id", nullable = false)
     private Evento evento;
@@ -34,6 +36,21 @@ public class Zona {
         this.entradasVendidas = 0;
     }
 
+    public Zona(String nombre, Evento evento, Integer capacidadTotal, Double precio) {
+        this.nombre = nombre;
+        this.evento = evento;
+        this.capacidadTotal = capacidadTotal;
+        this.entradasVendidas = 0;
+        this.precio = precio;
+    }
+
+    public Double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(Double precio) {
+        this.precio = precio;
+    }
     // Getters y Setters
     public Long getId() {
         return id;

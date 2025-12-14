@@ -38,10 +38,10 @@ public class ZonaService {
         }
 
         // Crear zonas con capacidades predeterminadas
-        Zona tribuna = new Zona("Tribuna", evento, 1000);
-        Zona gradaLateral = new Zona("Grada Lateral", evento, 1500);
-        Zona golNord = new Zona("Gol Nord", evento, 800);
-        Zona golSud = new Zona("Gol Sud", evento, 800);
+        Zona tribuna = new Zona("Tribuna", evento, 1000, 80.0);
+        Zona gradaLateral = new Zona("Grada Lateral", evento, 1500, 60.0);
+        Zona golNord = new Zona("Gol Nord", evento, 800, 45.0);
+        Zona golSud = new Zona("Gol Sud", evento, 800, 45.0);
 
         zonaRepository.save(tribuna);
         zonaRepository.save(gradaLateral);
@@ -157,6 +157,24 @@ public class ZonaService {
         }
 
         return total;
+    }
+    /**
+     * Obtener asientos ocupados por zona para un evento
+     * Devuelve un mapa con el nombre de la zona como clave y la lista de números de asiento como valor
+     */
+    public java.util.Map<String, java.util.List<Long>> obtenerAsientosOcupadosPorEvento(Long eventoId) {
+        List<Zona> zonas = zonaRepository.findByEventoId(eventoId);
+        java.util.Map<String, java.util.List<Long>> asientosOcupados = new java.util.HashMap<>();
+
+        for (Zona zona : zonas) {
+            java.util.List<Long> asientos = zona.getTickets().stream()
+                    .map(com.example.TrabajoMyDAI.data.model.Ticket::getAsiento)
+                    .filter(asiento -> asiento != null)
+                    .collect(java.util.stream.Collectors.toList());
+            asientosOcupados.put(zona.getNombre(), asientos);
+        }
+
+        return asientosOcupados;
     }
 }
 

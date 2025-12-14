@@ -5,13 +5,391 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recordatorios - Barça Athletic Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>body { .nav-link.admin-link {
-        color: #dc3545 !important;
-        font-weight: 600;
-    }background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }.container { padding-top: 60px; } .card { background-color: rgba(255,255,255,0.06);
-                                                                                                                                                                                                         }</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #ffd700;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--accent) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        .nav-link.admin-link {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+
+        /* Dropdown de saldo */
+        .saldo-dropdown {
+            position: relative;
+        }
+
+        .saldo-trigger {
+            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+            color: #1a237e !important;
+            font-weight: 700;
+            padding: 8px 18px !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .saldo-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .saldo-amount {
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+
+        .saldo-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .saldo-dropdown.show .saldo-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .saldo-menu-header {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .saldo-menu-header h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .saldo-menu-header .saldo-display {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+            color: #ffd700;
+        }
+
+        .saldo-menu-body {
+            padding: 20px;
+        }
+
+        .saldo-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .saldo-btn {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .saldo-btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a237e;
+        }
+
+        .saldo-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            color: #1a237e;
+        }
+
+        .saldo-btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .saldo-btn-secondary:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .saldo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+
+        .saldo-dropdown.show .saldo-overlay {
+            display: block;
+        }
+
+        /* Hero section */
+        .hero-section {
+            padding: 120px 0 40px 0;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 30px;
+        }
+
+        /* Container */
+        .recordatorios-container {
+            padding: 40px 0 80px 0;
+        }
+
+        /* Formulario */
+        .create-reminder-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .create-reminder-card h3 {
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            color: var(--primary);
+            border: none;
+            padding: 15px 30px;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(255,215,0,0.3);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255,215,0,0.5);
+        }
+
+        /* Lista de recordatorios */
+        .recordatorios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .reminder-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .reminder-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .reminder-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px;
+            color: white;
+        }
+
+        .reminder-header h4 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .reminder-body {
+            padding: 25px;
+            color: #333;
+        }
+
+        .reminder-info {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reminder-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .reminder-text {
+            flex: 1;
+        }
+
+        .reminder-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .reminder-value {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .reminder-message {
+            background: #f8f9fa;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .reminder-message p {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .reminder-date {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .reminder-date-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .reminder-date-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 5px 0 0 0;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            .recordatorios-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -26,81 +404,200 @@
                 <li class="nav-item"><a class="nav-link" href="/plantilla"><i class="fas fa-users"></i> Plantilla</a></li>
                 <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <!-- Opciones solo para usuarios normales (no admin) -->
                 <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
                 <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
-                <!-- Opciones solo para admin -->
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a></li>
-                <!-- Opciones para no logueados -->
+
+                <!-- Dropdown de saldo -->
+                <li class="nav-item saldo-dropdown" th:if="${logueado == true && esAdmin == false}">
+                    <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+                    <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
+                        <i class="fas fa-wallet"></i>
+                        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
+                    </button>
+
+                    <div class="saldo-menu">
+                        <div class="saldo-menu-header">
+                            <h4>Tu Saldo Disponible</h4>
+                            <div class="saldo-display" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
+                            <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span th:text="${session.usuario != null ? session.usuario.username : 'Usuario'}">Usuario</span>
+                            </p>
+                        </div>
+
+                        <div class="saldo-menu-body">
+                            <!-- Formulario para agregar saldo -->
+                            <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                                <h5 style="color: #1a237e; font-size: 0.9rem; margin-bottom: 10px; font-weight: 700;">
+                                    <i class="fas fa-plus-circle me-1"></i>Recargar Saldo
+                                </h5>
+                                <form th:action="@{/cuenta/agregar-saldo}" method="post">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
+                                        <input type="number" class="form-control" name="cantidad" step="0.01" min="1" max="1000"
+                                               placeholder="Cantidad" required>
+                                        <button class="btn btn-sm" type="submit" style="background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a237e; font-weight: 600;">
+                                            Agregar
+                                        </button>
+                                    </div>
+                                    <small style="color: #666; font-size: 0.75rem;">Entre 1€ y 1000€</small>
+                                </form>
+                            </div>
+
+                            <div class="saldo-actions">
+                                <a href="/tickets" class="saldo-btn saldo-btn-primary">
+                                    <i class="fas fa-ticket-alt me-1"></i> Mis Tickets
+                                </a>
+                                <a href="/cuenta/perfil" class="saldo-btn saldo-btn-secondary">
+                                    <i class="fas fa-user-circle me-1"></i> Mi Cuenta
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/cuenta/perfil"><i class="fas fa-user-circle"></i> Mi Cuenta</a></li>
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a></li>
-                <!-- Cerrar sesión para todos los logueados -->
                 <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container">
-    <h1 th:text="${mensaje}">Recordatorios</h1>
-    <!-- Mostrar mensaje si no hay tickets -->
-    <div th:if="${tickets == null || tickets.isEmpty()}">
-        <p>No tienes tickets asociados. Compra uno para crear recordatorios.</p>
-        <a th:href="@{/tickets}" class="btn btn-primary">Comprar Tickets</a>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1><i class="fas fa-bell"></i> Mis Recordatorios</h1>
+        <p>Gestiona tus alertas y nunca te pierdas un evento</p>
     </div>
+</section>
 
-    <!-- Mostrar lista de tickets -->
-    <div th:if="${tickets != null && !tickets.isEmpty()}">
-        <h2>Mis Tickets</h2>
-        <ul>
-            <li th:each="ticket : ${tickets}" th:text="${ticket.nombre}"></li>
-        </ul>
-    </div>
-
-    <!-- Restaurar funcionalidad de crear recordatorio desde ticket -->
-    <div th:if="${tickets != null && !tickets.isEmpty()}">
-        <h3>Crear Recordatorio</h3>
+<!-- Main Content -->
+<div class="container recordatorios-container">
+    <!-- Formulario para crear recordatorio -->
+    <div th:if="${tickets != null && !tickets.isEmpty()}" class="create-reminder-card">
+        <h3><i class="fas fa-plus-circle me-2"></i>Crear Nuevo Recordatorio</h3>
         <form th:action="@{/recordatorios}" method="post" th:object="${recordatorioForm}">
-            <div class="mb-3">
-                <label for="mensaje" class="form-label">Mensaje</label>
-                <input type="text" id="mensaje" name="mensaje" class="form-control" th:field="*{mensaje}" required>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="evento" class="form-label">
+                        <i class="fas fa-calendar-alt me-2"></i>Selecciona el Evento
+                    </label>
+                    <select id="evento" name="evento" class="form-select" th:field="*{evento}" required>
+                        <option value="">-- Elige un evento --</option>
+                        <option th:each="ticket : ${tickets}" th:value="${ticket.id}" th:text="${ticket.nombre}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="fecha" class="form-label">
+                        <i class="fas fa-clock me-2"></i>Fecha y Hora del Recordatorio
+                    </label>
+                    <input type="datetime-local" id="fecha" name="fecha" class="form-control" th:field="*{fecha}" required>
+                </div>
             </div>
+
             <div class="mb-3">
-                <label for="fecha" class="form-label">Fecha</label>
-                <input type="datetime-local" id="fecha" name="fecha" class="form-control" th:field="*{fecha}" required>
+                <label for="mensaje" class="form-label">
+                    <i class="fas fa-comment-alt me-2"></i>Mensaje Personalizado
+                </label>
+                <input type="text" id="mensaje" name="mensaje" class="form-control" th:field="*{mensaje}"
+                       placeholder="Ej: No olvides el partido de hoy!" required>
             </div>
-            <div class="mb-3">
-                <label for="evento" class="form-label">Evento</label>
-                <select id="evento" name="evento" class="form-select" th:field="*{evento}" required>
-                    <option th:each="ticket : ${tickets}" th:value="${ticket.id}" th:text="${ticket.nombre}"></option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-success">Crear Recordatorio</button>
+
+            <button type="submit" class="btn btn-custom">
+                <i class="fas fa-bell me-2"></i>Crear Recordatorio
+            </button>
         </form>
     </div>
 
-    <!-- Mostrar lista de recordatorios -->
+    <!-- Estado vacío si no hay tickets -->
+    <div th:if="${tickets == null || tickets.isEmpty()}" class="empty-state">
+        <i class="fas fa-ticket-alt"></i>
+        <h3>No tienes tickets asociados</h3>
+        <p>Compra entradas para poder crear recordatorios de tus eventos</p>
+        <a th:href="@{/eventos}" class="btn btn-custom mt-3" style="width: auto; padding: 12px 35px;">
+            <i class="fas fa-shopping-cart me-2"></i>Ver Eventos Disponibles
+        </a>
+    </div>
+
+    <!-- Lista de recordatorios -->
     <div th:if="${recordatorios != null && !recordatorios.isEmpty()}">
-        <h2>Mis Recordatorios</h2>
-        <div class="row">
-            <div class="col-md-6" th:each="rec : ${recordatorios}">
-                <div class="card mb-3 text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Recordatorio <span th:text="${rec.id_recordatorio}"></span></h5>
-                        <p class="card-text">Usuario: <span th:text="${rec.usuario.nombre}">Usuario</span></p>
-                        <p class="card-text">Evento: <span th:text="${rec.evento.nombre}">Evento</span></p>
-                        <p class="card-text">Mensaje: <strong th:text="${rec.mensaje}">Mensaje</strong></p>
-                        <p class="card-text"><small th:text="${rec.fecha}">Fecha</small></p>
+        <h2 style="margin: 40px 0 30px 0; font-weight: 800;">
+            <i class="fas fa-list me-2"></i>Mis Recordatorios Activos
+        </h2>
+        <div class="recordatorios-grid">
+            <div class="reminder-card" th:each="rec : ${recordatorios}">
+                <div class="reminder-header">
+                    <h4><i class="fas fa-bell me-2"></i>Recordatorio #<span th:text="${rec.id_recordatorio}"></span></h4>
+                </div>
+
+                <div class="reminder-body">
+                    <div class="reminder-info">
+                        <div class="reminder-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="reminder-text">
+                            <p class="reminder-label">Usuario</p>
+                            <p class="reminder-value" th:text="${rec.usuario.nombre}">Usuario</p>
+                        </div>
+                    </div>
+
+                    <div class="reminder-info">
+                        <div class="reminder-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="reminder-text">
+                            <p class="reminder-label">Evento</p>
+                            <p class="reminder-value" th:text="${rec.evento.nombre}">Evento</p>
+                        </div>
+                    </div>
+
+                    <div class="reminder-message">
+                        <p><i class="fas fa-comment-dots me-2"></i><strong th:text="${rec.mensaje}">Mensaje</strong></p>
+                    </div>
+
+                    <div class="reminder-date">
+                        <p class="reminder-date-label">Fecha del Recordatorio</p>
+                        <p class="reminder-date-value" th:text="${#temporals.format(rec.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Estado vacío si no hay recordatorios -->
+    <div th:if="${(recordatorios == null || recordatorios.isEmpty()) && tickets != null && !tickets.isEmpty()}"
+         class="empty-state" style="margin-top: 40px;">
+        <i class="fas fa-bell-slash"></i>
+        <h3>No tienes recordatorios creados</h3>
+        <p>Crea tu primer recordatorio usando el formulario de arriba</p>
+    </div>
 </div>
 
-<footer>Contenido estático del pie de página</footer>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Control de música de fondo flotante -->
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+    <audio id="backgroundMusic" loop>
+        <source src="/Ser-del-Barca-es.mp3" type="audio/mpeg">
+    </audio>
+    <div class="d-flex justify-content-center align-items-center gap-2">
+        <button id="playPauseBtn" class="btn btn-sm btn-outline-light" style="border-radius: 20px;">
+            <i class="fas fa-play"></i> Música
+        </button>
+        <input type="range" id="volumeControl" min="0" max="100" value="20"
+               class="form-range" style="width: 100px;">
+        <span id="volumeValue" class="small text-white">20%</span>
+    </div>
+</div>
+
+<script src="/js/audio-control.js"></script>
+
 </body>
 </html>
+
