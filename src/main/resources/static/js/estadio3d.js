@@ -6,6 +6,8 @@ let asientoSeleccionado = null;
 let asientosOcupados = {};
 let zonasData = [];
 let eventoId;
+let lastMouseMoveTime = 0;
+let hoveredAsiento = null;
 
 // Colores
 const COLORS = {
@@ -118,12 +120,12 @@ function crearEstadio() {
     // Líneas del campo
     crearLineasCampo();
 
-    // Crear zonas de asientos (reducido para mejor rendimiento)
-    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 12, 20, 0);
-    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 15, 12, Math.PI / 2);
-    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 15, 12, -Math.PI / 2);
-    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 10, 20, Math.PI);
-    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 10, 20, 0);
+    // Crear zonas de asientos (optimizado para mejor rendimiento)
+    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 10, 15, 0);
+    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 12, 10, Math.PI / 2);
+    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 12, 10, -Math.PI / 2);
+    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 8, 15, Math.PI);
+    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 8, 15, 0);
 }
 
 /**
@@ -164,6 +166,7 @@ function crearLineasCampo() {
 
 /**
  * Crear zona de asientos
+ * Optimizado: Usa geometría y material compartidos para mejor rendimiento
  */
 function crearZonaAsientos(nombreZona, posicion, filas, asientosPorFila, rotacion) {
     const asientoSize = 0.5;
@@ -172,11 +175,14 @@ function crearZonaAsientos(nombreZona, posicion, filas, asientosPorFila, rotacio
 
     let asientoNumero = 1;
 
+    // Compartir geometría y materiales para mejor rendimiento
+    const geometry = new THREE.BoxGeometry(asientoSize, asientoSize, asientoSize);
+    const materialDisponible = new THREE.MeshLambertMaterial({ color: COLORS.disponible });
+
     for (let fila = 0; fila < filas; fila++) {
         for (let asiento = 0; asiento < asientosPorFila; asiento++) {
-            const geometry = new THREE.BoxGeometry(asientoSize, asientoSize, asientoSize);
-            const material = new THREE.MeshLambertMaterial({ color: COLORS.disponible });
-            const asientoMesh = new THREE.Mesh(geometry, material);
+            // Reutilizar geometría (no crear una nueva cada vez)
+            const asientoMesh = new THREE.Mesh(geometry, materialDisponible.clone());
 
             // Posición local del asiento
             const x = (asiento - asientosPorFila / 2) * (asientoSize + asientoGap);
@@ -318,8 +324,16 @@ function actualizarPanelInfo() {
 
 /**
  * Manejar movimiento del mouse
+ * Optimizado: throttling para evitar llamadas excesivas
  */
 function onMouseMove(event) {
+    // Throttling: solo procesar cada 50ms
+    const now = Date.now();
+    if (now - lastMouseMoveTime < 50) {
+        return;
+    }
+    lastMouseMoveTime = now;
+
     const rect = renderer.domElement.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -327,14 +341,13 @@ function onMouseMove(event) {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(asientos);
 
-    // Resetear colores de hover
-    asientos.forEach(asiento => {
-        if (asiento !== asientoSeleccionado) {
-            asiento.material.color.setHex(
-                asiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
-            );
-        }
-    });
+    // Resetear color del asiento previamente en hover
+    if (hoveredAsiento && hoveredAsiento !== asientoSeleccionado) {
+        hoveredAsiento.material.color.setHex(
+            hoveredAsiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
+        );
+        hoveredAsiento = null;
+    }
 
     // Tooltip
     const tooltip = document.getElementById('tooltip');
@@ -344,6 +357,7 @@ function onMouseMove(event) {
 
         if (asiento.userData.disponible && asiento !== asientoSeleccionado) {
             asiento.material.color.setHex(COLORS.hover);
+            hoveredAsiento = asiento;
         }
 
         // Mostrar tooltip
