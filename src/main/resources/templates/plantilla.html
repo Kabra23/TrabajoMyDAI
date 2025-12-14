@@ -66,6 +66,161 @@
             font-weight: 600;
         }
 
+        /* Dropdown de saldo */
+        .saldo-dropdown {
+            position: relative;
+        }
+
+        .saldo-trigger {
+            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+            color: #1a237e !important;
+            font-weight: 700;
+            padding: 8px 18px !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .saldo-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .saldo-amount {
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+
+        .saldo-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .saldo-dropdown.show .saldo-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .saldo-menu-header {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .saldo-menu-header h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .saldo-menu-header .saldo-display {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+            color: #ffd700;
+        }
+
+        .saldo-menu-body {
+            padding: 20px;
+        }
+
+        .saldo-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        .saldo-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .saldo-info-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .saldo-info-value {
+            color: #1a237e;
+            font-weight: 700;
+        }
+
+        .saldo-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .saldo-btn {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .saldo-btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a237e;
+        }
+
+        .saldo-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            color: #1a237e;
+        }
+
+        .saldo-btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .saldo-btn-secondary:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .saldo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+
+        .saldo-dropdown.show .saldo-overlay {
+            display: block;
+        }
+
         /* Container */
         .container {
             padding-top: 120px;
@@ -784,6 +939,57 @@
                 <!-- Opciones solo para admin -->
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
                 <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a></li>
+                <!-- Dropdown de saldo para usuarios normales -->
+                <li class="nav-item saldo-dropdown" th:if="${logueado == true && esAdmin == false}">
+                    <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+                    <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
+                        <i class="fas fa-wallet"></i>
+                        <span class="saldo-amount" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
+                    </button>
+
+                    <div class="saldo-menu">
+                        <div class="saldo-menu-header">
+                            <h4>Tu Saldo Disponible</h4>
+                            <div class="saldo-display" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
+                            <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span th:text="${usuario != null ? usuario.username : 'Usuario'}">Usuario</span>
+                            </p>
+                        </div>
+
+                        <div class="saldo-menu-body">
+                            <!-- Formulario para agregar saldo -->
+                            <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                                <h5 style="color: #1a237e; font-size: 0.9rem; margin-bottom: 10px; font-weight: 700;">
+                                    <i class="fas fa-plus-circle me-1"></i>Recargar Saldo
+                                </h5>
+                                <form th:action="@{/cuenta/agregar-saldo}" method="post">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
+                                        <input type="number" class="form-control" name="cantidad" step="0.01" min="1" max="1000"
+                                               placeholder="Cantidad" required>
+                                        <button class="btn btn-sm" type="submit" style="background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a237e; font-weight: 600;">
+                                            Agregar
+                                        </button>
+                                    </div>
+                                    <small style="color: #666; font-size: 0.75rem;">Entre 1€ y 1000€</small>
+                                </form>
+                            </div>
+
+                            <div class="saldo-actions">
+                                <a href="/tickets" class="saldo-btn saldo-btn-primary">
+                                    <i class="fas fa-ticket-alt me-1"></i> Mis Tickets
+                                </a>
+                                <a href="/cuenta/perfil" class="saldo-btn saldo-btn-secondary">
+                                    <i class="fas fa-user-circle me-1"></i> Mi Cuenta
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <!-- Mi Cuenta para todos los usuarios logueados -->
+                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/cuenta/perfil"><i class="fas fa-user-circle"></i> Mi Cuenta</a></li>
                 <!-- Opciones para no logueados -->
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
                 <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a></li>
