@@ -17,7 +17,7 @@ public interface ZonaRepository extends JpaRepository<Zona, Long> {
 
     Optional<Zona> findByEventoAndNombre(Evento evento, String nombre);
 
-    @Query("SELECT z FROM Zona z WHERE z.evento.id_evento = :eventoId")
-    List<Zona> findByEventoId(@Param("eventoId") Long eventoId);
+    @Query("SELECT z FROM Zona z LEFT JOIN FETCH z.tickets WHERE z.evento.id_evento = :eventoId")
+    List<Zona> findByEventoIdWithTickets(@Param("eventoId") Long eventoId);
 }
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
@@ -95,6 +96,67 @@ public class PerfilController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/cuenta/perfil";
+        }
+    }
+
+    @PostMapping("/agregar-saldo-ajax")
+    @ResponseBody
+    public java.util.Map<String, Object> agregarSaldoAjax(@RequestParam Double cantidad,
+                                                          HttpSession session) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+
+        if (!estaLogueado(session)) {
+            response.put("success", false);
+            response.put("error", "No estás autenticado");
+            return response;
+        }
+
+        Usuario usuario = getUsuarioLogueado(session);
+
+        // Validar que el usuario no sea admin
+        if (usuario.isAdmin()) {
+            response.put("success", false);
+            response.put("error", "Los administradores no pueden tener saldo");
+            return response;
+        }
+
+        try {
+            // Validar cantidad
+            if (cantidad == null || cantidad <= 0) {
+                response.put("success", false);
+                response.put("error", "La cantidad debe ser mayor que 0");
+                return response;
+            }
+
+            if (cantidad > 1000) {
+                response.put("success", false);
+                response.put("error", "No puedes agregar más de 1000€ a la vez");
+                return response;
+            }
+
+            // Agregar saldo
+            usuarioService.agregarSaldo(usuario.getDni(), cantidad);
+
+            // Actualizar usuario en sesión
+            Optional<Usuario> usuarioActualizado = usuarioService.encontrarPorId(usuario.getDni());
+            if (usuarioActualizado.isPresent()) {
+                Usuario usuarioNuevo = usuarioActualizado.get();
+                session.setAttribute("usuario", usuarioNuevo);
+
+                response.put("success", true);
+                response.put("nuevoSaldo", usuarioNuevo.getSaldo());
+                response.put("mensaje", String.format("Se han agregado %.2f€ a tu saldo correctamente", cantidad));
+            } else {
+                response.put("success", false);
+                response.put("error", "Error al actualizar el saldo");
+            }
+
+            return response;
+
+        } catch (IllegalArgumentException e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return response;
         }
     }
 

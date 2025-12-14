@@ -32,8 +32,9 @@
         volumeControl.value = Math.round(volume * 100);
         volumeValue.textContent = Math.round(volume * 100) + '%';
 
-        // Configurar estado de reproducción - Por defecto reproducir en primera visita
-        const shouldPlay = savedState !== 'paused'; // Se reproducirá si no está explícitamente pausado
+        // Configurar estado de reproducción - SIEMPRE intentar reproducir por defecto
+        // Solo pausar si el usuario lo pausó explícitamente antes
+        const shouldPlay = savedState !== 'paused';
 
         if (shouldPlay) {
             // Intentar reproducir
@@ -43,7 +44,8 @@
                     updateButton(playPauseBtn, true);
                     saveState('playing');
                 }).catch(function(error) {
-                    console.log('Reproducción automática bloqueada:', error);
+                    console.log('Reproducción automática bloqueada por el navegador:', error);
+                    console.log('El usuario debe interactuar con la página para iniciar el audio');
                     updateButton(playPauseBtn, false);
                     saveState('paused');
                 });

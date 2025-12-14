@@ -70,7 +70,7 @@ public class ZonaService {
      * Obtener todas las zonas de un evento
      */
     public List<Zona> obtenerZonasPorEvento(Long eventoId) {
-        return zonaRepository.findByEventoId(eventoId);
+        return zonaRepository.findByEventoIdWithTickets(eventoId);
     }
 
     /**
@@ -127,7 +127,7 @@ public class ZonaService {
      * Obtener el número total de entradas disponibles para un evento (sumando todas las zonas)
      */
     public Integer obtenerEntradasDisponiblesTotales(Long eventoId) {
-        List<Zona> zonas = zonaRepository.findByEventoId(eventoId);
+        List<Zona> zonas = zonaRepository.findByEventoIdWithTickets(eventoId);
 
         if (zonas.isEmpty()) {
             return null; // Sin zonas configuradas
@@ -149,7 +149,7 @@ public class ZonaService {
      * Obtener el número total de entradas vendidas para un evento
      */
     public Integer obtenerEntradasVendidasTotales(Long eventoId) {
-        List<Zona> zonas = zonaRepository.findByEventoId(eventoId);
+        List<Zona> zonas = zonaRepository.findByEventoIdWithTickets(eventoId);
 
         int total = 0;
         for (Zona zona : zonas) {
@@ -163,7 +163,7 @@ public class ZonaService {
      * Devuelve un mapa con el nombre de la zona como clave y la lista de números de asiento como valor
      */
     public java.util.Map<String, java.util.List<Long>> obtenerAsientosOcupadosPorEvento(Long eventoId) {
-        List<Zona> zonas = zonaRepository.findByEventoId(eventoId);
+        List<Zona> zonas = zonaRepository.findByEventoIdWithTickets(eventoId);
         java.util.Map<String, java.util.List<Long>> asientosOcupados = new java.util.HashMap<>();
 
         for (Zona zona : zonas) {

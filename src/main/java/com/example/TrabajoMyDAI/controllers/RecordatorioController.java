@@ -38,15 +38,15 @@ public class RecordatorioController {
             return "redirect:/";
         }
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        model.addAttribute("esAdmin", usuario. isAdmin());
+        model.addAttribute("esAdmin", usuario.isAdmin());
         model.addAttribute("logueado", true);
         List<Recordatorio> recordatorios = recordatorioRepository.findByUsuario(usuario);
         List<Ticket> tickets = ticketRepository.findByUsuario(usuario);
         model.addAttribute("recordatorios", recordatorios);
         model.addAttribute("tickets", tickets);
         model.addAttribute("mensaje", "Lista de recordatorios");
-        model.addAttribute("logueado", true);
-        return "recordatorios/list";
+        model.addAttribute("recordatorioForm", new Recordatorio());
+        return "recordatorios";
     }
 
     @GetMapping("/crear")

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -484,12 +484,12 @@
         <form th:action="@{/recordatorios}" method="post" th:object="${recordatorioForm}">
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="evento" class="form-label">
+                    <label for="ticketId" class="form-label">
                         <i class="fas fa-calendar-alt me-2"></i>Selecciona el Evento
                     </label>
-                    <select id="evento" name="evento" class="form-select" th:field="*{evento}" required>
+                    <select id="ticketId" name="ticketId" class="form-select" required>
                         <option value="">-- Elige un evento --</option>
-                        <option th:each="ticket : ${tickets}" th:value="${ticket.id}" th:text="${ticket.nombre}"></option>
+                        <option th:each="ticket : ${tickets}" th:value="${ticket.id_ticket}" th:text="${ticket.evento.nombre}"></option>
                     </select>
                 </div>
 
@@ -537,15 +537,6 @@
                 </div>
 
                 <div class="reminder-body">
-                    <div class="reminder-info">
-                        <div class="reminder-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="reminder-text">
-                            <p class="reminder-label">Usuario</p>
-                            <p class="reminder-value" th:text="${rec.usuario.nombre}">Usuario</p>
-                        </div>
-                    </div>
 
                     <div class="reminder-info">
                         <div class="reminder-icon">
@@ -597,6 +588,7 @@
 </div>
 
 <script src="/js/audio-control.js"></script>
+<script src="/js/saldo-ajax.js"></script>
 
 </body>
 </html>

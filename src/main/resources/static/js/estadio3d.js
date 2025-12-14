@@ -6,7 +6,11 @@ let asientoSeleccionado = null;
 let asientosOcupados = {};
 let zonasData = [];
 let eventoId;
+let lastMouseMoveTime = 0;
+let hoveredAsiento = null;
 
+// Constantes de rendimiento
+const MOUSE_THROTTLE_MS = 50;
 // Colores
 const COLORS = {
     disponible: 0x4CAF50,
@@ -110,28 +114,49 @@ function updateLoadingProgress(message, percent) {
 function crearEstadio() {
     // Campo de fútbol
     const campoGeometry = new THREE.PlaneGeometry(70, 100);
-    const campoMaterial = new THREE.MeshLambertMaterial({ color: COLORS.campo });
+    const campoMaterial = new THREE.MeshLambertMaterial({
+        color: COLORS.campo,
+        side: THREE.DoubleSide
+    });
     const campo = new THREE.Mesh(campoGeometry, campoMaterial);
     campo.rotation.x = -Math.PI / 2;
+    campo.receiveShadow = true;
     scene.add(campo);
+
+    const pistaGeometry = new THREE.PlaneGeometry(85, 115);
+    const pistaMaterial = new THREE.MeshLambertMaterial({
+        color: 0x8B6914,
+        side: THREE.DoubleSide
+    });
+    const pista = new THREE.Mesh(pistaGeometry, pistaMaterial);
+    pista.rotation.x = -Math.PI / 2;
+    pista.position.y = -0.1;
+    scene.add(pista);
+
 
     // Líneas del campo
     crearLineasCampo();
 
     // Crear zonas de asientos (reducido para mejor rendimiento)
-    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 12, 20, 0);
-    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 15, 12, Math.PI / 2);
-    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 15, 12, -Math.PI / 2);
-    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 10, 20, Math.PI);
-    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 10, 20, 0);
-}
+    crearPorteria({ x: 0, y: 0, z: -50 });
+    crearPorteria({ x: 0, y: 0, z: 50 });
+
+    // Crear estructura del estadio (muros exteriores)
+    crearEstructuraEstadio();
+
+    // Crear zonas de asientos con nombres reales
+    // Crear zonas de asientos (optimizado para mejor rendimiento)
+    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 10, 15, 0);
+    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 12, 10, Math.PI / 2);
+    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 12, 10, -Math.PI / 2);
+    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 8, 15, Math.PI);
+    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 8, 15, 0);}
 
 /**
  * Crear líneas del campo de fútbol
  */
 function crearLineasCampo() {
-    const lineaMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-
+    const lineaMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
     // Líneas perimetrales
     const points = [];
     points.push(new THREE.Vector3(-35, 0.1, -50));
@@ -154,12 +179,129 @@ function crearLineasCampo() {
     scene.add(centralLine);
 
     // Círculo central
-    const circleGeometry = new THREE.CircleGeometry(9, 32);
+    const circleGeometry = new THREE.CircleGeometry(9.15, 32);
     const circleEdges = new THREE.EdgesGeometry(circleGeometry);
     const circleLine = new THREE.LineSegments(circleEdges, lineaMaterial);
     circleLine.rotation.x = -Math.PI / 2;
     circleLine.position.y = 0.1;
     scene.add(circleLine);
+    crearAreaPenalti(50);
+    crearAreaPenalti(-50);
+
+}
+function crearAreaPenalti(zPosition) {
+    const lineaMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+
+    // Área grande
+    const areaGrande = [
+        new THREE.Vector3(-20, 0.1, zPosition),
+        new THREE.Vector3(-20, 0.1, zPosition > 0 ? zPosition - 16.5 : zPosition + 16.5),
+        new THREE.Vector3(20, 0.1, zPosition > 0 ? zPosition - 16.5 : zPosition + 16.5),
+        new THREE.Vector3(20, 0.1, zPosition)
+    ];
+    const areaGrandeGeometry = new THREE.BufferGeometry().setFromPoints(areaGrande);
+    const areaGrandeLine = new THREE.Line(areaGrandeGeometry, lineaMaterial);
+    scene.add(areaGrandeLine);
+
+    // Área pequeña
+    const areaPequena = [
+        new THREE.Vector3(-9, 0.1, zPosition),
+        new THREE.Vector3(-9, 0.1, zPosition > 0 ? zPosition - 5.5 : zPosition + 5.5),
+        new THREE.Vector3(9, 0.1, zPosition > 0 ? zPosition - 5.5 : zPosition + 5.5),
+        new THREE.Vector3(9, 0.1, zPosition)
+    ];
+    const areaPequenaGeometry = new THREE.BufferGeometry().setFromPoints(areaPequena);
+    const areaPequenaLine = new THREE.Line(areaPequenaGeometry, lineaMaterial);
+    scene.add(areaPequenaLine);
+}
+
+/**
+ * Crear portería
+ */
+function crearPorteria(posicion) {
+    const materialPorteria = new THREE.MeshLambertMaterial({ color: 0xeeeeee });
+    const posteRadius = 0.12;
+    const posteHeight = 2.44;
+    const ancho = 7.32;
+
+    // Poste izquierdo
+    const posteIzq = new THREE.Mesh(
+        new THREE.CylinderGeometry(posteRadius, posteRadius, posteHeight, 8),
+        materialPorteria
+    );
+    posteIzq.position.set(posicion.x - ancho/2, posteHeight/2, posicion.z);
+    scene.add(posteIzq);
+
+    // Poste derecho
+    const posteDer = new THREE.Mesh(
+        new THREE.CylinderGeometry(posteRadius, posteRadius, posteHeight, 8),
+        materialPorteria
+    );
+    posteDer.position.set(posicion.x + ancho/2, posteHeight/2, posicion.z);
+    scene.add(posteDer);
+
+    // Travesaño
+    const travesano = new THREE.Mesh(
+        new THREE.CylinderGeometry(posteRadius, posteRadius, ancho, 8),
+        materialPorteria
+    );
+    travesano.rotation.z = Math.PI / 2;
+    travesano.position.set(posicion.x, posteHeight, posicion.z);
+    scene.add(travesano);
+
+    // Red (simplificada)
+    const redGeometry = new THREE.PlaneGeometry(ancho, posteHeight);
+    const redMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.DoubleSide,
+        wireframe: true
+    });
+    const red = new THREE.Mesh(redGeometry, redMaterial);
+    red.position.set(posicion.x, posteHeight/2, posicion.z);
+    scene.add(red);
+}
+
+/**
+ * Crear estructura exterior del estadio
+ */
+function crearEstructuraEstadio() {
+    const wallMaterial = new THREE.MeshLambertMaterial({
+        color: 0x555555,
+        side: THREE.DoubleSide
+    });
+
+    // Muro trasero tribuna
+    const muroTribuna = new THREE.Mesh(
+        new THREE.BoxGeometry(80, 15, 2),
+        wallMaterial
+    );
+    muroTribuna.position.set(0, 7.5, -72);
+    scene.add(muroTribuna);
+
+    // Muro gol nord
+    const muroGolNord = new THREE.Mesh(
+        new THREE.BoxGeometry(80, 12, 2),
+        wallMaterial
+    );
+    muroGolNord.position.set(0, 6, 72);
+    scene.add(muroGolNord);
+
+    // Muros laterales
+    const muroLateralIzq = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 12, 144),
+        wallMaterial
+    );
+    muroLateralIzq.position.set(-57, 6, 0);
+    scene.add(muroLateralIzq);
+
+    const muroLateralDer = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 12, 144),
+        wallMaterial
+    );
+    muroLateralDer.position.set(57, 6, 0);
+    scene.add(muroLateralDer);
 }
 
 /**
@@ -216,12 +358,10 @@ function crearZonaAsientos(nombreZona, posicion, filas, asientosPorFila, rotacio
 async function cargarDatosEstadio() {
     try {
         // Mostrar loading
-        document.getElementById('loading').style.display = 'flex';
-
+        updateLoadingProgress('Cargando información de zonas...', 85);
         // Crear promesa con timeout
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout: La carga tardó demasiado')), 10000)
-        );
+            setTimeout(() => reject(new Error('Timeout: La carga tardó demasiado. Verifica tu conexión.')), 5000)    );
 
         // Cargar zonas con timeout
         const zonasResponse = await Promise.race([
@@ -230,11 +370,13 @@ async function cargarDatosEstadio() {
         ]);
 
         if (!zonasResponse.ok) {
-            throw new Error(`Error HTTP: ${zonasResponse.status}`);
+            throw new Error(`Error HTTP ${zonasResponse.status}: No se pudieron cargar las zonas`);
         }
 
         const zonasResult = await zonasResponse.json();
-        zonasData = zonasResult.zonas;
+        zonasData = zonasResult.zonas || [];
+
+        updateLoadingProgress('Cargando asientos ocupados...', 90);
 
         // Cargar asientos ocupados con timeout
         const ocupadosResponse = await Promise.race([
@@ -248,25 +390,41 @@ async function cargarDatosEstadio() {
         } else {
             asientosOcupados = await ocupadosResponse.json();
         }
+        updateLoadingProgress('Finalizando...', 95);
 
         // Actualizar precios y disponibilidad
         actualizarAsientos();
 
         // Ocultar loading
-        document.getElementById('loading').style.display = 'none';
+        updateLoadingProgress('¡Listo!', 100);
 
+        // Ocultar loading con animación
+        setTimeout(() => {
+            document.getElementById('loading').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 300);
+        }, 200);
         // Actualizar panel de información
         actualizarPanelInfo();
 
     } catch (error) {
         console.error('Error al cargar datos del estadio:', error);
-        document.getElementById('loading').innerHTML =
-            '<div style="color: white; text-align: center; padding: 20px;">' +
-            '<h3>⚠️ Error al cargar el estadio</h3>' +
-            '<p style="margin: 15px 0;">' + error.message + '</p>' +
-            '<button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 5px; font-size: 16px;">🔄 Reintentar</button>' +
+        const loadingDiv = document.getElementById('loading');
+        loadingDiv.style.background = 'rgba(26, 35, 126, 0.98)';
+        loadingDiv.innerHTML =
+            '<div style="color: white; text-align: center; padding: 40px; max-width: 600px;">' +
+            '<i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #FFC107; margin-bottom: 20px;"></i>' +
+            '<h3 style="margin-bottom: 20px;">⚠️ Error al cargar el estadio 3D</h3>' +
+            '<p style="margin: 15px 0; font-size: 1.1rem; line-height: 1.5;">' + error.message + '</p>' +
+            '<p style="margin: 15px 0; color: #ccc;">El servidor puede estar temporalmente no disponible.</p>' +
+            '<button onclick="location.reload()" style="margin-top: 20px; padding: 12px 30px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; transition: all 0.3s;">' +
+            '<i class="fas fa-sync-alt me-2"></i>Reintentar' +
+            '</button>' +
             '<br><br>' +
-            '<a href="/eventos/' + eventoId + '/comprar" style="color: #FFC107; text-decoration: underline;">← Volver a la vista 2D</a>' +
+            '<a href="/eventos/' + eventoId + '/comprar" style="color: #FFC107; text-decoration: underline; font-size: 1.1rem; margin-top: 20px; display: inline-block;">' +
+            '<i class="fas fa-arrow-left me-2"></i>Volver a la vista 2D tradicional' +
+            '</a>' +
             '</div>';
     }
 }
