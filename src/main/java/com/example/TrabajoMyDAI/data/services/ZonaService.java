@@ -161,9 +161,10 @@ public class ZonaService {
     /**
      * Obtener asientos ocupados por zona para un evento
      * Devuelve un mapa con el nombre de la zona como clave y la lista de números de asiento como valor
+     * Optimizado con JOIN FETCH para evitar N+1 queries
      */
     public java.util.Map<String, java.util.List<Long>> obtenerAsientosOcupadosPorEvento(Long eventoId) {
-        List<Zona> zonas = zonaRepository.findByEventoId(eventoId);
+        List<Zona> zonas = zonaRepository.findByEventoIdWithTickets(eventoId);
         java.util.Map<String, java.util.List<Long>> asientosOcupados = new java.util.HashMap<>();
 
         for (Zona zona : zonas) {
