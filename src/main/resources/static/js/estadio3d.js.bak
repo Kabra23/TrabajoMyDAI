@@ -168,11 +168,11 @@ function crearEstadio() {
 
     // Crear zonas de asientos con nombres reales
     // Crear zonas de asientos (optimizado para mejor rendimiento)
-    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 8, 12, 0);
-    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 10, 8, Math.PI / 2);
-    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 10, 8, -Math.PI / 2);
-    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 6, 12, Math.PI);
-    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 6, 12, 0);}
+    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -60 }, 10, 15, 0);
+    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 12, 10, Math.PI / 2);
+    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 12, 10, -Math.PI / 2);
+    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 60 }, 8, 15, Math.PI);
+    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -60 }, 8, 15, 0);}
 
 /**
  * Crear líneas del campo de fútbol
@@ -497,7 +497,7 @@ function actualizarPanelInfo() {
 }
 
 /**
- * Manejar movimiento del mouse (optimizado)
+ * Manejar movimiento del mouse
  */
 function onMouseMove(event) {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -505,29 +505,25 @@ function onMouseMove(event) {
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    raycaster.far = MAX_RAYCAST_DISTANCE; // Limitar distancia de raycasting
     const intersects = raycaster.intersectObjects(asientos);
+
+    // Resetear colores de hover
+    asientos.forEach(asiento => {
+        if (asiento !== asientoSeleccionado) {
+            asiento.material.color.setHex(
+                asiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
+            );
+        }
+    });
 
     // Tooltip
     const tooltip = document.getElementById('tooltip');
 
     if (intersects.length > 0) {
         const asiento = intersects[0].object;
-        
-        // Solo actualizar si cambió el asiento hover
-        if (hoveredAsiento !== asiento) {
-            // Resetear asiento anterior
-            if (hoveredAsiento && hoveredAsiento !== asientoSeleccionado) {
-                hoveredAsiento.material.color.setHex(
-                    hoveredAsiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
-                );
-            }
-            
-            hoveredAsiento = asiento;
-            
-            if (asiento.userData.disponible && asiento !== asientoSeleccionado) {
-                asiento.material.color.setHex(COLORS.hover);
-            }
+
+        if (asiento.userData.disponible && asiento !== asientoSeleccionado) {
+            asiento.material.color.setHex(COLORS.hover);
         }
 
         // Mostrar tooltip
@@ -543,14 +539,6 @@ function onMouseMove(event) {
 
         renderer.domElement.style.cursor = asiento.userData.disponible ? 'pointer' : 'not-allowed';
     } else {
-        // Resetear hover cuando no hay intersección
-        if (hoveredAsiento && hoveredAsiento !== asientoSeleccionado) {
-            hoveredAsiento.material.color.setHex(
-                hoveredAsiento.userData.disponible ? COLORS.disponible : COLORS.ocupado
-            );
-            hoveredAsiento = null;
-        }
-        
         tooltip.style.display = 'none';
         renderer.domElement.style.cursor = 'default';
     }
