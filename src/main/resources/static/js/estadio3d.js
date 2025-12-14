@@ -9,6 +9,9 @@ let eventoId;
 let lastMouseMoveTime = 0;
 let hoveredAsiento = null;
 
+// Constantes de rendimiento
+const MOUSE_THROTTLE_MS = 50; // Intervalo de throttling para mousemove
+
 // Colores
 const COLORS = {
     disponible: 0x4CAF50,
@@ -181,7 +184,7 @@ function crearZonaAsientos(nombreZona, posicion, filas, asientosPorFila, rotacio
 
     for (let fila = 0; fila < filas; fila++) {
         for (let asiento = 0; asiento < asientosPorFila; asiento++) {
-            // Reutilizar geometría (no crear una nueva cada vez)
+            // Reutilizar geometría compartida, clonar material para permitir cambios de color individuales
             const asientoMesh = new THREE.Mesh(geometry, materialDisponible.clone());
 
             // Posición local del asiento
@@ -327,9 +330,9 @@ function actualizarPanelInfo() {
  * Optimizado: throttling para evitar llamadas excesivas
  */
 function onMouseMove(event) {
-    // Throttling: solo procesar cada 50ms
+    // Throttling: solo procesar cada MOUSE_THROTTLE_MS
     const now = Date.now();
-    if (now - lastMouseMoveTime < 50) {
+    if (now - lastMouseMoveTime < MOUSE_THROTTLE_MS) {
         return;
     }
     lastMouseMoveTime = now;
