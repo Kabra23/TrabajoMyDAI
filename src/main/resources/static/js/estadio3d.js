@@ -310,18 +310,21 @@ function crearZonaAsientosMixta(posicion, filas, asientosPorFila, rotacion) {
     const asientoGap = 0.15;
     const filaHeight = 0.5;
     const filaDepth = 0.8;
+    const TRIBUNA_ROWS = 5; // Número de filas de la zona premium
 
     let asientoNumeroTribuna = 1;
     let asientoNumeroGrada = 1;
 
     for (let fila = 0; fila < filas; fila++) {
         // Las primeras 5 filas son TRIBUNA (zona premium)
-        const esTribuna = fila < 5;
+        const esTribuna = fila < TRIBUNA_ROWS;
         
         for (let asiento = 0; asiento < asientosPorFila; asiento++) {
             // Usar geometría más simple para mejor rendimiento
             const geometry = new THREE.BoxGeometry(asientoSize, asientoSize * 0.8, asientoSize * 0.6);
-            const material = new THREE.MeshLambertMaterial({ color: COLORS.disponible });
+            // Color inicial basado en la zona (será actualizado al cargar datos reales)
+            const colorInicial = esTribuna ? COLORS.tribuna : COLORS.grada;
+            const material = new THREE.MeshLambertMaterial({ color: colorInicial });
             const asientoMesh = new THREE.Mesh(geometry, material);
 
             // Posición local del asiento

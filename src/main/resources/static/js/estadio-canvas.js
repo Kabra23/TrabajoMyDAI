@@ -171,13 +171,14 @@ class EstadioCanvas {
         // 15 filas x 40 asientos = 600 (primeras 5 filas = Tribuna, últimas 10 = Grada)
         const lateralFilas = 15;
         const lateralAsientosPorFila = 40;
+        const TRIBUNA_ROWS = 5; // Número de filas de la zona premium
         let gradaLateralNumero = 1;
         let tribunaNumero = 1;
 
         for (let fila = 0; fila < lateralFilas; fila++) {
             for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
                 // Las primeras 5 filas son TRIBUNA (zona premium)
-                const esTribuna = fila < 5;
+                const esTribuna = fila < TRIBUNA_ROWS;
                 
                 const x = -280 - (fila * (asientoSize + gap));
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
@@ -207,7 +208,7 @@ class EstadioCanvas {
         for (let fila = 0; fila < lateralFilas; fila++) {
             for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
                 // Las primeras 5 filas son TRIBUNA (zona premium)
-                const esTribuna = fila < 5;
+                const esTribuna = fila < TRIBUNA_ROWS;
                 
                 const x = 280 + (fila * (asientoSize + gap));
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
