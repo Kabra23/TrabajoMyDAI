@@ -15,7 +15,9 @@ const COLORS = {
     hover: 0xFFC107,
     campo: 0x7CB342,
     cesped: 0x2E7D32,
-    lineas: 0xFFFFFF
+    lineas: 0xFFFFFF,
+    tribuna: 0xFF8C00,  // Naranja premium para zona Tribuna
+    grada: 0x283593     // Azul para Grada normal
 };
 
 /**
@@ -177,10 +179,13 @@ function crearEstadio() {
     crearPorteria({ x: 0, y: 0, z: 52 });
 
     // Crear zonas de asientos (4 lados del estadio)
-    crearZonaAsientos('Tribuna', { x: 0, y: 0, z: -65 }, 8, 20, 0);
-    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 65 }, 6, 15, Math.PI);
-    crearZonaAsientos('Grada Lateral', { x: -45, y: 0, z: 0 }, 10, 12, Math.PI / 2);
-    crearZonaAsientos('Grada Lateral', { x: 45, y: 0, z: 0 }, 10, 12, -Math.PI / 2);
+    // Gol Sud - reducido a 12 filas x 40 asientos = 480
+    crearZonaAsientos('Gol Sud', { x: 0, y: 0, z: -65 }, 12, 40, 0);
+    // Gol Nord - reducido a 12 filas x 40 asientos = 480
+    crearZonaAsientos('Gol Nord', { x: 0, y: 0, z: 65 }, 12, 40, Math.PI);
+    // Grada Lateral con Tribuna integrada - 15 filas x 40 asientos = 600 por lado
+    crearZonaAsientosMixta({ x: -45, y: 0, z: 0 }, 15, 40, Math.PI / 2);
+    crearZonaAsientosMixta({ x: 45, y: 0, z: 0 }, 15, 40, -Math.PI / 2);
 
     console.log('✅ Estadio creado con', asientos.length, 'asientos');
 }
@@ -292,6 +297,65 @@ function crearZonaAsientos(nombreZona, posicion, filas, asientosPorFila, rotacio
             asientos.push(asientoMesh);
             scene.add(asientoMesh);
             asientoNumero++;
+        }
+    }
+}
+
+/**
+ * Crear zona de asientos mixta (Grada Lateral con Tribuna integrada)
+ * Las primeras 5 filas son Tribuna (premium), las últimas 10 son Grada Lateral
+ */
+function crearZonaAsientosMixta(posicion, filas, asientosPorFila, rotacion) {
+    const asientoSize = 0.8;
+    const asientoGap = 0.15;
+    const filaHeight = 0.5;
+    const filaDepth = 0.8;
+
+    let asientoNumeroTribuna = 1;
+    let asientoNumeroGrada = 1;
+
+    for (let fila = 0; fila < filas; fila++) {
+        // Las primeras 5 filas son TRIBUNA (zona premium)
+        const esTribuna = fila < 5;
+        
+        for (let asiento = 0; asiento < asientosPorFila; asiento++) {
+            // Usar geometría más simple para mejor rendimiento
+            const geometry = new THREE.BoxGeometry(asientoSize, asientoSize * 0.8, asientoSize * 0.6);
+            const material = new THREE.MeshLambertMaterial({ color: COLORS.disponible });
+            const asientoMesh = new THREE.Mesh(geometry, material);
+
+            // Posición local del asiento
+            const x = (asiento - asientosPorFila / 2 + 0.5) * (asientoSize + asientoGap);
+            const y = fila * filaHeight + 1;
+            const z = fila * filaDepth;
+
+            // Rotar según la zona
+            const pos = new THREE.Vector3(x, y, z);
+            pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotacion);
+
+            asientoMesh.position.set(
+                posicion.x + pos.x,
+                posicion.y + pos.y,
+                posicion.z + pos.z
+            );
+            asientoMesh.rotation.y = rotacion;
+
+            // Metadata del asiento
+            asientoMesh.userData = {
+                zona: esTribuna ? 'Tribuna' : 'Grada Lateral',
+                numero: esTribuna ? asientoNumeroTribuna : asientoNumeroGrada,
+                disponible: true,
+                precio: 0
+            };
+
+            asientos.push(asientoMesh);
+            scene.add(asientoMesh);
+            
+            if (esTribuna) {
+                asientoNumeroTribuna++;
+            } else {
+                asientoNumeroGrada++;
+            }
         }
     }
 }
