@@ -52,7 +52,7 @@ class EstadioCanvas {
             ocupado: '#f44336',
             seleccionado: '#2196F3',
             hover: '#FFC107',
-            tribuna: '#1a237e',
+            tribuna: '#FF6F00', // Naranja oscuro para diferenciar zona premium
             grada: '#283593'
         };
 
@@ -106,23 +106,132 @@ class EstadioCanvas {
     }
 
     crearEstructuraEstadio() {
-        // Crear asientos rodeando completamente el estadio (SIN ESQUINAS para evitar superposiciones)
-        const asientoSize = 12;
-        const gap = 2;
-        let asientoId = 1;
+        // DISTRIBUCIÓN AJUSTADA AL CAMPO DE FÚTBOL
+        // Reducir filas laterales para que cuadre con el campo visualmente
 
-        // TRIBUNA (Arriba) - Zona Premium
-        const tribunaFilas = 15;
-        const tribunaAsientosPorFila = 35;
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = (asiento - tribunaAsientosPorFila / 2) * (asientoSize + gap);
-                const y = -360 - (fila * 16);
+        const asientoSize = 14;
+        const gap = 3;
+        let asientoIdGlobal = 1;
+
+        // GOL NORD (Arriba) - 800 asientos
+        // 16 filas x 50 asientos = 800
+        const golNordFilas = 16;
+        const golNordAsientosPorFila = 50;
+        let golNordNumero = 1;
+
+        for (let fila = 0; fila < golNordFilas; fila++) {
+            for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
+                const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
+                const y = -320 - (fila * (asientoSize + gap));
 
                 this.asientos.push({
-                    id: asientoId++,
+                    id: asientoIdGlobal,
+                    zona: 'Gol Nord',
+                    numero: golNordNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                golNordNumero++;
+            }
+        }
+
+        // GOL SUD (Abajo) - 800 asientos
+        // 16 filas x 50 asientos = 800
+        const golSudFilas = 16;
+        const golSudAsientosPorFila = 50;
+        let golSudNumero = 1;
+
+        for (let fila = 0; fila < golSudFilas; fila++) {
+            for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
+                const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
+                const y = 320 + (fila * (asientoSize + gap));
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Gol Sud',
+                    numero: golSudNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                golSudNumero++;
+            }
+        }
+
+        // GRADA LATERAL IZQUIERDA - 750 asientos
+        // AJUSTADO: 10 filas x 75 asientos = 750 (más ancho, menos profundo)
+        const lateralFilas = 10; // Reducido de 15 a 10
+        const lateralAsientosPorFila = 75; // Aumentado de 50 a 75
+        let gradaLateralNumero = 1;
+
+        for (let fila = 0; fila < lateralFilas; fila++) {
+            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+                const x = -240 - (fila * (asientoSize + gap));
+                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Grada Lateral',
+                    numero: gradaLateralNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                gradaLateralNumero++;
+            }
+        }
+
+        // GRADA LATERAL DERECHA - 750 asientos
+        // AJUSTADO: 10 filas x 75 asientos = 750
+        for (let fila = 0; fila < lateralFilas; fila++) {
+            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+                const x = 240 + (fila * (asientoSize + gap));
+                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Grada Lateral',
+                    numero: gradaLateralNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                gradaLateralNumero++;
+            }
+        }
+
+        // TRIBUNA IZQUIERDA (500 asientos) - Zona Premium
+        // AJUSTADO: 10 filas x 50 asientos = 500
+        const tribunaFilas = 10;
+        const tribunaAsientosPorFila = 50;
+        let tribunaNumero = 1;
+
+        for (let fila = 0; fila < tribunaFilas; fila++) {
+            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
+                const x = -410 - (fila * (asientoSize + gap)); // Ajustado para estar pegado a grada
+                const y = (asiento - tribunaAsientosPorFila / 2) * (asientoSize + gap);
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
                     zona: 'Tribuna',
-                    numero: asientoId,
+                    numero: tribunaNumero,
                     x: x,
                     y: y,
                     size: asientoSize,
@@ -130,74 +239,40 @@ class EstadioCanvas {
                     precio: 0,
                     color: this.colors.tribuna
                 });
+                asientoIdGlobal++;
+                tribunaNumero++;
             }
         }
 
-        // GOL NORD (Abajo)
-        const golNordFilas = 12;
-        const golNordAsientosPorFila = 35;
-        for (let fila = 0; fila < golNordFilas; fila++) {
-            for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
-                const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
-                const y = 360 + (fila * 16);
+        // TRIBUNA DERECHA (500 asientos) - Zona Premium
+        // AJUSTADO: 10 filas x 50 asientos = 500
+        for (let fila = 0; fila < tribunaFilas; fila++) {
+            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
+                const x = 410 + (fila * (asientoSize + gap)); // Ajustado para estar pegado a grada
+                const y = (asiento - tribunaAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
-                    id: asientoId++,
-                    zona: 'Gol Nord',
-                    numero: asientoId,
+                    id: asientoIdGlobal,
+                    zona: 'Tribuna',
+                    numero: tribunaNumero,
                     x: x,
                     y: y,
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: this.colors.grada
+                    color: this.colors.tribuna
                 });
+                asientoIdGlobal++;
+                tribunaNumero++;
             }
         }
 
-        // GRADA LATERAL IZQUIERDA
-        const lateralFilas = 18;
-        const lateralAsientosPorFila = 50;
-        for (let fila = 0; fila < lateralFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
-                const x = -260 - (fila * 16);
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
-
-                this.asientos.push({
-                    id: asientoId++,
-                    zona: 'Grada Lateral',
-                    numero: asientoId,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.grada
-                });
-            }
-        }
-
-        // GRADA LATERAL DERECHA
-        for (let fila = 0; fila < lateralFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
-                const x = 260 + (fila * 16);
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
-
-                this.asientos.push({
-                    id: asientoId++,
-                    zona: 'Grada Lateral',
-                    numero: asientoId,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.grada
-                });
-            }
-        }
-
-        console.log(`✅ Creados ${this.asientos.length} asientos formando un estadio completo`);
+        console.log(`✅ Asientos ajustados al campo (${asientoSize}px):`);
+        console.log(`   - Gol Nord: ${golNordNumero-1} asientos (${golNordFilas} filas × ${golNordAsientosPorFila})`);
+        console.log(`   - Gol Sud: ${golSudNumero-1} asientos (${golSudFilas} filas × ${golSudAsientosPorFila})`);
+        console.log(`   - Grada Lateral: ${gradaLateralNumero-1} asientos (${lateralFilas} filas × ${lateralAsientosPorFila} × 2 lados)`);
+        console.log(`   - Tribuna: ${tribunaNumero-1} asientos (${tribunaFilas} filas × ${tribunaAsientosPorFila} × 2 lados) 🟠`);
+        console.log(`   TOTAL: ${this.asientos.length} asientos`);
     }
 
 
@@ -231,17 +306,37 @@ class EstadioCanvas {
     }
 
     actualizarAsientos() {
+        // Primero, filtrar asientos que exceden la capacidad de cada zona
+        const asientosFiltrados = [];
+
         this.asientos.forEach(asiento => {
             // Buscar info de la zona
             const zonaInfo = this.zonasData.find(z => z.nombre === asiento.zona);
             if (zonaInfo) {
                 asiento.precio = zonaInfo.precio;
+
+                // VALIDACIÓN: Solo incluir asientos dentro de la capacidad de la zona
+                if (asiento.numero <= zonaInfo.capacidadTotal) {
+                    asientosFiltrados.push(asiento);
+                } else {
+                    console.warn(`⚠️ Asiento ${asiento.numero} de ${asiento.zona} excede capacidad (${zonaInfo.capacidadTotal}). Ocultado.`);
+                }
+            } else {
+                // Si no hay info de la zona, incluir el asiento de todas formas
+                asientosFiltrados.push(asiento);
             }
 
-            // Verificar si está ocupado
-            const ocupados = this.asientosOcupados[asiento.zona] || [];
-            asiento.disponible = !ocupados.includes(asiento.numero);
+            // Verificar si está ocupado (solo para asientos válidos)
+            if (asiento.numero <= (zonaInfo?.capacidadTotal || Infinity)) {
+                const ocupados = this.asientosOcupados[asiento.zona] || [];
+                asiento.disponible = !ocupados.includes(asiento.numero);
+            }
         });
+
+        // Actualizar el array de asientos con solo los válidos
+        this.asientos = asientosFiltrados;
+
+        console.log(`✅ Asientos validados: ${this.asientos.length} asientos dentro de capacidad`);
     }
 
     setupEventListeners() {
@@ -413,9 +508,9 @@ class EstadioCanvas {
         this.ctx.shadowOffsetX = 10;
         this.ctx.shadowOffsetY = 10;
 
-        // Fondo del campo (plataforma)
+        // Fondo del campo (plataforma) - ajustado al nuevo tamaño
         this.ctx.fillStyle = '#1a237e';
-        this.ctx.fillRect(-260, -360, 520, 720);
+        this.ctx.fillRect(-210, -290, 420, 580);
 
         // Resetear sombra
         this.ctx.shadowColor = 'transparent';
@@ -450,10 +545,12 @@ class EstadioCanvas {
         this.ctx.shadowOffsetY = 2;
 
         const etiquetas = [
-            { texto: 'TRIBUNA', x: 0, y: -620, color: '#FFD700' },
-            { texto: 'GOL NORD', x: 0, y: 560, color: '#FFD700' },
-            { texto: 'GRADA LATERAL', x: -550, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
-            { texto: 'GRADA LATERAL', x: 550, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
+            { texto: 'GOL NORD', x: 0, y: -600, color: '#FFD700' },
+            { texto: 'GOL SUD', x: 0, y: 600, color: '#FFD700' },
+            { texto: 'GRADA LATERAL', x: -380, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
+            { texto: 'GRADA LATERAL', x: 380, y: 0, rotacion: Math.PI / 2, color: '#FFD700' },
+            { texto: 'TRIBUNA ⭐', x: -550, y: 0, rotacion: -Math.PI / 2, color: '#FF6F00' },
+            { texto: 'TRIBUNA ⭐', x: 550, y: 0, rotacion: Math.PI / 2, color: '#FF6F00' }
         ];
 
         etiquetas.forEach(etiqueta => {
@@ -486,19 +583,25 @@ class EstadioCanvas {
     }
 
     dibujarCampo() {
+        // Campo ajustado a la nueva distribución de asientos
+        const campoAncho = 400;
+        const campoAlto = 560;
+        const campoX = -200;
+        const campoY = -280;
+
         // Fondo del campo con patrón de césped
-        const gradient = this.ctx.createLinearGradient(-250, -350, -250, 350);
+        const gradient = this.ctx.createLinearGradient(campoX, campoY, campoX, campoY + campoAlto);
         gradient.addColorStop(0, '#2E7D32');
         gradient.addColorStop(0.5, '#388E3C');
         gradient.addColorStop(1, '#2E7D32');
         this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(-250, -350, 500, 700);
+        this.ctx.fillRect(campoX, campoY, campoAncho, campoAlto);
 
         // Franjas de césped más oscuras
         this.ctx.fillStyle = 'rgba(46, 125, 50, 0.3)';
         for (let i = 0; i < 14; i++) {
             if (i % 2 === 0) {
-                this.ctx.fillRect(-250, -350 + (i * 50), 500, 50);
+                this.ctx.fillRect(campoX, campoY + (i * 40), campoAncho, 40);
             }
         }
 
@@ -515,17 +618,17 @@ class EstadioCanvas {
         this.ctx.shadowOffsetY = 1;
 
         // Perímetro del campo
-        this.ctx.strokeRect(-245, -345, 490, 690);
+        this.ctx.strokeRect(campoX + 5, campoY + 5, campoAncho - 10, campoAlto - 10);
 
         // Línea central
         this.ctx.beginPath();
-        this.ctx.moveTo(-245, 0);
-        this.ctx.lineTo(245, 0);
+        this.ctx.moveTo(campoX + 5, 0);
+        this.ctx.lineTo(campoX + campoAncho - 5, 0);
         this.ctx.stroke();
 
         // Círculo central
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, 50, 0, Math.PI * 2);
+        this.ctx.arc(0, 0, 45, 0, Math.PI * 2);
         this.ctx.stroke();
 
         // Punto central
@@ -535,8 +638,8 @@ class EstadioCanvas {
         this.ctx.fill();
 
         // Áreas y porterías
-        this.dibujarAreaCompleta(-345);
-        this.dibujarAreaCompleta(345);
+        this.dibujarAreaCompleta(-275);
+        this.dibujarAreaCompleta(275);
 
         // Esquinas (cuartos de círculo)
         this.dibujarEsquinas();
@@ -553,13 +656,13 @@ class EstadioCanvas {
         this.ctx.lineWidth = 3;
 
         // Área grande (16.5m)
-        this.ctx.strokeRect(-120, esArriba ? y : y - 100, 240, 100);
+        this.ctx.strokeRect(-110, esArriba ? y : y - 90, 220, 90);
 
         // Área pequeña (5.5m)
-        this.ctx.strokeRect(-60, esArriba ? y : y - 40, 120, 40);
+        this.ctx.strokeRect(-50, esArriba ? y : y - 35, 100, 35);
 
         // Punto de penalti
-        const penaltiY = esArriba ? y + 66 : y - 66;
+        const penaltiY = esArriba ? y + 60 : y - 60;
         this.ctx.beginPath();
         this.ctx.arc(0, penaltiY, 3, 0, Math.PI * 2);
         this.ctx.fillStyle = this.colors.lineas;
@@ -568,9 +671,9 @@ class EstadioCanvas {
         // Arco del área (semicírculo fuera del área)
         this.ctx.beginPath();
         if (esArriba) {
-            this.ctx.arc(0, penaltiY, 55, 0.3, Math.PI - 0.3);
+            this.ctx.arc(0, penaltiY, 50, 0.3, Math.PI - 0.3);
         } else {
-            this.ctx.arc(0, penaltiY, 55, -Math.PI + 0.3, -0.3);
+            this.ctx.arc(0, penaltiY, 50, -Math.PI + 0.3, -0.3);
         }
         this.ctx.stroke();
 
@@ -618,10 +721,10 @@ class EstadioCanvas {
         this.ctx.lineWidth = 3;
 
         const esquinas = [
-            {x: -245, y: -345, inicio: 0, fin: Math.PI / 2},
-            {x: 245, y: -345, inicio: Math.PI / 2, fin: Math.PI},
-            {x: 245, y: 345, inicio: Math.PI, fin: Math.PI * 1.5},
-            {x: -245, y: 345, inicio: Math.PI * 1.5, fin: Math.PI * 2}
+            {x: -195, y: -275, inicio: 0, fin: Math.PI / 2},
+            {x: 195, y: -275, inicio: Math.PI / 2, fin: Math.PI},
+            {x: 195, y: 275, inicio: Math.PI, fin: Math.PI * 1.5},
+            {x: -195, y: 275, inicio: Math.PI * 1.5, fin: Math.PI * 2}
         ];
 
         esquinas.forEach(esquina => {
@@ -637,7 +740,7 @@ class EstadioCanvas {
             const screenX = asiento.x * this.zoom + this.offsetX;
             const screenY = asiento.y * this.zoom + this.offsetY;
             return screenX > -100 && screenX < this.width + 100 &&
-                   screenY > -100 && screenY < this.height + 100;
+                screenY > -100 && screenY < this.height + 100;
         });
 
         asientosVisibles.forEach(asiento => {
@@ -658,20 +761,38 @@ class EstadioCanvas {
                 color = this.colors.ocupado;
             }
 
-            // Dibujar asiento simplificado para mejor rendimiento
+            // Dibujar asiento con mejor visualización
             const x = asiento.x - asiento.size / 2;
             const y = asiento.y - asiento.size / 2;
             const size = asiento.size;
 
+            // Fondo del asiento con color de zona (Tribuna = naranja, resto = azul)
+            if (asiento.zona === 'Tribuna') {
+                // Asiento de Tribuna: fondo naranja
+                this.ctx.fillStyle = asiento.color; // #FF6F00
+                this.ctx.fillRect(x - 1, y - 1, size + 2, size + 2);
+            } else {
+                // Asiento de Grada: fondo azul suave
+                this.ctx.fillStyle = 'rgba(40, 53, 147, 0.3)'; // Azul translúcido
+                this.ctx.fillRect(x - 1, y - 1, size + 2, size + 2);
+            }
+
+            // Color del asiento según disponibilidad
             this.ctx.fillStyle = color;
             this.ctx.fillRect(x, y, size, size);
 
-            // Solo agregar sombra y detalles si el zoom es suficiente
-            if (this.zoom > 0.8) {
-                // Borde
-                this.ctx.strokeStyle = this.darkenColor(color, 20);
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(x, y, size, size);
+            // Borde para mejor definición
+            this.ctx.strokeStyle = this.darkenColor(color, 20);
+            this.ctx.lineWidth = 1.5;
+            this.ctx.strokeRect(x, y, size, size);
+
+            // Si es Tribuna y está disponible, agregar indicador visual extra
+            if (asiento.zona === 'Tribuna' && asiento.disponible && this.zoom > 0.6) {
+                // Pequeño punto dorado en el centro para indicar premium
+                this.ctx.fillStyle = '#FFD700';
+                this.ctx.beginPath();
+                this.ctx.arc(asiento.x, asiento.y, 2, 0, Math.PI * 2);
+                this.ctx.fill();
             }
         });
     }
@@ -909,23 +1030,53 @@ class EstadioCanvas {
             btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
         }
 
-        // Enviar mediante formulario real en lugar de fetch para mantener la sesión
+        // Usar fetch para enviar los datos y recibir respuesta JSON
         try {
-            // Crear un formulario oculto y enviarlo
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/eventos/${this.eventoId}/comprar-asientos-individuales`;
+            console.log('📤 Enviando compra al servidor...', datosCompra);
 
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'asientos';
-            input.value = JSON.stringify(datosCompra);
+            // Preparar datos para enviar como form data
+            const formData = new URLSearchParams();
+            formData.append('asientos', JSON.stringify(datosCompra));
 
-            form.appendChild(input);
-            document.body.appendChild(form);
+            const response = await fetch(`/eventos/${this.eventoId}/comprar-asientos-individuales`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            });
 
-            console.log('📤 Enviando formulario...');
-            form.submit();
+            console.log('📨 Respuesta recibida:', response.status, response.statusText);
+
+            // Parsear respuesta JSON
+            const data = await response.json();
+            console.log('📦 Datos recibidos:', data);
+
+            if (data.success) {
+                // Compra exitosa
+                console.log('✅ Compra exitosa:', data.mensaje);
+
+                // Mostrar mensaje de éxito
+                alert(data.mensaje || '¡Compra realizada con éxito!');
+
+                // Redirigir a la página de tickets
+                window.location.href = data.redirect || '/tickets';
+            } else {
+                // Hubo un error en la compra
+                console.error('❌ Error en la compra:', data.error);
+                alert(data.error || 'Error al procesar la compra. Por favor, inténtalo de nuevo.');
+
+                // Si hay una redirección específica (por ejemplo, login)
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    // Re-habilitar el botón para reintentar
+                    if (btnConfirmar) {
+                        btnConfirmar.disabled = false;
+                        btnConfirmar.innerHTML = '<i class="fas fa-check me-2"></i>Confirmar Compra';
+                    }
+                }
+            }
         } catch (error) {
             console.error('❌ Error al realizar la compra:', error);
             alert('Error de conexión. Por favor, inténtalo de nuevo.');

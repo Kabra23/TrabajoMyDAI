@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
@@ -270,20 +271,26 @@ public class TicketController {
 
     @PostMapping("/eventos/{id}/comprar-asientos-individuales")
     @Transactional
-    public String procesarCompraAsientosIndividuales(@PathVariable("id") Long id,
+    @ResponseBody
+    public java.util.Map<String, Object> procesarCompraAsientosIndividuales(@PathVariable("id") Long id,
                                                      @RequestParam String asientos,
-                                                     HttpSession session,
-                                                     RedirectAttributes redirectAttributes) {
+                                                     HttpSession session) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
-            return "redirect:/login";
+            response.put("success", false);
+            response.put("error", "Debes iniciar sesión para comprar entradas");
+            response.put("redirect", "/login");
+            return response;
         }
 
         // VALIDACIÓN: Verificar que el usuario NO sea administrador
         if (usuario.isAdmin()) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Los administradores no pueden comprar entradas.");
-            return "redirect:/eventos";
+            response.put("success", false);
+            response.put("error", "Los administradores no pueden comprar entradas.");
+            response.put("redirect", "/eventos");
+            return response;
         }
 
         Evento evento = eventoRepository.findById(id)
@@ -296,9 +303,9 @@ public class TicketController {
 
             // Validar que no haya más de 10 asientos
             if (jsonArray.size() > 10) {
-                redirectAttributes.addFlashAttribute("error",
-                        "No puedes comprar más de 10 entradas a la vez.");
-                return "redirect:/eventos/" + id + "/comprar-3d";
+                response.put("success", false);
+                response.put("error", "No puedes comprar más de 10 entradas a la vez.");
+                return response;
             }
 
             // Calcular precio total y validar disponibilidad
@@ -315,25 +322,25 @@ public class TicketController {
 
                 // Validar que el asiento esté en el rango
                 if (zonaSeleccionada.getCapacidadTotal() != null && numeroAsiento > zonaSeleccionada.getCapacidadTotal()) {
-                    redirectAttributes.addFlashAttribute("error",
-                            String.format("El asiento %d excede la capacidad de la zona %s (máximo: %d).",
+                    response.put("success", false);
+                    response.put("error", String.format("El asiento %d excede la capacidad de la zona %s (máximo: %d).",
                                     numeroAsiento, zona, zonaSeleccionada.getCapacidadTotal()));
-                    return "redirect:/eventos/" + id + "/comprar-3d";
+                    return response;
                 }
 
                 // Validar que el asiento no esté ocupado
                 if (ticketRepository.findByZonaAndAsiento(zonaSeleccionada, numeroAsiento).isPresent()) {
-                    redirectAttributes.addFlashAttribute("error",
-                            String.format("El asiento %d ya está ocupado en la zona %s.",
+                    response.put("success", false);
+                    response.put("error", String.format("El asiento %d ya está ocupado en la zona %s.",
                                     numeroAsiento, zona));
-                    return "redirect:/eventos/" + id + "/comprar-3d";
+                    return response;
                 }
 
                 // Validar disponibilidad
                 if (!zonaSeleccionada.hayDisponibilidad()) {
-                    redirectAttributes.addFlashAttribute("error",
-                            "No hay entradas disponibles en la zona " + zona + ".");
-                    return "redirect:/eventos/" + id + "/comprar-3d";
+                    response.put("success", false);
+                    response.put("error", "No hay entradas disponibles en la zona " + zona + ".");
+                    return response;
                 }
 
                 double precio = evento.getPrecioPorZona(zona);
@@ -348,17 +355,17 @@ public class TicketController {
 
             // Validar saldo
             if (usuario.getSaldo() < precioTotal) {
-                redirectAttributes.addFlashAttribute("error",
-                        String.format("Saldo insuficiente. Necesitas %.2f€ pero solo tienes %.2f€.",
+                response.put("success", false);
+                response.put("error", String.format("Saldo insuficiente. Necesitas %.2f€ pero solo tienes %.2f€.",
                                 precioTotal, usuario.getSaldo()));
-                return "redirect:/eventos/" + id + "/comprar-3d";
+                return response;
             }
 
             // Descontar saldo
             if (!usuario.descontarSaldo(precioTotal)) {
-                redirectAttributes.addFlashAttribute("error",
-                        "Error al procesar el pago.");
-                return "redirect:/eventos/" + id + "/comprar-3d";
+                response.put("success", false);
+                response.put("error", "Error al procesar el pago.");
+                return response;
             }
 
             // Guardar usuario
@@ -382,16 +389,16 @@ public class TicketController {
                 zonaService.incrementarEntradasVendidas(zona.getId());
             }
 
-            redirectAttributes.addFlashAttribute("success",
-                    String.format("¡Compra realizada con éxito! Se han reservado %d entradas. Total: %.2f€",
+            response.put("success", true);
+            response.put("mensaje", String.format("¡Compra realizada con éxito! Se han reservado %d entradas. Total: %.2f€",
                             asientosAComprar.size(), precioTotal));
-
-            return "redirect:/tickets";
+            response.put("redirect", "/tickets");
+            return response;
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Error al procesar la compra: " + e.getMessage());
-            return "redirect:/eventos/" + id + "/comprar-3d";
+            response.put("success", false);
+            response.put("error", "Error al procesar la compra: " + e.getMessage());
+            return response;
         }
     }
 
