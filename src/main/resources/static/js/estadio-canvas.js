@@ -52,7 +52,7 @@ class EstadioCanvas {
             ocupado: '#f44336',
             seleccionado: '#2196F3',
             hover: '#FFC107',
-            tribuna: '#FF6F00', // Naranja oscuro para diferenciar zona premium
+            tribuna: '#FF8C00', // Naranja premium para zona Tribuna
             grada: '#283593'
         };
 
@@ -113,10 +113,10 @@ class EstadioCanvas {
         const gap = 3;
         let asientoIdGlobal = 1;
 
-        // GOL NORD (Arriba) - 800 asientos
-        // 16 filas x 50 asientos = 800
-        const golNordFilas = 16;
-        const golNordAsientosPorFila = 50;
+        // GOL NORD (Arriba) - 480 asientos (optimizado)
+        // 12 filas x 40 asientos = 480
+        const golNordFilas = 12;
+        const golNordAsientosPorFila = 40;
         let golNordNumero = 1;
 
         for (let fila = 0; fila < golNordFilas; fila++) {
@@ -140,10 +140,10 @@ class EstadioCanvas {
             }
         }
 
-        // GOL SUD (Abajo) - 800 asientos
-        // 16 filas x 50 asientos = 800
-        const golSudFilas = 16;
-        const golSudAsientosPorFila = 50;
+        // GOL SUD (Abajo) - 480 asientos (optimizado)
+        // 12 filas x 40 asientos = 480
+        const golSudFilas = 12;
+        const golSudAsientosPorFila = 40;
         let golSudNumero = 1;
 
         for (let fila = 0; fila < golSudFilas; fila++) {
@@ -167,111 +167,78 @@ class EstadioCanvas {
             }
         }
 
-        // GRADA LATERAL IZQUIERDA - 750 asientos
-        // AJUSTADO: 10 filas x 75 asientos = 750 (más ancho, menos profundo)
-        const lateralFilas = 10; // Reducido de 15 a 10
-        const lateralAsientosPorFila = 75; // Aumentado de 50 a 75
+        // GRADA LATERAL IZQUIERDA CON TRIBUNA INTEGRADA - 600 asientos
+        // 15 filas x 40 asientos = 600 (primeras 5 filas = Tribuna, últimas 10 = Grada)
+        const lateralFilas = 15;
+        const lateralAsientosPorFila = 40;
+        const TRIBUNA_ROWS = 5; // Número de filas de la zona premium
         let gradaLateralNumero = 1;
-
-        for (let fila = 0; fila < lateralFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
-                const x = -240 - (fila * (asientoSize + gap));
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'Grada Lateral',
-                    numero: gradaLateralNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.grada
-                });
-                asientoIdGlobal++;
-                gradaLateralNumero++;
-            }
-        }
-
-        // GRADA LATERAL DERECHA - 750 asientos
-        // AJUSTADO: 10 filas x 75 asientos = 750
-        for (let fila = 0; fila < lateralFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
-                const x = 240 + (fila * (asientoSize + gap));
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'Grada Lateral',
-                    numero: gradaLateralNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.grada
-                });
-                asientoIdGlobal++;
-                gradaLateralNumero++;
-            }
-        }
-
-        // TRIBUNA IZQUIERDA (500 asientos) - Zona Premium
-        // AJUSTADO: 10 filas x 50 asientos = 500
-        const tribunaFilas = 10;
-        const tribunaAsientosPorFila = 50;
         let tribunaNumero = 1;
 
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = -410 - (fila * (asientoSize + gap)); // Ajustado para estar pegado a grada
-                const y = (asiento - tribunaAsientosPorFila / 2) * (asientoSize + gap);
+        for (let fila = 0; fila < lateralFilas; fila++) {
+            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+                // Las primeras 5 filas son TRIBUNA (zona premium)
+                const esTribuna = fila < TRIBUNA_ROWS;
+                
+                const x = -280 - (fila * (asientoSize + gap));
+                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
-                    zona: 'Tribuna',
-                    numero: tribunaNumero,
+                    zona: esTribuna ? 'Tribuna' : 'Grada Lateral',
+                    numero: esTribuna ? tribunaNumero : gradaLateralNumero,
                     x: x,
                     y: y,
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: this.colors.tribuna
+                    color: esTribuna ? '#FF8C00' : this.colors.grada
                 });
                 asientoIdGlobal++;
-                tribunaNumero++;
+                if (esTribuna) {
+                    tribunaNumero++;
+                } else {
+                    gradaLateralNumero++;
+                }
             }
         }
 
-        // TRIBUNA DERECHA (500 asientos) - Zona Premium
-        // AJUSTADO: 10 filas x 50 asientos = 500
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = 410 + (fila * (asientoSize + gap)); // Ajustado para estar pegado a grada
-                const y = (asiento - tribunaAsientosPorFila / 2) * (asientoSize + gap);
+        // GRADA LATERAL DERECHA CON TRIBUNA INTEGRADA - 600 asientos
+        // 15 filas x 40 asientos = 600 (primeras 5 filas = Tribuna, últimas 10 = Grada)
+        for (let fila = 0; fila < lateralFilas; fila++) {
+            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+                // Las primeras 5 filas son TRIBUNA (zona premium)
+                const esTribuna = fila < TRIBUNA_ROWS;
+                
+                const x = 280 + (fila * (asientoSize + gap));
+                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
-                    zona: 'Tribuna',
-                    numero: tribunaNumero,
+                    zona: esTribuna ? 'Tribuna' : 'Grada Lateral',
+                    numero: esTribuna ? tribunaNumero : gradaLateralNumero,
                     x: x,
                     y: y,
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: this.colors.tribuna
+                    color: esTribuna ? '#FF8C00' : this.colors.grada
                 });
                 asientoIdGlobal++;
-                tribunaNumero++;
+                if (esTribuna) {
+                    tribunaNumero++;
+                } else {
+                    gradaLateralNumero++;
+                }
             }
         }
 
-        console.log(`✅ Asientos ajustados al campo (${asientoSize}px):`);
-        console.log(`   - Gol Nord: ${golNordNumero-1} asientos (${golNordFilas} filas × ${golNordAsientosPorFila})`);
-        console.log(`   - Gol Sud: ${golSudNumero-1} asientos (${golSudFilas} filas × ${golSudAsientosPorFila})`);
-        console.log(`   - Grada Lateral: ${gradaLateralNumero-1} asientos (${lateralFilas} filas × ${lateralAsientosPorFila} × 2 lados)`);
-        console.log(`   - Tribuna: ${tribunaNumero-1} asientos (${tribunaFilas} filas × ${tribunaAsientosPorFila} × 2 lados) 🟠`);
+        console.log(`✅ Estadio optimizado:`);
+        console.log(`   - Gol Nord: 480 asientos (12 filas × 40)`);
+        console.log(`   - Gol Sud: 480 asientos (12 filas × 40)`);
+        console.log(`   - Grada Lateral (con Tribuna integrada): 1,200 asientos`);
+        console.log(`     • Tribuna (5 filas × 40 × 2 lados): 400 asientos 🟠`);
+        console.log(`     • Grada normal (10 filas × 40 × 2 lados): 800 asientos 🔵`);
         console.log(`   TOTAL: ${this.asientos.length} asientos`);
     }
 
@@ -547,10 +514,8 @@ class EstadioCanvas {
         const etiquetas = [
             { texto: 'GOL NORD', x: 0, y: -600, color: '#FFD700' },
             { texto: 'GOL SUD', x: 0, y: 600, color: '#FFD700' },
-            { texto: 'GRADA LATERAL', x: -380, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
-            { texto: 'GRADA LATERAL', x: 380, y: 0, rotacion: Math.PI / 2, color: '#FFD700' },
-            { texto: 'TRIBUNA ⭐', x: -550, y: 0, rotacion: -Math.PI / 2, color: '#FF6F00' },
-            { texto: 'TRIBUNA ⭐', x: 550, y: 0, rotacion: Math.PI / 2, color: '#FF6F00' }
+            { texto: 'GRADA LATERAL ⭐', x: -380, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
+            { texto: 'GRADA LATERAL ⭐', x: 380, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
         ];
 
         etiquetas.forEach(etiqueta => {
