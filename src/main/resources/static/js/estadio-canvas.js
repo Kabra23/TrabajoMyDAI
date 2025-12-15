@@ -878,7 +878,7 @@ class EstadioCanvas {
             });
     }
 
-    realizarCompraMultiple() {
+    async realizarCompraMultiple() {
         // Agrupar asientos por zona para hacer las compras
         const asientosPorZona = {};
 
@@ -889,12 +889,7 @@ class EstadioCanvas {
             asientosPorZona[asiento.zona].push(asiento.numero);
         });
 
-        // Crear formulario para cada zona
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/eventos/${this.eventoId}/comprar-asientos-individuales`;
-
-        // Enviar datos en formato JSON
+        // Crear array de datos de compra
         const datosCompra = [];
         for (const [zona, asientos] of Object.entries(asientosPorZona)) {
             asientos.forEach(numeroAsiento => {
@@ -905,14 +900,41 @@ class EstadioCanvas {
             });
         }
 
-        const inputDatos = document.createElement('input');
-        inputDatos.type = 'hidden';
-        inputDatos.name = 'asientos';
-        inputDatos.value = JSON.stringify(datosCompra);
-        form.appendChild(inputDatos);
+        console.log('📦 Enviando datos de compra:', datosCompra);
 
-        document.body.appendChild(form);
-        form.submit();
+        // Mostrar mensaje de procesamiento
+        const btnConfirmar = document.getElementById('confirmar-btn');
+        if (btnConfirmar) {
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+        }
+
+        // Enviar mediante formulario real en lugar de fetch para mantener la sesión
+        try {
+            // Crear un formulario oculto y enviarlo
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/eventos/${this.eventoId}/comprar-asientos-individuales`;
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'asientos';
+            input.value = JSON.stringify(datosCompra);
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            console.log('📤 Enviando formulario...');
+            form.submit();
+        } catch (error) {
+            console.error('❌ Error al realizar la compra:', error);
+            alert('Error de conexión. Por favor, inténtalo de nuevo.');
+
+            if (btnConfirmar) {
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = '<i class="fas fa-check me-2"></i>Confirmar Compra';
+            }
+        }
     }
 
     mostrarErrorSaldo(precio, saldo) {

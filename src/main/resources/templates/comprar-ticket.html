@@ -656,7 +656,7 @@
                     <span th:text="${success}"></span>
                 </div>
 
-                <form th:action="@{/eventos/{id}/comprar-multiple(id=${evento.id})}" method="post" id="formCompra">
+                <form th:action="@{/eventos/{id}/comprar-auto(id=${evento.id})}" method="post" id="formCompra">
                     <div class="mb-4">
                         <label for="zona" class="form-label">
                             <i class="fas fa-map-marked-alt me-2"></i>Zona del Estadio
@@ -678,22 +678,6 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="asiento" class="form-label">
-                            <i class="fas fa-chair me-2"></i>Número de Asiento Inicial
-                        </label>
-                        <input type="number" id="asiento" name="asientoInicial" class="form-control"
-                               min="1" max="1500" placeholder="Ej: 42" required step="1">
-                        <small class="form-text text-muted mt-2 d-block" id="asiento-info">
-                            <i class="fas fa-lightbulb me-1"></i>
-                            Los asientos se numeran de forma independiente en cada zona
-                        </small>
-                        <div id="asiento-warning" class="form-text text-danger mt-1" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-1"></i>
-                            <span id="asiento-warning-text"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
                         <label for="cantidad" class="form-label">
                             <i class="fas fa-ticket-alt me-2"></i>Cantidad de Entradas
                         </label>
@@ -701,7 +685,7 @@
                                min="1" max="10" value="1" placeholder="1" required step="1">
                         <small class="form-text text-muted mt-2 d-block">
                             <i class="fas fa-info-circle me-1"></i>
-                            Puedes comprar hasta 10 entradas consecutivas a la vez
+                            Los asientos se asignarán automáticamente por orden (máximo 10 entradas)
                         </small>
                     </div>
 
@@ -715,8 +699,8 @@
                             <strong id="resumen-zona">-</strong>
                         </div>
                         <div class="resumen-item">
-                            <span>Asiento inicial:</span>
-                            <strong id="resumen-asiento">-</strong>
+                            <span>Asignación:</span>
+                            <strong style="color: #4CAF50;">Automática</strong>
                         </div>
                         <div class="resumen-item">
                             <span>Cantidad:</span>
@@ -751,11 +735,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const zonaSelect = document.getElementById('zona');
-        const asientoInput = document.getElementById('asiento');
         const cantidadInput = document.getElementById('cantidad');
-        const asientoInfo = document.getElementById('asiento-info');
-        const asientoWarning = document.getElementById('asiento-warning');
-        const asientoWarningText = document.getElementById('asiento-warning-text');
         const resumenCompra = document.getElementById('resumenCompra');
         const precioCards = document.querySelectorAll('.precio-card');
         const formCompra = document.getElementById('formCompra');
@@ -763,23 +743,9 @@
         // Actualizar resumen cuando cambie la zona
         zonaSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            const capacidad = selectedOption.getAttribute('data-capacidad');
             const precio = selectedOption.getAttribute('data-precio');
             const disponibles = selectedOption.getAttribute('data-disponibles');
             const zonaNombre = this.value;
-
-            // Actualizar límite de asientos
-            if (capacidad && capacidad !== 'null') {
-                asientoInput.max = capacidad;
-                asientoInfo.innerHTML = `
-                    <i class="fas fa-lightbulb me-1"></i>
-                    Esta zona tiene <strong>${capacidad} asientos</strong> (números del 1 al ${capacidad}).
-                    <strong style="color: var(--success-color);">${disponibles} disponibles</strong>
-                `;
-            } else {
-                asientoInput.max = 1500;
-                asientoInfo.innerHTML = '<i class="fas fa-lightbulb me-1"></i>Los asientos se numeran de forma independiente en cada zona';
-            }
 
             // Marcar tarjeta de precio como activa
             precioCards.forEach(card => card.classList.remove('active'));
@@ -788,22 +754,8 @@
                 activeCard.classList.add('active');
             }
 
-            // Validar asiento actual
-            validateAsiento();
-
             // Actualizar resumen
-            updateResumen(zonaNombre, asientoInput.value, parseInt(cantidadInput.value) || 1, precio);
-        });
-
-        // Validación de asiento en tiempo real
-        asientoInput.addEventListener('input', function() {
-            validateAsiento();
-
-            const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
-            const precio = selectedOption.getAttribute('data-precio');
-            const zonaNombre = zonaSelect.value;
-            const cantidad = parseInt(cantidadInput.value) || 1;
-            updateResumen(zonaNombre, this.value, cantidad, precio);
+            updateResumen(zonaNombre, parseInt(cantidadInput.value) || 1, precio);
         });
 
         // Actualizar cuando cambie la cantidad
@@ -811,40 +763,13 @@
             const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
             const precio = selectedOption.getAttribute('data-precio');
             const zonaNombre = zonaSelect.value;
-            updateResumen(zonaNombre, asientoInput.value, parseInt(this.value) || 1, precio);
+            updateResumen(zonaNombre, parseInt(this.value) || 1, precio);
         });
 
-        // Función para validar el asiento
-        function validateAsiento() {
-            const asientoValue = parseInt(asientoInput.value);
-            const maxAsiento = parseInt(asientoInput.max);
-
-            if (asientoInput.value === '') {
-                asientoWarning.style.display = 'none';
-                return true;
-            }
-
-            if (asientoValue < 1) {
-                asientoWarningText.textContent = 'El número de asiento debe ser mayor que 0';
-                asientoWarning.style.display = 'block';
-                return false;
-            }
-
-            if (asientoValue > maxAsiento) {
-                asientoWarningText.textContent = `El asiento debe estar entre 1 y ${maxAsiento}`;
-                asientoWarning.style.display = 'block';
-                return false;
-            }
-
-            asientoWarning.style.display = 'none';
-            return true;
-        }
-
         // Función para actualizar el resumen
-        function updateResumen(zona, asiento, cantidad, precioUnitario) {
-            if (zona && asiento && precioUnitario && validateAsiento() && cantidad > 0) {
+        function updateResumen(zona, cantidad, precioUnitario) {
+            if (zona && precioUnitario && cantidad > 0) {
                 document.getElementById('resumen-zona').textContent = zona;
-                document.getElementById('resumen-asiento').textContent = '#' + asiento;
                 document.getElementById('resumen-cantidad').textContent = cantidad + (cantidad === 1 ? ' entrada' : ' entradas');
                 document.getElementById('resumen-precio-unitario').textContent = parseFloat(precioUnitario).toFixed(2) + '€';
                 const total = parseFloat(precioUnitario) * cantidad;
@@ -857,12 +782,6 @@
 
         // Validación antes de enviar el formulario
         formCompra.addEventListener('submit', function(e) {
-            if (!validateAsiento()) {
-                e.preventDefault();
-                asientoInput.focus();
-                return false;
-            }
-
             if (!zonaSelect.value) {
                 e.preventDefault();
                 alert('Por favor, selecciona una zona');
@@ -874,6 +793,17 @@
             if (cantidad < 1 || cantidad > 10) {
                 e.preventDefault();
                 alert('La cantidad debe estar entre 1 y 10');
+                cantidadInput.focus();
+                return false;
+            }
+
+            // Verificar disponibilidad
+            const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
+            const disponibles = parseInt(selectedOption.getAttribute('data-disponibles'));
+
+            if (cantidad > disponibles) {
+                e.preventDefault();
+                alert(`Solo hay ${disponibles} entradas disponibles en esta zona`);
                 cantidadInput.focus();
                 return false;
             }

@@ -1,5 +1,6 @@
 package com.example.TrabajoMyDAI.controllers;
 
+
 import com.example.TrabajoMyDAI.data.exceptions.ValidationException;
 import com.example.TrabajoMyDAI.data.model.Evento;
 import com.example.TrabajoMyDAI.data.model.Ticket;
@@ -437,6 +438,128 @@ public class TicketController {
 
         redirectAttributes.addFlashAttribute("success",
                 "Ticket devuelto correctamente. Se ha reembolsado " + ticket.getPrecio() + "€ a tu saldo.");
+
+        return "redirect:/tickets";
+    }
+
+    @PostMapping("/eventos/{id}/comprar-auto")
+    @Transactional
+    public String procesarCompraAutomatica(@PathVariable("id") Long id,
+                                          @RequestParam String zona,
+                                          @RequestParam(defaultValue = "1") Integer cantidad,
+                                          HttpSession session,
+                                          RedirectAttributes redirectAttributes) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        // VALIDACIÓN: Verificar que el usuario NO sea administrador
+        if (usuario.isAdmin()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Los administradores no pueden comprar entradas.");
+            return "redirect:/eventos";
+        }
+
+        // VALIDACIÓN: Cantidad entre 1 y 10
+        if (cantidad < 1 || cantidad > 10) {
+            redirectAttributes.addFlashAttribute("error",
+                    "La cantidad debe estar entre 1 y 10 entradas.");
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        Evento evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado"));
+
+        // VALIDACIÓN: Verificar disponibilidad de la zona
+        Zona zonaSeleccionada = zonaService.obtenerZonaPorEventoYNombre(id, zona)
+                .orElseThrow(() -> new ValidationException("Zona no encontrada."));
+
+        // VALIDACIÓN: Verificar disponibilidad suficiente
+        if (zonaSeleccionada.getEntradasDisponibles() < cantidad) {
+            redirectAttributes.addFlashAttribute("error",
+                    String.format("Solo quedan %d entradas disponibles en la zona %s.",
+                            zonaSeleccionada.getEntradasDisponibles(), zona));
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        // Obtener todos los asientos ocupados en esta zona
+        java.util.List<Ticket> ticketsEnZona = ticketRepository.findByZona(zonaSeleccionada);
+        java.util.Set<Long> asientosOcupados = new java.util.HashSet<>();
+        for (Ticket t : ticketsEnZona) {
+            asientosOcupados.add(t.getAsiento());
+        }
+
+        // Encontrar los primeros N asientos disponibles en orden
+        java.util.List<Long> asientosDisponibles = new java.util.ArrayList<>();
+        Integer capacidad = zonaSeleccionada.getCapacidadTotal();
+
+        if (capacidad == null) {
+            redirectAttributes.addFlashAttribute("error",
+                    "La zona no tiene capacidad definida.");
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        for (long numeroAsiento = 1; numeroAsiento <= capacidad && asientosDisponibles.size() < cantidad; numeroAsiento++) {
+            if (!asientosOcupados.contains(numeroAsiento)) {
+                asientosDisponibles.add(numeroAsiento);
+            }
+        }
+
+        // VALIDACIÓN: Verificar que se encontraron suficientes asientos
+        if (asientosDisponibles.size() < cantidad) {
+            redirectAttributes.addFlashAttribute("error",
+                    String.format("No se pudieron encontrar %d asientos disponibles consecutivos en la zona %s.",
+                            cantidad, zona));
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        // Obtener precio dinámico del evento según la zona
+        double precioUnitario = evento.getPrecioPorZona(zona);
+        double precioTotal = precioUnitario * cantidad;
+
+        // VALIDACIÓN: Verificar que el usuario tenga saldo suficiente
+        if (usuario.getSaldo() < precioTotal) {
+            redirectAttributes.addFlashAttribute("error",
+                    String.format("Saldo insuficiente. Necesitas %.2f€ pero solo tienes %.2f€. Por favor, recarga tu saldo.",
+                            precioTotal, usuario.getSaldo()));
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        // Descontar el precio total del saldo del usuario
+        if (!usuario.descontarSaldo(precioTotal)) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al procesar el pago. Por favor, inténtalo de nuevo.");
+            return "redirect:/eventos/" + id + "/comprar";
+        }
+
+        // Guardar usuario con saldo actualizado
+        usuarioRepository.save(usuario);
+        // Actualizar sesión
+        session.setAttribute("usuario", usuario);
+
+        // Crear tickets para cada asiento disponible encontrado
+        for (Long numeroAsiento : asientosDisponibles) {
+            Ticket ticket = new Ticket();
+            ticket.setUsuario(usuario);
+            ticket.setEvento(evento);
+            ticket.setZona(zonaSeleccionada);
+            ticket.setAsiento(numeroAsiento);
+            ticket.setPrecio(precioUnitario);
+
+            ticketRepository.save(ticket);
+
+            // Incrementar el contador de entradas vendidas en la zona
+            zonaService.incrementarEntradasVendidas(zonaSeleccionada.getId());
+        }
+
+        // Crear mensaje con los números de asientos asignados
+        String asientosTexto = asientosDisponibles.toString().replace("[", "").replace("]", "");
+
+        redirectAttributes.addFlashAttribute("success",
+                String.format("¡Compra realizada con éxito! Se han reservado %d entrada(s) en zona %s. Asientos asignados: %s. Total: %.2f€",
+                        cantidad, zona, asientosTexto, precioTotal));
 
         return "redirect:/tickets";
     }

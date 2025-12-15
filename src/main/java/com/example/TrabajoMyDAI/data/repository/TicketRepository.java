@@ -20,4 +20,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     // NUEVO: Método para verificar si un asiento ya está ocupado en una zona específica
     Optional<Ticket> findByZonaAndAsiento(Zona zona, Long asiento);
+
+    // NUEVO: Método para obtener todos los tickets de una zona
+    List<Ticket> findByZona(Zona zona);
 }
