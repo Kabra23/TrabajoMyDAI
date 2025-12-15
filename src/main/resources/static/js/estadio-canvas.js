@@ -120,7 +120,7 @@ class EstadioCanvas {
                 const y = -360 - (fila * 16);
 
                 this.asientos.push({
-                    id: asientoId++,
+                    id: asientoId,
                     zona: 'Tribuna',
                     numero: asientoId,
                     x: x,
@@ -130,6 +130,7 @@ class EstadioCanvas {
                     precio: 0,
                     color: this.colors.tribuna
                 });
+                asientoId++;
             }
         }
 
@@ -142,7 +143,7 @@ class EstadioCanvas {
                 const y = 360 + (fila * 16);
 
                 this.asientos.push({
-                    id: asientoId++,
+                    id: asientoId,
                     zona: 'Gol Nord',
                     numero: asientoId,
                     x: x,
@@ -152,6 +153,7 @@ class EstadioCanvas {
                     precio: 0,
                     color: this.colors.grada
                 });
+                asientoId++;
             }
         }
 
@@ -164,7 +166,7 @@ class EstadioCanvas {
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
-                    id: asientoId++,
+                    id: asientoId,
                     zona: 'Grada Lateral',
                     numero: asientoId,
                     x: x,
@@ -174,6 +176,7 @@ class EstadioCanvas {
                     precio: 0,
                     color: this.colors.grada
                 });
+                asientoId++;
             }
         }
 
@@ -184,7 +187,7 @@ class EstadioCanvas {
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
-                    id: asientoId++,
+                    id: asientoId,
                     zona: 'Grada Lateral',
                     numero: asientoId,
                     x: x,
@@ -194,6 +197,7 @@ class EstadioCanvas {
                     precio: 0,
                     color: this.colors.grada
                 });
+                asientoId++;
             }
         }
 
