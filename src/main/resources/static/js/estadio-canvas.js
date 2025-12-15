@@ -53,7 +53,9 @@ class EstadioCanvas {
             seleccionado: '#2196F3',
             hover: '#FFC107',
             tribuna: '#FF8C00', // Naranja premium para zona Tribuna
-            grada: '#283593'
+            grada: '#283593', // Azul oscuro para Grada Lateral
+            golNord: '#00BCD4', // Cyan para Gol Nord
+            golSud: '#9C27B0' // Purple para Gol Sud
         };
 
         this.inicializar();
@@ -109,8 +111,8 @@ class EstadioCanvas {
         // DISTRIBUCIÓN AJUSTADA AL CAMPO DE FÚTBOL
         // Reducir filas laterales para que cuadre con el campo visualmente
 
-        const asientoSize = 14;
-        const gap = 3;
+        const asientoSize = 12;
+        const gap = 5;
         let asientoIdGlobal = 1;
 
         // GOL NORD (Arriba) - 480 asientos (optimizado)
@@ -122,7 +124,7 @@ class EstadioCanvas {
         for (let fila = 0; fila < golNordFilas; fila++) {
             for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
                 const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
-                const y = -320 - (fila * (asientoSize + gap));
+                const y = -350 - (fila * (asientoSize + gap));
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -133,7 +135,7 @@ class EstadioCanvas {
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: this.colors.grada
+                    color: this.colors.golNord
                 });
                 asientoIdGlobal++;
                 golNordNumero++;
@@ -149,7 +151,7 @@ class EstadioCanvas {
         for (let fila = 0; fila < golSudFilas; fila++) {
             for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
                 const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
-                const y = 320 + (fila * (asientoSize + gap));
+                const y = 350 + (fila * (asientoSize + gap));
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -160,7 +162,7 @@ class EstadioCanvas {
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: this.colors.grada
+                    color: this.colors.golSud
                 });
                 asientoIdGlobal++;
                 golSudNumero++;
@@ -180,7 +182,7 @@ class EstadioCanvas {
                 // Las primeras 5 filas son TRIBUNA (zona premium)
                 const esTribuna = fila < TRIBUNA_ROWS;
 
-                const x = -280 - (fila * (asientoSize + gap));
+                const x = -320 - (fila * (asientoSize + gap));
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
@@ -192,7 +194,7 @@ class EstadioCanvas {
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: esTribuna ? '#FF8C00' : this.colors.grada
+                    color: esTribuna ? this.colors.tribuna : this.colors.grada
                 });
                 asientoIdGlobal++;
                 if (esTribuna) {
@@ -210,7 +212,7 @@ class EstadioCanvas {
                 // Las primeras 5 filas son TRIBUNA (zona premium)
                 const esTribuna = fila < TRIBUNA_ROWS;
 
-                const x = 280 + (fila * (asientoSize + gap));
+                const x = 320 + (fila * (asientoSize + gap));
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
@@ -222,7 +224,7 @@ class EstadioCanvas {
                     size: asientoSize,
                     disponible: true,
                     precio: 0,
-                    color: esTribuna ? '#FF8C00' : this.colors.grada
+                    color: esTribuna ? this.colors.tribuna : this.colors.grada
                 });
                 asientoIdGlobal++;
                 if (esTribuna) {
@@ -501,7 +503,7 @@ class EstadioCanvas {
     }
 
     dibujarEtiquetasZonas() {
-        this.ctx.font = 'bold 22px Arial';
+        this.ctx.font = 'bold 24px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
 
@@ -512,10 +514,10 @@ class EstadioCanvas {
         this.ctx.shadowOffsetY = 2;
 
         const etiquetas = [
-            { texto: 'GOL NORD', x: 0, y: -600, color: '#FFD700' },
-            { texto: 'GOL SUD', x: 0, y: 600, color: '#FFD700' },
-            { texto: 'GRADA LATERAL ⭐', x: -380, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
-            { texto: 'GRADA LATERAL ⭐', x: 380, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
+            { texto: 'GOL NORD', x: 0, y: -480, color: '#FFD700' },
+            { texto: 'GOL SUD', x: 0, y: 480, color: '#FFD700' },
+            { texto: 'GRADA LATERAL ⭐', x: -460, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
+            { texto: 'GRADA LATERAL ⭐', x: 460, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
         ];
 
         etiquetas.forEach(etiqueta => {
@@ -525,9 +527,9 @@ class EstadioCanvas {
                 this.ctx.rotate(etiqueta.rotacion);
             }
 
-            // Fondo de la etiqueta
+            // Fondo de la etiqueta con mejor contraste
             const metrics = this.ctx.measureText(etiqueta.texto);
-            this.ctx.fillStyle = 'rgba(26, 35, 126, 0.9)';
+            this.ctx.fillStyle = 'rgba(26, 35, 126, 0.95)';
             this.ctx.fillRect(-metrics.width / 2 - 15, -18, metrics.width + 30, 36);
 
             // Borde dorado
@@ -731,16 +733,9 @@ class EstadioCanvas {
             const y = asiento.y - asiento.size / 2;
             const size = asiento.size;
 
-            // Fondo del asiento con color de zona (Tribuna = naranja, resto = azul)
-            if (asiento.zona === 'Tribuna') {
-                // Asiento de Tribuna: fondo naranja
-                this.ctx.fillStyle = asiento.color; // #FF6F00
-                this.ctx.fillRect(x - 1, y - 1, size + 2, size + 2);
-            } else {
-                // Asiento de Grada: fondo azul suave
-                this.ctx.fillStyle = 'rgba(40, 53, 147, 0.3)'; // Azul translúcido
-                this.ctx.fillRect(x - 1, y - 1, size + 2, size + 2);
-            }
+            // Fondo del asiento con color de zona específico
+            this.ctx.fillStyle = asiento.color;
+            this.ctx.fillRect(x - 1, y - 1, size + 2, size + 2);
 
             // Color del asiento según disponibilidad
             this.ctx.fillStyle = color;
