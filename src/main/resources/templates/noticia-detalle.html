@@ -3,32 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias - Barça Athletic Hub</title>
+    <title th:text="${noticia != null ? noticia.titulo + ' - Barça Athletic Hub' : 'Noticia - Barça Athletic Hub'}">Noticia - Barça Athletic Hub</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root{
-            --primary: #1a237e;
-            --secondary: #283593;
-            --accent: #ffd700;
+            --primary:#1a237e;
+            --secondary:#283593;
+            --accent:#ffd700;
         }
 
-        *{ box-sizing: border-box; }
+        *{ margin:0; padding:0; box-sizing:border-box; }
 
         body{
-            margin:0;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color:#fff;
+            min-height:100vh;
         }
 
         /* Navbar */
         .navbar{
-            background: rgba(0,0,0,.40) !important;
+            background: rgba(0,0,0,0.4) !important;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 18px rgba(0,0,0,.22);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .navbar-brand{
@@ -37,52 +36,54 @@
             color: var(--accent) !important;
             transition: transform .25s ease;
         }
-        .navbar-brand:hover{ transform: scale(1.03); }
+        .navbar-brand:hover{ transform: scale(1.04); }
 
         .nav-link{
             color:#fff !important;
-            margin:0 10px;
-            position:relative;
+            margin: 0 10px;
+            position: relative;
             transition: color .25s ease;
-            font-weight: 600;
         }
         .nav-link::after{
-            content:"";
+            content:'';
             position:absolute;
+            bottom:-5px;
             left:0;
-            bottom:-6px;
             width:0;
             height:2px;
             background: var(--accent);
             transition: width .25s ease;
         }
-        .nav-link:hover{ color: var(--accent) !important; }
         .nav-link:hover::after{ width:100%; }
+        .nav-link:hover{ color: var(--accent) !important; }
 
         .nav-link.admin-link{
             color:#dc3545 !important;
-            font-weight: 800;
+            font-weight:700;
         }
 
-        /* Saldo dropdown  */
+        /* Dropdown saldo */
         .saldo-dropdown{ position: relative; }
+
         .saldo-trigger{
             background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
-            color: #1a237e !important;
-            font-weight: 800;
+            color:#1a237e !important;
+            font-weight:800;
             padding: 8px 18px !important;
             border-radius: 25px;
-            border: none;
+            transition: all .25s ease;
+            cursor:pointer;
+            border:none;
             display:flex;
             align-items:center;
             gap:8px;
-            cursor:pointer;
-            transition: all .25s ease;
         }
+
         .saldo-trigger:hover{
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255,215,0,.30);
+            box-shadow: 0 6px 20px rgba(255,215,0,0.35);
         }
+
         .saldo-amount{ font-size: 1.05rem; font-weight: 900; }
 
         .saldo-menu{
@@ -90,187 +91,244 @@
             top:100%;
             right:0;
             margin-top:10px;
-            background:#fff;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,.25);
-            min-width: 300px;
+            background:white;
+            border-radius:16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            min-width:300px;
             opacity:0;
             visibility:hidden;
             transform: translateY(-10px);
             transition: all .25s ease;
-            z-index: 1000;
+            z-index:1000;
             overflow:hidden;
         }
+
         .saldo-dropdown.show .saldo-menu{
-            opacity:1; visibility:visible; transform: translateY(0);
+            opacity:1;
+            visibility:visible;
+            transform: translateY(0);
         }
-        .saldo-overlay{
-            position:fixed;
-            inset:0;
-            background: transparent;
-            z-index:999;
-            display:none;
-        }
-        .saldo-dropdown.show .saldo-overlay{ display:block; }
 
         .saldo-menu-header{
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color:#fff;
-            padding: 18px 18px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color:white;
+            padding:20px;
             text-align:center;
         }
         .saldo-menu-header h4{
             margin:0;
-            font-size:.9rem;
+            font-size: .9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            opacity: .9;
+            opacity:.9;
         }
         .saldo-menu-header .saldo-display{
-            font-size: 2.25rem;
+            font-size: 2.4rem;
             font-weight: 900;
-            margin: 8px 0 6px;
+            margin: 10px 0;
             color: var(--accent);
         }
-        .saldo-menu-body{ padding: 18px; }
+
+        .saldo-menu-body{ padding:20px; }
+
         .saldo-actions{
             display:grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 14px;
+            gap:10px;
+            margin-top: 12px;
         }
+
         .saldo-btn{
             padding: 10px;
             border-radius: 10px;
             border:none;
-            font-weight: 700;
+            font-weight:700;
+            cursor:pointer;
+            transition: all .25s ease;
             text-decoration:none;
             text-align:center;
             display:inline-block;
-            transition: all .25s ease;
         }
+
         .saldo-btn-primary{
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             color:#1a237e;
         }
         .saldo-btn-primary:hover{
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(255,215,0,.25);
+            box-shadow: 0 4px 12px rgba(255,215,0,0.35);
+            color:#1a237e;
         }
+
         .saldo-btn-secondary{
             background:#f5f5f5;
+            color:#666;
+        }
+        .saldo-btn-secondary:hover{
+            background:#e0e0e0;
             color:#333;
         }
-        .saldo-btn-secondary:hover{ background:#e9e9e9; }
 
+        .saldo-overlay{
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: transparent;
+            z-index: 999;
+            display:none;
+        }
+        .saldo-dropdown.show .saldo-overlay{ display:block; }
 
-        .page-main{
-            padding-top: 105px;
-            padding-bottom: 60px;
-        }
-
-        .page-header{
-            text-align:center;
-            margin: 10px 0 34px;
-        }
-        .page-header h1{
-            margin:0 0 10px;
-            font-weight: 900;
-            letter-spacing: .2px;
-            color: #fff;
-            text-shadow: 0 8px 22px rgba(0,0,0,.25);
-        }
-        .page-header p{
-            margin:0;
-            font-size: 1.05rem;
-            color: rgba(255,255,255,.92);
+        /* Detalle noticia */
+        .wrap-noticia{
+            max-width: 980px;
+            margin: 110px auto 60px;
+            padding: 0 20px;
         }
 
-        /* Grid centrado (aunque haya 1 sola noticia) */
-        .noticias-grid{
-            display:grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 360px));
-            justify-content: center;
-            gap: 26px;
-            margin-top: 28px;
-        }
-
-        .noticia-card{
-            position: relative;
-            border-radius: 22px;
-            overflow:hidden;
-            background: rgba(255,255,255,.06);
-            border: 1px solid rgba(255,255,255,.12);
-            box-shadow: 0 10px 34px rgba(0,0,0,.25);
-            transition: transform .25s ease, box-shadow .25s ease;
-        }
-        .noticia-card:hover{
-            transform: translateY(-8px);
-            box-shadow: 0 16px 46px rgba(0,0,0,.33);
-        }
-
-        .noticia-imagen{
-            height: 210px;
-            position:relative;
-            background: linear-gradient(135deg, #004D98, #A50044);
-        }
-        .noticia-imagen img{
-            width:100%;
-            height:100%;
-            object-fit: cover;
-            display:block;
-        }
-        /* Degradado  */
-        .noticia-imagen::after{
-            content:"";
-            position:absolute;
-            inset:0;
-            background: linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.55));
-            pointer-events:none;
-        }
-
-        .noticia-contenido{
-            padding: 18px 18px 20px;
-        }
-        .noticia-fecha{
-            color: var(--accent);
-            font-weight: 800;
-            font-size: .9rem;
-            margin-bottom: 8px;
-        }
-        .noticia-titulo{
-            color:#fff;
-            font-weight: 900;
-            font-size: 1.2rem;
-            line-height: 1.25;
-            margin: 0 0 10px;
-        }
-        .noticia-descripcion{
-            color: rgba(255,255,255,.88);
-            margin: 0 0 14px;
-            line-height: 1.55;
-        }
-
-        .noticia-link{
+        .back-link{
             display:inline-flex;
             align-items:center;
-            gap:8px;
+            gap:10px;
             color: var(--accent);
             font-weight: 900;
             text-decoration:none;
+            margin-bottom: 14px;
         }
-        .noticia-link:hover{ color:#ffed4e; }
+        .back-link:hover{ color:#ffed4e; }
+
+        .noticia-cardx{
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 22px;
+            padding: 26px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .meta{
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: .3px;
+        }
+
+        .title{
+            font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+            font-weight: 900;
+            margin: 10px 0 14px;
+            line-height: 1.1;
+        }
+
+        .hero-media{
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 18px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.18);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+            margin: 12px 0 18px;
+        }
+
+        .hero-media img{
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .lead{
+            opacity: .92;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin: 0 0 6px;
+        }
+
+        .sep{
+            border-color: rgba(255,255,255,0.2);
+            margin: 18px 0;
+        }
+
+        .noticia-body{
+            margin-top: 16px;
+            font-size: 1.06rem;
+            line-height: 1.9;
+            color: rgba(255,255,255,0.92);
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: none;
+        }
+
+        .noticia-body::first-letter,
+        .noticia-body p::first-letter{
+            float: none !important;
+            font-size: inherit !important;
+            line-height: inherit !important;
+            font-weight: inherit !important;
+            color: inherit !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .noticia-body p{
+            margin: 0 0 14px;
+        }
+
+        .noticia-body h3{
+            margin: 18px 0 10px;
+            font-size: 1.12rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: .2px;
+        }
+
+        .noticia-body .spacer{
+            height: 10px;
+        }
+
+        .noticia-body .bullet{
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin: 6px 0;
+            padding: 10px 12px;
+            background: rgba(0,0,0,0.12);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+        }
+
+        .noticia-body .dot{
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent);
+            margin-top: .62rem;
+            flex: 0 0 auto;
+        }
+
+
 
         footer{
             text-align:center;
-            padding: 28px 0;
-            background: rgba(0,0,0,.40);
+            padding: 30px 0;
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(10px);
-            margin-top: 40px;
+            margin-top: 60px;
+        }
+
+        .noticia-body h3::first-letter,
+        .noticia-body p::first-letter{
+            float: none !important;
+            font-size: inherit !important;
+            line-height: inherit !important;
+            font-weight: inherit !important;
+            color: inherit !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         @media (max-width: 768px){
-            .page-main{ padding-top: 95px; }
+            .hero{ height: 220px; font-size: 3.5rem; }
         }
     </style>
 </head>
@@ -281,8 +339,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;">
-            Barça Atlètic
+            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;"> Barça Atlètic
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -296,6 +353,7 @@
                 <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                 <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
 
+                <!-- Opciones solo para usuarios normales (no admin) -->
                 <li class="nav-item" th:if="${logueado == true && esAdmin == false}">
                     <a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a>
                 </li>
@@ -303,6 +361,7 @@
                     <a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a>
                 </li>
 
+                <!-- Opciones solo para admin -->
                 <li class="nav-item" th:if="${esAdmin == true}">
                     <a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a>
                 </li>
@@ -310,14 +369,15 @@
                     <a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a>
                 </li>
 
-                <!-- Saldo -->
+                <!-- Dropdown de saldo para usuarios normales -->
                 <li class="nav-item saldo-dropdown" th:if="${logueado == true && esAdmin == false}">
                     <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+
                     <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
                         <i class="fas fa-wallet"></i>
                         <span class="saldo-amount"
                               th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
-                        <i class="fas fa-chevron-down" style="font-size: .8rem;"></i>
+                        <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
                     </button>
 
                     <div class="saldo-menu">
@@ -325,43 +385,50 @@
                             <h4>Tu Saldo Disponible</h4>
                             <div class="saldo-display"
                                  th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
-                            <p style="margin:0; font-size:.85rem; opacity:.85;">
+                            <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
                                 <i class="fas fa-user-circle me-1"></i>
                                 <span th:text="${session.usuario != null ? session.usuario.username : 'Usuario'}">Usuario</span>
                             </p>
                         </div>
 
                         <div class="saldo-menu-body">
-                            <div style="margin-bottom: 12px; padding: 12px; background:#f8f9fa; border-radius: 10px;">
-                                <h5 style="color:#1a237e; font-size:.9rem; margin-bottom: 10px; font-weight: 900;">
+                            <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                                <h5 style="color: #1a237e; font-size: 0.9rem; margin-bottom: 10px; font-weight: 800;">
                                     <i class="fas fa-plus-circle me-1"></i>Recargar Saldo
                                 </h5>
+
                                 <form th:action="@{/cuenta/agregar-saldo}" method="post">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
                                         <input type="number" class="form-control" name="cantidad" step="0.01" min="1" max="1000"
                                                placeholder="Cantidad" required>
                                         <button class="btn btn-sm" type="submit"
-                                                style="background: linear-gradient(135deg, #ffd700, #ffed4e); color:#1a237e; font-weight: 900;">
+                                                style="background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a237e; font-weight: 800;">
                                             Agregar
                                         </button>
                                     </div>
-                                    <small style="color:#666; font-size:.75rem;">Entre 1€ y 1000€</small>
+                                    <small style="color: #666; font-size: 0.75rem;">Entre 1€ y 1000€</small>
                                 </form>
                             </div>
 
                             <div class="saldo-actions">
-                                <a href="/tickets" class="saldo-btn saldo-btn-primary"><i class="fas fa-ticket-alt me-1"></i> Mis Tickets</a>
-                                <a href="/cuenta/perfil" class="saldo-btn saldo-btn-secondary"><i class="fas fa-user-circle me-1"></i> Mi Cuenta</a>
+                                <a href="/tickets" class="saldo-btn saldo-btn-primary">
+                                    <i class="fas fa-ticket-alt me-1"></i> Mis Tickets
+                                </a>
+                                <a href="/cuenta/perfil" class="saldo-btn saldo-btn-secondary">
+                                    <i class="fas fa-user-circle me-1"></i> Mi Cuenta
+                                </a>
                             </div>
                         </div>
                     </div>
                 </li>
 
+                <!-- Opciones para todos los usuarios logueados -->
                 <li class="nav-item" th:if="${logueado == true}">
                     <a class="nav-link" href="/cuenta/perfil"><i class="fas fa-user-circle"></i> Mi Cuenta</a>
                 </li>
 
+                <!-- Opciones para no logueados -->
                 <li class="nav-item" th:if="${logueado != true}">
                     <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a>
                 </li>
@@ -369,6 +436,7 @@
                     <a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a>
                 </li>
 
+                <!-- Cerrar sesión -->
                 <li class="nav-item" th:if="${logueado == true}">
                     <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
                 </li>
@@ -377,48 +445,56 @@
     </div>
 </nav>
 
-<!-- Main -->
-<main class="page-main">
-    <div class="container">
-        <div class="page-header">
-            <h1><i class="fas fa-newspaper"></i> Noticias Barça Atlètic</h1>
-            <p>Las últimas novedades del filial azulgrana</p>
+<!-- Contenido de las noticias -->
+<main class="wrap-noticia">
+    <a class="back-link" href="/noticias"><i class="fas fa-arrow-left"></i> Volver a noticias</a>
+
+    <article class="noticia-cardx">
+        <div class="meta" th:text="${noticia.fecha}">Fecha</div>
+        <h1 class="title" th:text="${noticia.titulo}">Título</h1>
+
+        <div class="hero-media">
+            <img class="hero-img"
+                 th:src="@{/img/noticias/{file}(file=${(noticia.imagen != null and !#strings.isEmpty(noticia.imagen)) ? noticia.imagen : 'placeholder.jpg'})}"
+                 th:alt="${noticia.titulo}">
         </div>
 
-        <div class="noticias-grid">
 
-            <!-- Si no hay noticias -->
-            <div th:if="${#lists.isEmpty(noticias)}" class="text-center" style="opacity:.9;">
-                <p style="margin:0;">Todavía no hay noticias para mostrar.</p>
-            </div>
 
-            <!-- Cards -->
-            <div class="noticia-card" th:each="n : ${noticias}">
-                <div class="noticia-imagen">
-                    <img
-                            th:src="@{/img/noticias/{file}(file=${(n.imagen != null and !#strings.isEmpty(n.imagen)) ? n.imagen : 'placeholder.jpg'})}"
-                            th:alt="${n.titulo}">
+        <p class="lead" th:text="${noticia.descripcion}">Resumen</p>
+
+        <hr class="sep">
+
+        <!-- Cuerpo de las noticias -->
+        <div class="noticia-body">
+            <th:block th:each="t : ${lineasContenido}">
+
+                <div th:if="${#strings.isEmpty(t)}" class="spacer"></div>
+
+                <h3 th:if="${!#strings.isEmpty(t) and #strings.endsWith(t, ':')}"
+                    th:text="${t}"></h3>
+
+                <div th:if="${!#strings.isEmpty(t) and #strings.startsWith(t, '- ')}" class="bullet">
+                    <span class="dot"></span>
+                    <span th:text="${#strings.substring(t, 2)}"></span>
                 </div>
 
-                <div class="noticia-contenido">
-                    <div class="noticia-fecha" th:text="${n.fecha}">Fecha</div>
-                    <h2 class="noticia-titulo" th:text="${n.titulo}">Título</h2>
-                    <p class="noticia-descripcion" th:text="${n.descripcion}">Descripción</p>
+                <p th:if="${!#strings.isEmpty(t) and !#strings.endsWith(t, ':') and !#strings.startsWith(t, '- ')}"
+                   th:text="${t}"></p>
 
-                    <a class="noticia-link" th:href="@{/noticias/{id}(id=${n.id})}">
-                        Leer más <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
+            </th:block>
         </div>
-    </div>
+
+
+
+
+    </article>
 </main>
 
 <!-- Footer -->
 <footer>
     <div class="container">
-        <p style="margin:0;"><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p>
+        <p><i class="fas fa-copyright"></i> 2025 Barça Athletic Hub. Todos los derechos reservados.</p>
 
         <div class="mt-3">
             <audio id="backgroundMusic" loop>
@@ -430,7 +506,7 @@
                     <i class="fas fa-play"></i> Reproducir Música
                 </button>
                 <input type="range" id="volumeControl" min="0" max="100" value="20"
-                       class="form-range" style="width:150px;">
+                       class="form-range" style="width: 150px;">
                 <span id="volumeValue" class="small">20%</span>
             </div>
         </div>
@@ -440,5 +516,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/audio-control.js"></script>
 <script src="/js/saldo-ajax.js"></script>
+
 </body>
 </html>
+

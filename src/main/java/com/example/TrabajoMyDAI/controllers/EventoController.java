@@ -23,7 +23,8 @@ public class EventoController {
         this.zonaService = zonaService;
     }
 
-    @GetMapping("/noticias")
+
+    /*@GetMapping("/noticias")
     public String noticias(Model model, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("logueado", usuario != null);
@@ -32,7 +33,7 @@ public class EventoController {
         model.addAttribute("noticias", eventoService.obtenerTodosLosEventos());
         model.addAttribute("mensaje", "Últimas noticias");
         return "noticias";
-    }
+    }*/
 
     @GetMapping("/eventos")
     public String eventos(Model model, HttpSession session) {
