@@ -113,16 +113,16 @@ class EstadioCanvas {
         const gap = 3;
         let asientoIdGlobal = 1;
 
-        // GOL NORD (Arriba) - 480 asientos (optimizado)
-        // 12 filas x 40 asientos = 480
+        // GOL NORD (Arriba) - 384 asientos (optimizado)
+        // 12 filas x 32 asientos = 384
         const golNordFilas = 12;
-        const golNordAsientosPorFila = 40;
+        const golNordAsientosPorFila = 32;
         let golNordNumero = 1;
 
         for (let fila = 0; fila < golNordFilas; fila++) {
             for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
                 const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
-                const y = -320 - (fila * (asientoSize + gap));
+                const y = -280 - (fila * (asientoSize + gap));
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -140,16 +140,16 @@ class EstadioCanvas {
             }
         }
 
-        // GOL SUD (Abajo) - 480 asientos (optimizado)
-        // 12 filas x 40 asientos = 480
+        // GOL SUD (Abajo) - 384 asientos (optimizado)
+        // 12 filas x 32 asientos = 384
         const golSudFilas = 12;
-        const golSudAsientosPorFila = 40;
+        const golSudAsientosPorFila = 32;
         let golSudNumero = 1;
 
         for (let fila = 0; fila < golSudFilas; fila++) {
             for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
                 const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
-                const y = 320 + (fila * (asientoSize + gap));
+                const y = 280 + (fila * (asientoSize + gap));
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -234,8 +234,8 @@ class EstadioCanvas {
         }
 
         console.log(`✅ Estadio optimizado:`);
-        console.log(`   - Gol Nord: 480 asientos (12 filas × 40)`);
-        console.log(`   - Gol Sud: 480 asientos (12 filas × 40)`);
+        console.log(`   - Gol Nord: 384 asientos (12 filas × 32)`);
+        console.log(`   - Gol Sud: 384 asientos (12 filas × 32)`);
         console.log(`   - Grada Lateral (con Tribuna integrada): 1,200 asientos`);
         console.log(`     • Tribuna (5 filas × 40 × 2 lados): 400 asientos 🟠`);
         console.log(`     • Grada normal (10 filas × 40 × 2 lados): 800 asientos 🔵`);
@@ -477,7 +477,7 @@ class EstadioCanvas {
 
         // Fondo del campo (plataforma) - ajustado al nuevo tamaño
         this.ctx.fillStyle = '#1a237e';
-        this.ctx.fillRect(-210, -290, 420, 580);
+        this.ctx.fillRect(-175, -240, 350, 480);
 
         // Resetear sombra
         this.ctx.shadowColor = 'transparent';
@@ -512,10 +512,10 @@ class EstadioCanvas {
         this.ctx.shadowOffsetY = 2;
 
         const etiquetas = [
-            { texto: 'GOL NORD', x: 0, y: -600, color: '#FFD700' },
-            { texto: 'GOL SUD', x: 0, y: 600, color: '#FFD700' },
-            { texto: 'GRADA LATERAL ⭐', x: -380, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
-            { texto: 'GRADA LATERAL ⭐', x: 380, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
+            { texto: 'GOL NORD', x: 0, y: -400, color: '#FFD700' },
+            { texto: 'GOL SUD', x: 0, y: 400, color: '#FFD700' },
+            { texto: 'GRADA LATERAL ⭐', x: -450, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
+            { texto: 'GRADA LATERAL ⭐', x: 450, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
         ];
 
         etiquetas.forEach(etiqueta => {
@@ -549,10 +549,10 @@ class EstadioCanvas {
 
     dibujarCampo() {
         // Campo ajustado a la nueva distribución de asientos
-        const campoAncho = 400;
-        const campoAlto = 560;
-        const campoX = -200;
-        const campoY = -280;
+        const campoAncho = 300;
+        const campoAlto = 450;
+        const campoX = -150;
+        const campoY = -225;
 
         // Fondo del campo con patrón de césped
         const gradient = this.ctx.createLinearGradient(campoX, campoY, campoX, campoY + campoAlto);
@@ -564,7 +564,7 @@ class EstadioCanvas {
 
         // Franjas de césped más oscuras
         this.ctx.fillStyle = 'rgba(46, 125, 50, 0.3)';
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < 11; i++) {
             if (i % 2 === 0) {
                 this.ctx.fillRect(campoX, campoY + (i * 40), campoAncho, 40);
             }
@@ -603,8 +603,8 @@ class EstadioCanvas {
         this.ctx.fill();
 
         // Áreas y porterías
-        this.dibujarAreaCompleta(-275);
-        this.dibujarAreaCompleta(275);
+        this.dibujarAreaCompleta(-225);
+        this.dibujarAreaCompleta(225);
 
         // Esquinas (cuartos de círculo)
         this.dibujarEsquinas();
@@ -686,10 +686,10 @@ class EstadioCanvas {
         this.ctx.lineWidth = 3;
 
         const esquinas = [
-            {x: -195, y: -275, inicio: 0, fin: Math.PI / 2},
-            {x: 195, y: -275, inicio: Math.PI / 2, fin: Math.PI},
-            {x: 195, y: 275, inicio: Math.PI, fin: Math.PI * 1.5},
-            {x: -195, y: 275, inicio: Math.PI * 1.5, fin: Math.PI * 2}
+            {x: -145, y: -220, inicio: 0, fin: Math.PI / 2},
+            {x: 145, y: -220, inicio: Math.PI / 2, fin: Math.PI},
+            {x: 145, y: 220, inicio: Math.PI, fin: Math.PI * 1.5},
+            {x: -145, y: 220, inicio: Math.PI * 1.5, fin: Math.PI * 2}
         ];
 
         esquinas.forEach(esquina => {
