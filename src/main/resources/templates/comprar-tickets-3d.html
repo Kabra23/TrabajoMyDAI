@@ -1,182 +1,593 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Comprar entradas 3D - ' + ${evento.nombre}">Comprar entradas 3D</title>
+    <title>Estadio Interactivo - Canvas 2D</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/estadio-3d.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            overflow: hidden;
+        }
+
+        #estadio-canvas {
+            display: block;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 35, 126, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffd700;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        #info-panel h3 {
+            color: #1a237e;
+            margin-top: 0;
+            font-size: 1.4rem;
+            border-bottom: 3px solid #ffd700;
+            padding-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            color: #1a237e;
+            font-weight: 700;
+        }
+
+        #legend {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        #legend h4 {
+            margin: 0 0 10px 0;
+            color: #1a237e;
+            font-size: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        #controls h4 {
+            margin: 0 0 12px 0;
+            color: #1a237e;
+            font-size: 1rem;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 8px;
+        }
+
+        #controls button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a237e;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .zoom-controls button {
+            flex: 1;
+            padding: 8px;
+            font-size: 1.2rem;
+        }
+
+        .controls-help {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .controls-help div {
+            margin: 5px 0;
+        }
+
+        #asiento-info {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 4px solid #ffd700;
+        }
+
+        #asiento-info h4 {
+            margin: 0 0 10px 0;
+            color: #1a237e;
+        }
+
+        .asiento-detail {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        #confirmar-btn {
+            display: none;
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a237e;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #confirmar-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(255, 215, 0, 0.4);
+        }
+
+        #tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            z-index: 200;
+            display: none;
+            white-space: nowrap;
+        }
+
+        .btn-link {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            color: #1a237e;
+            text-decoration: none;
+            border: 2px solid #1a237e;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-link:hover {
+            background: #1a237e;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            #info-panel {
+                width: calc(100% - 40px);
+                top: auto;
+                bottom: 20px;
+                max-height: 40vh;
+            }
+
+            #legend {
+                bottom: auto;
+                top: 140px;
+                left: 20px;
+            }
+
+            #controls {
+                top: 20px;
+                left: 20px;
+                right: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/logo.jpg" alt="Barça Atlètic" style="height: 30px; margin-right: 8px;"> Barça Atlètic
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Inicio</a></li>
-                <li class="nav-item"><a class="nav-link" href="/plantilla"><i class="fas fa-users"></i> Plantilla</a></li>
-                <li class="nav-item"><a class="nav-link" href="/eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
-                <li class="nav-item"><a class="nav-link" href="/noticias"><i class="fas fa-newspaper"></i> Noticias</a></li>
-                <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                <li class="nav-item" th:if="${logueado == true && esAdmin == false}"><a class="nav-link" href="/recordatorios"><i class="fas fa-bell"></i> Recordatorios</a></li>
-                <!-- Opciones solo para admin -->
-                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/eventos"><i class="fas fa-tools"></i> Panel Admin</a></li>
-                <li class="nav-item" th:if="${esAdmin == true}"><a class="nav-link admin-link" href="/admin/usuarios"><i class="fas fa-users-cog"></i> Admin Usuarios</a></li>
-                <!-- Dropdown de saldo para usuarios normales -->
-                <li class="nav-item saldo-dropdown" th:if="${logueado == true && esAdmin == false}">
-                    <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
-                    <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
-                        <i class="fas fa-wallet"></i>
-                        <span class="saldo-amount" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
-                        <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
-                    </button>
-
-                    <div class="saldo-menu">
-                        <div class="saldo-menu-header">
-                            <h4>Tu Saldo Disponible</h4>
-                            <div class="saldo-display" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
-                            <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
-                                <i class="fas fa-user-circle me-1"></i>
-                                <span th:text="${usuario != null ? usuario.username : 'Usuario'}">Usuario</span>
-                            </p>
-                        </div>
-
-                        <div class="saldo-menu-body">
-                            <!-- Formulario para agregar saldo -->
-                            <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                                <h5 style="color: #1a237e; font-size: 0.9rem; margin-bottom: 10px; font-weight: 700;">
-                                    <i class="fas fa-plus-circle me-1"></i>Recargar Saldo
-                                </h5>
-                                <form th:action="@{/cuenta/agregar-saldo}" method="post">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
-                                        <input type="number" class="form-control" name="cantidad" step="0.01" min="1" max="1000"
-                                               placeholder="Cantidad" required>
-                                        <button class="btn btn-sm" type="submit" style="background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a237e; font-weight: 600;">
-                                            Agregar
-                                        </button>
-                                    </div>
-                                    <small style="color: #666; font-size: 0.75rem;">Entre 1€ y 1000€</small>
-                                </form>
-                            </div>
-
-                            <div class="saldo-actions">
-                                <a href="/tickets" class="saldo-btn saldo-btn-primary">
-                                    <i class="fas fa-ticket-alt me-1"></i> Mis Tickets
-                                </a>
-                                <a href="/cuenta/perfil" class="saldo-btn saldo-btn-secondary">
-                                    <i class="fas fa-user-circle me-1"></i> Mi Cuenta
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <!-- Mi Cuenta para todos los usuarios logueados -->
-                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/cuenta/perfil"><i class="fas fa-user-circle"></i> Mi Cuenta</a></li>
-                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
-                <li class="nav-item" th:if="${logueado != true}"><a class="nav-link" href="/registro"><i class="fas fa-user-plus"></i> Registro</a></li>
-                <li class="nav-item" th:if="${logueado == true}"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
 
 <!-- Loading Screen -->
 <div id="loading">
     <div class="spinner"></div>
-    <h3>Cargando Estadio 3D...</h3>
-    <p>Por favor espera mientras se cargan los asientos</p>
+    <h3>Cargando Estadio...</h3>
+    <p>Inicializando vista (0%)</p>
 </div>
 
-<!-- Canvas Container -->
-<div id="canvas-container"></div>
+<!-- Canvas Principal -->
+<canvas id="estadio-canvas"></canvas>
 
 <!-- Tooltip -->
 <div id="tooltip"></div>
 
 <!-- Panel de Información -->
 <div id="info-panel">
-    <h3 th:text="${evento.nombre}">Nombre del Evento</h3>
-    <div class="info-row">
-        <span class="info-label">Fecha:</span>
-        <span class="info-value" th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span>
-    </div>
-    <div class="info-row">
-        <span class="info-label">Estadio:</span>
-        <span class="info-value" th:text="${evento.lugar}">Lugar</span>
+    <h3>Estadio Johan Cruyff</h3>
+
+    <!-- Recarga de Saldo -->
+    <div style="background: linear-gradient(135deg, #fff9c4, #fff59d); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 2px solid #ffd700;">
+        <h5 style="color: #1a237e; margin: 0 0 10px 0; font-size: 0.95rem;">
+            <i class="fas fa-wallet" style="margin-right: 5px;"></i>Recargar Saldo
+        </h5>
+        <form id="form-agregar-saldo" style="margin: 0;">
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <input type="number" id="input-cantidad-saldo" name="cantidad" step="0.01" min="1" max="1000"
+                    placeholder="Cantidad" required
+                    style="flex: 1; padding: 8px; border: 2px solid #1a237e; border-radius: 8px; font-size: 0.9rem;">
+                <button type="submit" id="btn-agregar-saldo" style="
+                    background: linear-gradient(135deg, #1a237e, #283593);
+                    color: white;
+                    border: none;
+                    padding: 8px 15px;
+                    border-radius: 8px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-plus"></i> Añadir
+                </button>
+            </div>
+            <small style="display: block; margin-top: 5px; color: #666; font-size: 0.75rem;">Entre 1€ y 1000€</small>
+            <div id="mensaje-saldo" style="margin-top: 8px; padding: 8px; border-radius: 6px; font-size: 0.85rem; display: none;"></div>
+        </form>
     </div>
 
-    <div id="zona-info" style="margin-top: 20px;">
-        <!-- Aquí se cargará dinámicamente la información de las zonas -->
+    <div id="zona-info">
+        <p style="text-align: center; color: #666;">Cargando información...</p>
     </div>
 
-    <div id="asiento-info">
-        <!-- Información del asiento seleccionado -->
-    </div>
+    <div id="asiento-info"></div>
 
     <button id="confirmar-btn" onclick="confirmarCompra()">
         <i class="fas fa-check me-2"></i>Confirmar Compra
     </button>
 
-    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee;">
-        <a th:href="@{/eventos/{id}/comprar(id=${evento.id})}" class="btn btn-sm btn-outline-secondary" style="width: 100%;">
-            <i class="fas fa-list me-2"></i>Ver Vista 2D Tradicional
-        </a>
-    </div>
+    <a href="/eventos" class="btn-link">
+        <i class="fas fa-arrow-left me-2"></i>Volver a Eventos
+    </a>
 </div>
 
 <!-- Leyenda -->
 <div id="legend">
-    <h4>Leyenda</h4>
+    <h4><i class="fas fa-info-circle me-2"></i>Leyenda</h4>
+
+    <!-- Estados de asientos -->
     <div class="legend-item">
-        <div class="legend-color color-disponible"></div>
+        <div class="legend-color" style="background-color: #4CAF50;"></div>
         <span>Disponible</span>
     </div>
     <div class="legend-item">
-        <div class="legend-color color-ocupado"></div>
+        <div class="legend-color" style="background-color: #f44336;"></div>
         <span>Ocupado</span>
     </div>
     <div class="legend-item">
-        <div class="legend-color color-seleccionado"></div>
+        <div class="legend-color" style="background-color: #2196F3;"></div>
         <span>Seleccionado</span>
+    </div>
+
+    <!-- Separador -->
+    <div style="margin: 10px 0; padding-top: 8px; border-top: 1px solid #e0e0e0;"></div>
+
+    <!-- Zonas especiales -->
+    <div style="margin-bottom: 8px;">
+        <small style="color: #666; font-weight: 600; display: block; margin-bottom: 5px;">
+            <i class="fas fa-map-marker-alt me-1"></i>Zonas:
+        </small>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(90deg, #FF6F00, #FFB300); border: 1px solid #E65100;"></div>
+        <span style="font-weight: 600; color: #FF6F00;">Tribuna VIP ⭐</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #283593;"></div>
+        <span>Grada Normal</span>
+    </div>
+
+    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0; font-size: 0.85rem; color: #666;">
+        <i class="fas fa-lightbulb" style="color: #ffd700; margin-right: 5px;"></i>
+        <strong>Tip:</strong> Click para seleccionar/deseleccionar (máx. 10)
     </div>
 </div>
 
 <!-- Controles -->
 <div id="controls">
+    <h4><i class="fas fa-cog me-2"></i>Controles</h4>
+
+    <!-- Zoom -->
+    <div class="zoom-controls">
+        <button onclick="ajustarZoom(-0.2)" title="Alejar">
+            <i class="fas fa-search-minus"></i>
+        </button>
+        <button onclick="ajustarZoom(0.2)" title="Acercar">
+            <i class="fas fa-search-plus"></i>
+        </button>
+    </div>
+
+    <!-- Resetear Vista -->
     <button onclick="resetearVista()">
         <i class="fas fa-undo me-2"></i>Resetear Vista
     </button>
-    <div style="margin-top: 10px; font-size: 0.8rem; color: #666; text-align: center;">
+
+    <!-- Ayuda -->
+    <div class="controls-help">
+        <div><i class="fas fa-hand-pointer"></i> Arrastra para mover</div>
+        <div><i class="fas fa-scroll"></i> Scroll para zoom</div>
         <div><i class="fas fa-mouse"></i> Click para seleccionar</div>
-        <div><i class="fas fa-hand-pointer"></i> Arrastra para rotar</div>
-        <div><i class="fas fa-search"></i> Scroll para zoom</div>
     </div>
 </div>
 
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-<script src="/js/estadio3d.js"></script>
-<script th:inline="javascript">
-    // Inicializar con el ID del evento
-    const eventoId = /*[[${evento.id}]]*/ 1;
+<script>
+    // ID del evento (cambiar con Thymeleaf en producción)
+    const eventoId = 1; // /*[[${evento.id}]]*/
 
-    window.addEventListener('DOMContentLoaded', () => {
-        initEstadio3D(eventoId);
-    });
+    // Función para manejar mensajes de saldo
+    function mostrarMensajeSaldo(mensaje, tipo) {
+        const mensajeSaldo = document.getElementById('mensaje-saldo');
+        if (!mensajeSaldo) return;
+
+        mensajeSaldo.textContent = mensaje;
+        mensajeSaldo.style.display = 'block';
+
+        if (tipo === 'success') {
+            mensajeSaldo.style.background = 'linear-gradient(135deg, #e8f5e9, #c8e6c9)';
+            mensajeSaldo.style.color = '#2e7d32';
+            mensajeSaldo.style.borderLeft = '3px solid #4caf50';
+        } else {
+            mensajeSaldo.style.background = 'linear-gradient(135deg, #ffebee, #ffcdd2)';
+            mensajeSaldo.style.color = '#c62828';
+            mensajeSaldo.style.borderLeft = '3px solid #f44336';
+        }
+    }
+
+    // Configurar formulario de saldo
+    function configurarFormularioSaldo() {
+        console.log('⚙️ Configurando formulario de saldo...');
+        const formSaldo = document.getElementById('form-agregar-saldo');
+        const inputCantidad = document.getElementById('input-cantidad-saldo');
+        const btnAgregar = document.getElementById('btn-agregar-saldo');
+
+        if (!formSaldo) {
+            console.warn('⚠️ Formulario de saldo no encontrado');
+            return;
+        }
+
+        formSaldo.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const cantidad = parseFloat(inputCantidad.value);
+
+            if (!cantidad || cantidad <= 0 || cantidad > 1000) {
+                mostrarMensajeSaldo('La cantidad debe estar entre 1€ y 1000€', 'error');
+                return;
+            }
+
+            btnAgregar.disabled = true;
+            btnAgregar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+            try {
+                const response = await fetch('/cuenta/agregar-saldo-ajax', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `cantidad=${cantidad}`
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarMensajeSaldo(data.mensaje || 'Saldo agregado correctamente', 'success');
+                    inputCantidad.value = '';
+
+                    setTimeout(() => {
+                        const msg = document.getElementById('mensaje-saldo');
+                        if (msg) msg.style.display = 'none';
+                    }, 3000);
+                } else {
+                    mostrarMensajeSaldo(data.error || 'Error al agregar saldo', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensajeSaldo('Error de conexión. Inténtalo de nuevo.', 'error');
+            } finally {
+                btnAgregar.disabled = false;
+                btnAgregar.innerHTML = '<i class="fas fa-plus"></i> Añadir';
+            }
+        });
+
+        console.log('✅ Formulario de saldo configurado');
+    }
 </script>
 
-<script src="/js/saldo-ajax.js"></script>
+<!-- Script de prueba para diagnosticar carga -->
+<script src="/js/test-load.js?v=3"
+        onerror="console.error('❌ Ni siquiera se puede cargar test-load.js - problema con archivos estáticos');"
+        onload="console.log('✅ test-load.js cargado - archivos estáticos funcionan');"></script>
+
+<!-- Cargar el script del estadio -->
+<script src="/js/estadio-canvas.js?v=3"
+        onerror="console.error('❌ ERROR: No se pudo cargar estadio-canvas.js'); document.getElementById('loading').innerHTML = '<div style=\'color:white;padding:40px;text-align:center;\'><h3>Error: No se pudo cargar el script</h3><p>Verifica que el servidor esté corriendo</p><button onclick=\'location.reload()\' style=\'background:#ffd700;color:#1a237e;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:10px;\'>Reintentar</button></div>';"
+        onload="console.log('✅ Script estadio-canvas.js cargado correctamente');"></script>
+
+<!-- Inicializar cuando TODO esté listo -->
+<script>
+    // Verificar inmediatamente si el script se cargó
+    console.log('🔍 Verificando carga del script...');
+    console.log('window.initEstadio3D tipo:', typeof window.initEstadio3D);
+
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 DOM cargado - Inicializando aplicación');
+        console.log('📍 Evento ID:', eventoId);
+        console.log('🔍 Verificando funciones globales:');
+        console.log('  - initEstadio3D:', typeof initEstadio3D);
+        console.log('  - resetearVista:', typeof resetearVista);
+        console.log('  - confirmarCompra:', typeof confirmarCompra);
+
+        // 1. Configurar formulario de saldo
+        try {
+            configurarFormularioSaldo();
+        } catch (error) {
+            console.error('❌ Error configurando formulario:', error);
+        }
+
+        // 2. Inicializar estadio con un pequeño delay para asegurar que el script se cargó
+        setTimeout(() => {
+            if (typeof initEstadio3D === 'function') {
+                console.log('🎮 Función initEstadio3D encontrada, iniciando...');
+                try {
+                    initEstadio3D(eventoId);
+                } catch (error) {
+                    console.error('❌ Error al inicializar estadio:', error);
+                    console.error('Stack:', error.stack);
+                }
+            } else {
+                console.error('❌ ERROR: initEstadio3D no está definida después del DOMContentLoaded');
+                console.error('Tipo actual:', typeof initEstadio3D);
+                console.error('window.initEstadio3D:', typeof window.initEstadio3D);
+
+                // Mostrar error al usuario
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.innerHTML = `
+                        <div style="color: white; text-align: center; padding: 40px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #FFC107;"></i>
+                            <h3>Error al cargar el estadio</h3>
+                            <p>No se pudo cargar el visualizador 3D</p>
+                            <p style="font-size: 0.9rem; color: #ffcdd2;">El script estadio-canvas.js no está disponible</p>
+                            <details style="margin: 20px; text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                                <summary style="cursor: pointer; color: #ffd700;">Información técnica</summary>
+                                <pre style="color: #fff; font-size: 12px;">
+Tipo de initEstadio3D: ${typeof initEstadio3D}
+window.initEstadio3D: ${typeof window.initEstadio3D}
+Script URL: /js/estadio-canvas.js?v=2
+
+Posibles causas:
+1. El servidor no está sirviendo archivos estáticos correctamente
+2. Error de sintaxis en estadio-canvas.js
+3. Problema de caché del navegador
+
+Solución:
+1. Abre DevTools (F12) → Console
+2. Busca errores en rojo
+3. Abre DevTools → Network
+4. Recarga y busca estadio-canvas.js
+5. Verifica si aparece en rojo (error 404 o 500)
+                                </pre>
+                            </details>
+                            <button onclick="location.reload()" style="
+                                background: #ffd700;
+                                color: #1a237e;
+                                border: none;
+                                padding: 12px 24px;
+                                border-radius: 8px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                margin: 10px;
+                            ">Reintentar</button>
+                            <br><br>
+                            <a href="/eventos" style="color: #ffd700; text-decoration: underline;">Volver a Eventos</a>
+                        </div>
+                    `;
+                }
+            }
+        }, 100); // Delay de 100ms para asegurar que el script se procesó completamente
+    });
+</script>
 
 </body>
 </html>

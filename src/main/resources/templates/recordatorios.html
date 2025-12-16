@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -272,13 +272,17 @@
         .reminder-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             padding: 20px;
-            color: white;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .reminder-header h4 {
             margin: 0;
-            font-size: 1.3rem;
             font-weight: 700;
+            font-size: 1.2rem;
+            flex: 1;
         }
 
         .reminder-body {
@@ -478,43 +482,6 @@
 
 <!-- Main Content -->
 <div class="container recordatorios-container">
-    <!-- Formulario para crear recordatorio -->
-    <div th:if="${tickets != null && !tickets.isEmpty()}" class="create-reminder-card">
-        <h3><i class="fas fa-plus-circle me-2"></i>Crear Nuevo Recordatorio</h3>
-        <form th:action="@{/recordatorios}" method="post" th:object="${recordatorioForm}">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="ticketId" class="form-label">
-                        <i class="fas fa-calendar-alt me-2"></i>Selecciona el Evento
-                    </label>
-                    <select id="ticketId" name="ticketId" class="form-select" required>
-                        <option value="">-- Elige un evento --</option>
-                        <option th:each="ticket : ${tickets}" th:value="${ticket.id_ticket}" th:text="${ticket.evento.nombre}"></option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="fecha" class="form-label">
-                        <i class="fas fa-clock me-2"></i>Fecha y Hora del Recordatorio
-                    </label>
-                    <input type="datetime-local" id="fecha" name="fecha" class="form-control" th:field="*{fecha}" required>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="mensaje" class="form-label">
-                    <i class="fas fa-comment-alt me-2"></i>Mensaje Personalizado
-                </label>
-                <input type="text" id="mensaje" name="mensaje" class="form-control" th:field="*{mensaje}"
-                       placeholder="Ej: No olvides el partido de hoy!" required>
-            </div>
-
-            <button type="submit" class="btn btn-custom">
-                <i class="fas fa-bell me-2"></i>Crear Recordatorio
-            </button>
-        </form>
-    </div>
-
     <!-- Estado vacío si no hay tickets -->
     <div th:if="${tickets == null || tickets.isEmpty()}" class="empty-state">
         <i class="fas fa-ticket-alt"></i>
@@ -527,17 +494,29 @@
 
     <!-- Lista de recordatorios -->
     <div th:if="${recordatorios != null && !recordatorios.isEmpty()}">
-        <h2 style="margin: 40px 0 30px 0; font-weight: 800;">
-            <i class="fas fa-list me-2"></i>Mis Recordatorios Activos
-        </h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+            <h2 style="margin: 0; font-weight: 800;">
+                <i class="fas fa-list me-2"></i>Mis Recordatorios Activos
+                <span style="background: var(--accent); color: var(--primary); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin-left: 10px;" th:text="${recordatorios.size()}">0</span>
+            </h2>
+            <a th:href="@{/recordatorios/crear}" class="btn btn-custom" style="width: auto; padding: 12px 30px;">
+                <i class="fas fa-plus-circle me-2"></i>Crear Nuevo Recordatorio
+            </a>
+        </div>
+
         <div class="recordatorios-grid">
             <div class="reminder-card" th:each="rec : ${recordatorios}">
                 <div class="reminder-header">
                     <h4><i class="fas fa-bell me-2"></i>Recordatorio #<span th:text="${rec.id_recordatorio}"></span></h4>
+                    <form th:action="@{/recordatorios/eliminar/{id}(id=${rec.id_recordatorio})}" method="post" style="display: inline;"
+                          onsubmit="return confirm('¿Estás seguro de eliminar este recordatorio?');">
+                        <button type="submit" class="btn btn-sm btn-danger" style="border-radius: 50%; width: 35px; height: 35px; padding: 0;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
                 </div>
 
                 <div class="reminder-body">
-
                     <div class="reminder-info">
                         <div class="reminder-icon">
                             <i class="fas fa-calendar-check"></i>
@@ -561,16 +540,20 @@
         </div>
     </div>
 
-    <!-- Estado vacío si no hay recordatorios -->
+    <!-- Estado vacío si no hay recordatorios pero sí hay tickets -->
     <div th:if="${(recordatorios == null || recordatorios.isEmpty()) && tickets != null && !tickets.isEmpty()}"
-         class="empty-state" style="margin-top: 40px;">
+         class="empty-state">
         <i class="fas fa-bell-slash"></i>
         <h3>No tienes recordatorios creados</h3>
-        <p>Crea tu primer recordatorio usando el formulario de arriba</p>
+        <p>Crea tu primer recordatorio para no perderte ningún evento</p>
+        <a th:href="@{/recordatorios/crear}" class="btn btn-custom mt-3" style="width: auto; padding: 12px 35px;">
+            <i class="fas fa-plus-circle me-2"></i>Crear Mi Primer Recordatorio
+        </a>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <!-- Control de música de fondo flotante -->
 <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">

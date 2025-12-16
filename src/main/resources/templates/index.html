@@ -468,7 +468,7 @@
                     <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
                     <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
                         <i class="fas fa-wallet"></i>
-                        <span class="saldo-amount" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
                         <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
                     </button>
 

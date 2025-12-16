@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Renderizado - Estadio 3D</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        #info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #info h2 {
+            margin-top: 0;
+            color: #1a237e;
+        }
+        .status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+        .warning {
+            background: #fff9c4;
+            color: #f57f17;
+            border-left: 4px solid #ffd700;
+        }
+        #estadio-canvas {
+            display: block;
+            border: 2px solid #1a237e;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        button {
+            background: #1a237e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #283593;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>🧪 Test de Renderizado - Estadio Canvas 2D</h2>
+        <div id="status-container"></div>
+        <div style="margin-top: 20px;">
+            <button onclick="testCanvas()">🔍 Test Canvas Básico</button>
+            <button onclick="testJavaScript()">📜 Test JavaScript</button>
+            <button onclick="testFunciones()">⚙️ Test Funciones</button>
+            <button onclick="initEstadio3D(1)">🏟️ Iniciar Estadio (ID: 1)</button>
+            <button onclick="location.reload()">🔄 Recargar Página</button>
+        </div>
+    </div>
+
+    <canvas id="estadio-canvas"></canvas>
+
+    <script>
+        const statusContainer = document.getElementById('status-container');
+
+        function addStatus(message, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            statusContainer.appendChild(div);
+            console.log(message);
+        }
+
+        function clearStatus() {
+            statusContainer.innerHTML = '';
+        }
+
+        function testCanvas() {
+            clearStatus();
+            addStatus('🧪 Iniciando test de canvas...', 'warning');
+
+            const canvas = document.getElementById('estadio-canvas');
+            if (!canvas) {
+                addStatus('❌ ERROR: Canvas no encontrado en el DOM', 'error');
+                return;
+            }
+            addStatus('✅ Canvas encontrado: ' + canvas.id, 'success');
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                addStatus('❌ ERROR: No se pudo obtener contexto 2D', 'error');
+                return;
+            }
+            addStatus('✅ Contexto 2D obtenido correctamente', 'success');
+
+            // Configurar tamaño
+            canvas.width = 800;
+            canvas.height = 600;
+            addStatus(`✅ Dimensiones: ${canvas.width}x${canvas.height}`, 'success');
+
+            // Dibujar test
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#2E7D32';
+            ctx.fillRect(100, 100, 600, 400);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(100, 100, 600, 400);
+
+            ctx.font = 'bold 32px Arial';
+            ctx.fillText('CANVAS FUNCIONA ✓', 250, 320);
+
+            addStatus('✅ Canvas renderizado correctamente', 'success');
+        }
+
+        function testJavaScript() {
+            clearStatus();
+            addStatus('🧪 Verificando carga de JavaScript...', 'warning');
+
+            const script = document.querySelector('script[src="/js/estadio-canvas.js"]');
+            if (!script) {
+                addStatus('❌ ERROR: Script estadio-canvas.js no encontrado en el DOM', 'error');
+            } else {
+                addStatus('✅ Script tag encontrado', 'success');
+            }
+        }
+
+        function testFunciones() {
+            clearStatus();
+            addStatus('🧪 Verificando funciones globales...', 'warning');
+
+            const funciones = [
+                'initEstadio3D',
+                'resetearVista',
+                'ajustarZoom',
+                'confirmarCompra',
+                'limpiarSeleccion'
+            ];
+
+            let todasOk = true;
+            funciones.forEach(func => {
+                const tipo = typeof window[func];
+                if (tipo === 'function') {
+                    addStatus(`✅ ${func}: disponible`, 'success');
+                } else {
+                    addStatus(`❌ ${func}: NO disponible (tipo: ${tipo})`, 'error');
+                    todasOk = false;
+                }
+            });
+
+            if (todasOk) {
+                addStatus('🎉 ¡Todas las funciones están disponibles!', 'success');
+            } else {
+                addStatus('⚠️ Algunas funciones no están disponibles. El script puede no haberse cargado.', 'error');
+            }
+        }
+
+        // Auto-test al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            addStatus('🚀 Página cargada', 'success');
+            addStatus('ℹ️ Usa los botones arriba para probar cada componente', 'warning');
+        });
+    </script>
+
+    <!-- Cargar el script del estadio -->
+    <script src="/js/estadio-canvas.js"></script>
+
+    <script>
+        // Verificar después de cargar el script
+        setTimeout(() => {
+            if (typeof window.initEstadio3D === 'function') {
+                addStatus('✅ estadio-canvas.js cargado correctamente', 'success');
+            } else {
+                addStatus('❌ estadio-canvas.js NO se cargó o tiene errores', 'error');
+            }
+        }, 500);
+    </script>
+</body>
+</html>
+

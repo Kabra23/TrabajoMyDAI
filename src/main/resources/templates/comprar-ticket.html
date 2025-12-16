@@ -509,17 +509,17 @@
                     <div class="saldo-overlay" onclick="this.parentElement.classList.remove('show')"></div>
                     <button class="nav-link saldo-trigger" onclick="this.parentElement.classList.toggle('show')">
                         <i class="fas fa-wallet"></i>
-                        <span class="saldo-amount" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
+                        <span class="saldo-amount" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</span>
                         <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
                     </button>
 
                     <div class="saldo-menu">
                         <div class="saldo-menu-header">
                             <h4>Tu Saldo Disponible</h4>
-                            <div class="saldo-display" th:text="${usuario != null && usuario.saldo != null ? #numbers.formatDecimal(usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
+                            <div class="saldo-display" th:text="${session.usuario != null && session.usuario.saldo != null ? #numbers.formatDecimal(session.usuario.saldo, 1, 2) + '€' : '0.00€'}">0.00€</div>
                             <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">
                                 <i class="fas fa-user-circle me-1"></i>
-                                <span th:text="${usuario != null ? usuario.username : 'Usuario'}">Usuario</span>
+                                <span th:text="${session.usuario != null ? session.usuario.username : 'Usuario'}">Usuario</span>
                             </p>
                         </div>
 
@@ -656,7 +656,7 @@
                     <span th:text="${success}"></span>
                 </div>
 
-                <form th:action="@{/eventos/{id}/comprar(id=${evento.id})}" method="post" id="formCompra">
+                <form th:action="@{/eventos/{id}/comprar-auto(id=${evento.id})}" method="post" id="formCompra">
                     <div class="mb-4">
                         <label for="zona" class="form-label">
                             <i class="fas fa-map-marked-alt me-2"></i>Zona del Estadio
@@ -678,14 +678,14 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="asiento" class="form-label">
-                            <i class="fas fa-chair me-2"></i>Número de Asiento
+                        <label for="cantidad" class="form-label">
+                            <i class="fas fa-ticket-alt me-2"></i>Cantidad de Entradas
                         </label>
-                        <input type="number" id="asiento" name="asiento" class="form-control"
-                               min="1" max="1500" placeholder="Ej: 42" required>
-                        <small class="form-text text-muted mt-2 d-block" id="asiento-info">
-                            <i class="fas fa-lightbulb me-1"></i>
-                            Los asientos se numeran de forma independiente en cada zona
+                        <input type="number" id="cantidad" name="cantidad" class="form-control"
+                               min="1" max="10" value="1" placeholder="1" required step="1">
+                        <small class="form-text text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Los asientos se asignarán automáticamente por orden (máximo 10 entradas)
                         </small>
                     </div>
 
@@ -699,8 +699,16 @@
                             <strong id="resumen-zona">-</strong>
                         </div>
                         <div class="resumen-item">
-                            <span>Asiento:</span>
-                            <strong id="resumen-asiento">-</strong>
+                            <span>Asignación:</span>
+                            <strong style="color: #4CAF50;">Automática</strong>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Cantidad:</span>
+                            <strong id="resumen-cantidad">1</strong>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Precio unitario:</span>
+                            <strong id="resumen-precio-unitario">0.00€</strong>
                         </div>
                         <div class="resumen-item">
                             <span>TOTAL:</span>
@@ -727,31 +735,17 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const zonaSelect = document.getElementById('zona');
-        const asientoInput = document.getElementById('asiento');
-        const asientoInfo = document.getElementById('asiento-info');
+        const cantidadInput = document.getElementById('cantidad');
         const resumenCompra = document.getElementById('resumenCompra');
         const precioCards = document.querySelectorAll('.precio-card');
+        const formCompra = document.getElementById('formCompra');
 
         // Actualizar resumen cuando cambie la zona
         zonaSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            const capacidad = selectedOption.getAttribute('data-capacidad');
             const precio = selectedOption.getAttribute('data-precio');
             const disponibles = selectedOption.getAttribute('data-disponibles');
             const zonaNombre = this.value;
-
-            // Actualizar límite de asientos
-            if (capacidad && capacidad !== 'null') {
-                asientoInput.max = capacidad;
-                asientoInfo.innerHTML = `
-                    <i class="fas fa-lightbulb me-1"></i>
-                    Esta zona tiene <strong>${capacidad} asientos</strong> (números del 1 al ${capacidad}).
-                    <strong style="color: var(--success-color);">${disponibles} disponibles</strong>
-                `;
-            } else {
-                asientoInput.max = 1500;
-                asientoInfo.innerHTML = '<i class="fas fa-lightbulb me-1"></i>Los asientos se numeran de forma independiente en cada zona';
-            }
 
             // Marcar tarjeta de precio como activa
             precioCards.forEach(card => card.classList.remove('active'));
@@ -761,34 +755,59 @@
             }
 
             // Actualizar resumen
-            updateResumen(zonaNombre, asientoInput.value, precio);
-
-            // Resetear asiento si excede el máximo
-            if (asientoInput.value && parseInt(asientoInput.value) > parseInt(asientoInput.max)) {
-                asientoInput.value = '';
-                updateResumen(zonaNombre, '', precio);
-            }
+            updateResumen(zonaNombre, parseInt(cantidadInput.value) || 1, precio);
         });
 
-        // Actualizar resumen cuando cambie el asiento
-        asientoInput.addEventListener('input', function() {
+        // Actualizar cuando cambie la cantidad
+        cantidadInput.addEventListener('input', function() {
             const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
             const precio = selectedOption.getAttribute('data-precio');
             const zonaNombre = zonaSelect.value;
-            updateResumen(zonaNombre, this.value, precio);
+            updateResumen(zonaNombre, parseInt(this.value) || 1, precio);
         });
 
         // Función para actualizar el resumen
-        function updateResumen(zona, asiento, precio) {
-            if (zona && asiento && precio) {
+        function updateResumen(zona, cantidad, precioUnitario) {
+            if (zona && precioUnitario && cantidad > 0) {
                 document.getElementById('resumen-zona').textContent = zona;
-                document.getElementById('resumen-asiento').textContent = '#' + asiento;
-                document.getElementById('resumen-precio').textContent = parseFloat(precio).toFixed(2) + '€';
+                document.getElementById('resumen-cantidad').textContent = cantidad + (cantidad === 1 ? ' entrada' : ' entradas');
+                document.getElementById('resumen-precio-unitario').textContent = parseFloat(precioUnitario).toFixed(2) + '€';
+                const total = parseFloat(precioUnitario) * cantidad;
+                document.getElementById('resumen-precio').textContent = total.toFixed(2) + '€';
                 resumenCompra.classList.add('show');
             } else {
                 resumenCompra.classList.remove('show');
             }
         }
+
+        // Validación antes de enviar el formulario
+        formCompra.addEventListener('submit', function(e) {
+            if (!zonaSelect.value) {
+                e.preventDefault();
+                alert('Por favor, selecciona una zona');
+                zonaSelect.focus();
+                return false;
+            }
+
+            const cantidad = parseInt(cantidadInput.value);
+            if (cantidad < 1 || cantidad > 10) {
+                e.preventDefault();
+                alert('La cantidad debe estar entre 1 y 10');
+                cantidadInput.focus();
+                return false;
+            }
+
+            // Verificar disponibilidad
+            const selectedOption = zonaSelect.options[zonaSelect.selectedIndex];
+            const disponibles = parseInt(selectedOption.getAttribute('data-disponibles'));
+
+            if (cantidad > disponibles) {
+                e.preventDefault();
+                alert(`Solo hay ${disponibles} entradas disponibles en esta zona`);
+                cantidadInput.focus();
+                return false;
+            }
+        });
 
         // Click en tarjetas de precio para seleccionar zona
         precioCards.forEach(card => {
@@ -804,7 +823,7 @@
     });
 </script>
 
-<!-- Control de mÃºsica de fondo flotante -->
+<!-- Control de música de fondo flotante -->
 <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
     <audio id="backgroundMusic" loop>
         <source src="/Ser-del-Barca-es.mp3" type="audio/mpeg">
