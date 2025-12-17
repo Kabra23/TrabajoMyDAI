@@ -154,12 +154,35 @@ class EstadioCanvas {
         const gap = 3;
         let asientoIdGlobal = 1;
 
-        // GOL NORD (Arriba) - 480 asientos
-        const golNordFilas = 12;
+        // GOL NORD (Arriba) - Exterior (6 filas más alejadas)
+        const golNordExteriorFilas = 6;
         const golNordAsientosPorFila = 40;
         let golNordNumero = 1;
 
-        for (let fila = 0; fila < golNordFilas; fila++) {
+        for (let fila = 0; fila < golNordExteriorFilas; fila++) {
+            for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
+                const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
+                const y = -420 - (fila * (asientoSize + gap));
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Gol Nord',
+                    numero: golNordNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                golNordNumero++;
+            }
+        }
+
+        // GOL NORD (Arriba) - Interior (6 filas más cercanas)
+        const golNordInteriorFilas = 6;
+        for (let fila = 0; fila < golNordInteriorFilas; fila++) {
             for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
                 const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
                 const y = -320 - (fila * (asientoSize + gap));
@@ -180,12 +203,12 @@ class EstadioCanvas {
             }
         }
 
-        // GOL SUD (Abajo) - 480 asientos
-        const golSudFilas = 12;
+        // GOL SUD (Abajo) - Interior (6 filas más cercanas)
+        const golSudInteriorFilas = 6;
         const golSudAsientosPorFila = 40;
         let golSudNumero = 1;
 
-        for (let fila = 0; fila < golSudFilas; fila++) {
+        for (let fila = 0; fila < golSudInteriorFilas; fila++) {
             for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
                 const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
                 const y = 320 + (fila * (asientoSize + gap));
@@ -206,20 +229,89 @@ class EstadioCanvas {
             }
         }
 
-        // GRADA LATERAL (Izquierda y Derecha)
-        const lateralFilas = 15;
-        const lateralAsientosPorFila = 40;
+        // GOL SUD (Abajo) - Exterior (6 filas más alejadas)
+        const golSudExteriorFilas = 6;
+        for (let fila = 0; fila < golSudExteriorFilas; fila++) {
+            for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
+                const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
+                const y = 420 + (fila * (asientoSize + gap));
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Gol Sud',
+                    numero: golSudNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                golSudNumero++;
+            }
+        }
+
+        // GRADA LATERAL IZQUIERDA - Exterior (8 filas más alejadas)
+        const lateralExteriorFilas = 8;
+        const lateralAsientosPorFila = 35;
         let gradaLateralNumero = 1;
 
-        // Lateral izquierda (solo grada)
-        for (let fila = 0; fila < lateralFilas; fila++) {
+        for (let fila = 0; fila < lateralExteriorFilas; fila++) {
+            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+                const x = -380 - (fila * (asientoSize + gap));
+                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Grada lateral',
+                    numero: gradaLateralNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.grada
+                });
+                asientoIdGlobal++;
+                gradaLateralNumero++;
+            }
+        }
+
+        // TRIBUNA IZQUIERDA - Interior (5 filas más cercanas)
+        const tribunaInteriorFilas = 5;
+        let tribunaNumero = 1;
+
+        for (let fila = 0; fila < tribunaInteriorFilas; fila++) {
             for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
                 const x = -280 - (fila * (asientoSize + gap));
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
-                    zona: 'Grada Lateral',
+                    zona: 'tribuna',
+                    numero: tribunaNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.tribuna
+                });
+                asientoIdGlobal++;
+                tribunaNumero++;
+            }
+        }
+
+        // GRADA LATERAL DERECHA - Exterior (8 filas más alejadas)
+        for (let fila = 0; fila < lateralExteriorFilas; fila++) {
+            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+                const x = 380 + (fila * (asientoSize + gap));
+                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'Grada lateral',
                     numero: gradaLateralNumero,
                     x: x,
                     y: y,
@@ -233,108 +325,15 @@ class EstadioCanvas {
             }
         }
 
-        // Lateral derecha (solo grada)
-        for (let fila = 0; fila < lateralFilas; fila++) {
+        // TRIBUNA DERECHA - Interior (5 filas más cercanas)
+        for (let fila = 0; fila < tribunaInteriorFilas; fila++) {
             for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
                 const x = 280 + (fila * (asientoSize + gap));
                 const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
-                    zona: 'Grada Lateral',
-                    numero: gradaLateralNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.grada
-                });
-                asientoIdGlobal++;
-                gradaLateralNumero++;
-            }
-        }
-
-        // TRIBUNAS (Esquinas - 4 secciones pequeñas VIP)
-        const tribunaFilas = 8;
-        const tribunaAsientosPorFila = 10;
-        let tribunaNumero = 1;
-
-        // Tribuna esquina superior derecha
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = 380 + (fila * (asientoSize + gap));
-                const y = -280 - (asiento * (asientoSize + gap));
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'Tribuna',
-                    numero: tribunaNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.tribuna
-                });
-                asientoIdGlobal++;
-                tribunaNumero++;
-            }
-        }
-
-        // Tribuna esquina inferior derecha
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = 380 + (fila * (asientoSize + gap));
-                const y = 110 + (asiento * (asientoSize + gap));
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'Tribuna',
-                    numero: tribunaNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.tribuna
-                });
-                asientoIdGlobal++;
-                tribunaNumero++;
-            }
-        }
-
-        // Tribuna esquina superior izquierda
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = -380 - (fila * (asientoSize + gap));
-                const y = -280 - (asiento * (asientoSize + gap));
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'Tribuna',
-                    numero: tribunaNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.tribuna
-                });
-                asientoIdGlobal++;
-                tribunaNumero++;
-            }
-        }
-
-        // Tribuna esquina inferior izquierda
-        for (let fila = 0; fila < tribunaFilas; fila++) {
-            for (let asiento = 0; asiento < tribunaAsientosPorFila; asiento++) {
-                const x = -380 - (fila * (asientoSize + gap));
-                const y = 110 + (asiento * (asientoSize + gap));
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'Tribuna',
+                    zona: 'tribuna',
                     numero: tribunaNumero,
                     x: x,
                     y: y,
@@ -349,10 +348,10 @@ class EstadioCanvas {
         }
 
         console.log(`✅ Estadio creado: ${this.asientos.length} asientos`);
-        console.log(`   - Gol Nord: 480 asientos`);
-        console.log(`   - Gol Sud: 480 asientos`);
-        console.log(`   - Grada Lateral: 1200 asientos`);
-        console.log(`   - Tribuna (4 esquinas): 320 asientos`);
+        console.log(`   - Gol Nord (exterior + interior): ${golNordNumero - 1} asientos`);
+        console.log(`   - Gol Sud (interior + exterior): ${golSudNumero - 1} asientos`);
+        console.log(`   - Grada lateral (izq + der): ${gradaLateralNumero - 1} asientos`);
+        console.log(`   - Tribuna (izq + der interior): ${tribunaNumero - 1} asientos`);
     }
 
     ajustarZoomInicial() {
@@ -859,10 +858,25 @@ class EstadioCanvas {
         this.ctx.shadowOffsetY = 2;
 
         const etiquetas = [
-            { texto: 'GOL NORD', x: 0, y: -600, color: '#FFD700' },
-            { texto: 'GOL SUD', x: 0, y: 600, color: '#FFD700' },
-            { texto: 'GRADA LATERAL ⭐', x: -380, y: 0, rotacion: -Math.PI / 2, color: '#FFD700' },
-            { texto: 'GRADA LATERAL ⭐', x: 380, y: 0, rotacion: Math.PI / 2, color: '#FFD700' }
+            // Gol Nord sections
+            { texto: 'Gol Nord', x: 0, y: -470, color: '#FFD700', fontSize: '20px' },
+            { texto: 'Gol Nord', x: 0, y: -370, color: '#FFD700', fontSize: '16px' },
+            
+            // Gol Sud sections
+            { texto: 'Gol Sud', x: 0, y: 370, color: '#FFD700', fontSize: '16px' },
+            { texto: 'Gol Sud', x: 0, y: 470, color: '#FFD700', fontSize: '20px' },
+            
+            // Grada total (external labels on sides)
+            { texto: 'Grada total', x: -520, y: 0, rotacion: -Math.PI / 2, color: '#FFD700', fontSize: '20px' },
+            { texto: 'Grada total', x: 520, y: 0, rotacion: Math.PI / 2, color: '#FFD700', fontSize: '20px' },
+            
+            // Grada lateral (middle sections)
+            { texto: 'Grada lateral', x: -430, y: 0, rotacion: -Math.PI / 2, color: '#FFFFFF', fontSize: '16px' },
+            { texto: 'Grada lateral', x: 430, y: 0, rotacion: Math.PI / 2, color: '#FFFFFF', fontSize: '16px' },
+            
+            // Tribuna (inner sections)
+            { texto: 'tribuna', x: -320, y: 0, rotacion: -Math.PI / 2, color: '#FF8C00', fontSize: '14px' },
+            { texto: 'tribuna', x: 320, y: 0, rotacion: Math.PI / 2, color: '#FF8C00', fontSize: '14px' }
         ];
 
         etiquetas.forEach(etiqueta => {
@@ -872,13 +886,16 @@ class EstadioCanvas {
                 this.ctx.rotate(etiqueta.rotacion);
             }
 
+            this.ctx.font = `bold ${etiqueta.fontSize || '22px'} Arial`;
             const metrics = this.ctx.measureText(etiqueta.texto);
-            this.ctx.fillStyle = 'rgba(26, 35, 126, 0.9)';
-            this.ctx.fillRect(-metrics.width / 2 - 15, -18, metrics.width + 30, 36);
+            
+            // Background box
+            this.ctx.fillStyle = 'rgba(26, 35, 126, 0.85)';
+            this.ctx.fillRect(-metrics.width / 2 - 12, -15, metrics.width + 24, 30);
 
             this.ctx.strokeStyle = etiqueta.color;
             this.ctx.lineWidth = 2;
-            this.ctx.strokeRect(-metrics.width / 2 - 15, -18, metrics.width + 30, 36);
+            this.ctx.strokeRect(-metrics.width / 2 - 12, -15, metrics.width + 24, 30);
 
             this.ctx.fillStyle = etiqueta.color;
             this.ctx.fillText(etiqueta.texto, 0, 0);
@@ -914,8 +931,8 @@ class EstadioCanvas {
             const y = asiento.y - asiento.size / 2;
             const size = asiento.size;
 
-            // Fondo de zona premium
-            if (asiento.zona === 'Tribuna') {
+            // Fondo de zona premium (tribuna)
+            if (asiento.zona === 'tribuna') {
                 this.ctx.fillStyle = asiento.color;
                 this.ctx.fillRect(x - 1, y - 1, size + 2, size + 2);
             } else {
@@ -939,8 +956,8 @@ class EstadioCanvas {
             this.ctx.lineWidth = 1.5;
             this.ctx.strokeRect(x, y, size, size);
 
-            // Indicador premium
-            if (asiento.zona === 'Tribuna' && asiento.disponible && this.zoom > 0.8) {
+            // Indicador premium para tribuna
+            if (asiento.zona === 'tribuna' && asiento.disponible && this.zoom > 0.8) {
                 this.ctx.fillStyle = '#FFD700';
                 this.ctx.beginPath();
                 this.ctx.arc(asiento.x, asiento.y, 2, 0, Math.PI * 2);
@@ -982,7 +999,7 @@ class EstadioCanvas {
         tooltip.style.left = e.clientX + 10 + 'px';
         tooltip.style.top = e.clientY + 10 + 'px';
 
-        const iconoZona = asiento.zona === 'Tribuna' ? '⭐' : '🎫';
+        const iconoZona = asiento.zona === 'tribuna' ? '⭐' : '🎫';
         const colorEstado = asiento.disponible ? '#4CAF50' : '#f44336';
         const textoEstado = asiento.disponible ? 'Disponible' : 'Ocupado';
 
@@ -1029,7 +1046,7 @@ class EstadioCanvas {
                 asientosPorZona[asiento.zona] = {
                     asientos: [],
                     precio: asiento.precio,
-                    icono: asiento.zona === 'Tribuna' ? '⭐' : '🎟️'
+                    icono: asiento.zona === 'tribuna' ? '⭐' : '🎟️'
                 };
             }
             asientosPorZona[asiento.zona].asientos.push(asiento.numero);
@@ -1048,7 +1065,7 @@ class EstadioCanvas {
             const subtotal = data.asientos.length * data.precio;
 
             html += `
-                <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 12px; border-radius: 10px; margin: 10px 0; border-left: 4px solid ${zona === 'Tribuna' ? '#FF8C00' : '#283593'};">
+                <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 12px; border-radius: 10px; margin: 10px 0; border-left: 4px solid ${zona === 'tribuna' ? '#FF8C00' : '#283593'};">
                     <div style="font-weight: 700; color: #1a237e; margin-bottom: 6px; font-size: 0.95rem;">
                         ${data.icono} ${zona}
                     </div>
@@ -1112,7 +1129,7 @@ class EstadioCanvas {
             const porcentajeDisponible = (zona.disponibles / zona.capacidadTotal * 100).toFixed(0);
             const porcentajeOcupado = ((zona.capacidadTotal - zona.disponibles) / zona.capacidadTotal * 100).toFixed(0);
             const colorBarra = '#4CAF50'; // Verde para disponibles
-            const iconoZona = zona.nombre === 'Tribuna' ? '⭐' : '🎟️';
+            const iconoZona = zona.nombre === 'tribuna' ? '⭐' : '🎟️';
 
             html += `
                 <div style="margin: 15px 0; padding: 15px; background: linear-gradient(135deg, #ffffff, #f8f9fa); border-radius: 12px; border: 2px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
