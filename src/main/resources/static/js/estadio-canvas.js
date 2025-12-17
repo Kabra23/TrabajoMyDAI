@@ -259,9 +259,10 @@ class EstadioCanvas {
             }
         }
 
-        // GRADA LATERAL IZQUIERDA - Exterior (8 filas más alejadas)
+        // GRADA LATERAL - Contadores separados para izquierda y derecha
         let gradaLateralNumero = 1;
 
+        // GRADA LATERAL IZQUIERDA - Exterior (8 filas más alejadas)
         for (let fila = 0; fila < LATERAL_EXTERIOR_FILAS; fila++) {
             for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = -380 - (fila * (asientoSize + gap));
@@ -283,31 +284,8 @@ class EstadioCanvas {
             }
         }
 
-        // TRIBUNA IZQUIERDA - Interior (5 filas más cercanas)
-        let tribunaNumero = 1;
-
-        for (let fila = 0; fila < TRIBUNA_INTERIOR_FILAS; fila++) {
-            for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
-                const x = -280 - (fila * (asientoSize + gap));
-                const y = (asiento - LATERAL_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
-
-                this.asientos.push({
-                    id: asientoIdGlobal,
-                    zona: 'tribuna',
-                    numero: tribunaNumero,
-                    x: x,
-                    y: y,
-                    size: asientoSize,
-                    disponible: true,
-                    precio: 0,
-                    color: this.colors.tribuna
-                });
-                asientoIdGlobal++;
-                tribunaNumero++;
-            }
-        }
-
         // GRADA LATERAL DERECHA - Exterior (8 filas más alejadas)
+        // Continuar la numeración desde donde terminó la izquierda
         for (let fila = 0; fila < LATERAL_EXTERIOR_FILAS; fila++) {
             for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = 380 + (fila * (asientoSize + gap));
@@ -329,7 +307,33 @@ class EstadioCanvas {
             }
         }
 
+        // TRIBUNA - Contadores para secciones izquierda y derecha
+        let tribunaNumero = 1;
+
+        // TRIBUNA IZQUIERDA - Interior (5 filas más cercanas)
+        for (let fila = 0; fila < TRIBUNA_INTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
+                const x = -280 - (fila * (asientoSize + gap));
+                const y = (asiento - LATERAL_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
+
+                this.asientos.push({
+                    id: asientoIdGlobal,
+                    zona: 'tribuna',
+                    numero: tribunaNumero,
+                    x: x,
+                    y: y,
+                    size: asientoSize,
+                    disponible: true,
+                    precio: 0,
+                    color: this.colors.tribuna
+                });
+                asientoIdGlobal++;
+                tribunaNumero++;
+            }
+        }
+
         // TRIBUNA DERECHA - Interior (5 filas más cercanas)
+        // Continuar la numeración desde donde terminó la izquierda
         for (let fila = 0; fila < TRIBUNA_INTERIOR_FILAS; fila++) {
             for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = 280 + (fila * (asientoSize + gap));
@@ -351,11 +355,16 @@ class EstadioCanvas {
             }
         }
 
+        const totalGolNord = golNordNumero - 1;
+        const totalGolSud = golSudNumero - 1;
+        const totalGradaLateral = gradaLateralNumero - 1;
+        const totalTribuna = tribunaNumero - 1;
+
         console.log(`✅ Estadio creado: ${this.asientos.length} asientos`);
-        console.log(`   - Gol Nord (exterior + interior): ${golNordNumero - 1} asientos`);
-        console.log(`   - Gol Sud (interior + exterior): ${golSudNumero - 1} asientos`);
-        console.log(`   - Grada lateral (izq + der): ${gradaLateralNumero - 1} asientos`);
-        console.log(`   - Tribuna (izq + der interior): ${tribunaNumero - 1} asientos`);
+        console.log(`   - Gol Nord (exterior + interior): ${totalGolNord} asientos`);
+        console.log(`   - Gol Sud (interior + exterior): ${totalGolSud} asientos`);
+        console.log(`   - Grada lateral (izq + der): ${totalGradaLateral} asientos`);
+        console.log(`   - Tribuna (izq + der interior): ${totalTribuna} asientos`);
     }
 
     ajustarZoomInicial() {
@@ -853,13 +862,13 @@ class EstadioCanvas {
         // Solo dibujar si el zoom es mayor a 0.5
         if (this.zoom < 0.5) return;
 
-        // Default font sizes
-        const DEFAULT_FONT_SIZE = '22px';
+        // Font size constants
+        const EXTRA_LARGE_FONT_SIZE = '22px';
         const LARGE_FONT_SIZE = '20px';
         const MEDIUM_FONT_SIZE = '16px';
         const SMALL_FONT_SIZE = '14px';
 
-        this.ctx.font = `bold ${DEFAULT_FONT_SIZE} Arial`;
+        this.ctx.font = `bold ${EXTRA_LARGE_FONT_SIZE} Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
@@ -896,7 +905,7 @@ class EstadioCanvas {
                 this.ctx.rotate(etiqueta.rotacion);
             }
 
-            this.ctx.font = `bold ${etiqueta.fontSize || DEFAULT_FONT_SIZE} Arial`;
+            this.ctx.font = `bold ${etiqueta.fontSize || EXTRA_LARGE_FONT_SIZE} Arial`;
             const metrics = this.ctx.measureText(etiqueta.texto);
             
             // Background box
