@@ -154,14 +154,25 @@ class EstadioCanvas {
         const gap = 3;
         let asientoIdGlobal = 1;
 
+        // Configuration constants for stadium structure
+        const GOL_NORD_EXTERIOR_FILAS = 6;
+        const GOL_NORD_INTERIOR_FILAS = 6;
+        const GOL_NORD_ASIENTOS_POR_FILA = 40;
+        
+        const GOL_SUD_INTERIOR_FILAS = 6;
+        const GOL_SUD_EXTERIOR_FILAS = 6;
+        const GOL_SUD_ASIENTOS_POR_FILA = 40;
+        
+        const LATERAL_EXTERIOR_FILAS = 8;
+        const LATERAL_ASIENTOS_POR_FILA = 35;
+        const TRIBUNA_INTERIOR_FILAS = 5;
+
         // GOL NORD (Arriba) - Exterior (6 filas más alejadas)
-        const golNordExteriorFilas = 6;
-        const golNordAsientosPorFila = 40;
         let golNordNumero = 1;
 
-        for (let fila = 0; fila < golNordExteriorFilas; fila++) {
-            for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
-                const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
+        for (let fila = 0; fila < GOL_NORD_EXTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < GOL_NORD_ASIENTOS_POR_FILA; asiento++) {
+                const x = (asiento - GOL_NORD_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
                 const y = -420 - (fila * (asientoSize + gap));
 
                 this.asientos.push({
@@ -181,10 +192,9 @@ class EstadioCanvas {
         }
 
         // GOL NORD (Arriba) - Interior (6 filas más cercanas)
-        const golNordInteriorFilas = 6;
-        for (let fila = 0; fila < golNordInteriorFilas; fila++) {
-            for (let asiento = 0; asiento < golNordAsientosPorFila; asiento++) {
-                const x = (asiento - golNordAsientosPorFila / 2) * (asientoSize + gap);
+        for (let fila = 0; fila < GOL_NORD_INTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < GOL_NORD_ASIENTOS_POR_FILA; asiento++) {
+                const x = (asiento - GOL_NORD_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
                 const y = -320 - (fila * (asientoSize + gap));
 
                 this.asientos.push({
@@ -204,13 +214,11 @@ class EstadioCanvas {
         }
 
         // GOL SUD (Abajo) - Interior (6 filas más cercanas)
-        const golSudInteriorFilas = 6;
-        const golSudAsientosPorFila = 40;
         let golSudNumero = 1;
 
-        for (let fila = 0; fila < golSudInteriorFilas; fila++) {
-            for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
-                const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
+        for (let fila = 0; fila < GOL_SUD_INTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < GOL_SUD_ASIENTOS_POR_FILA; asiento++) {
+                const x = (asiento - GOL_SUD_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
                 const y = 320 + (fila * (asientoSize + gap));
 
                 this.asientos.push({
@@ -230,10 +238,9 @@ class EstadioCanvas {
         }
 
         // GOL SUD (Abajo) - Exterior (6 filas más alejadas)
-        const golSudExteriorFilas = 6;
-        for (let fila = 0; fila < golSudExteriorFilas; fila++) {
-            for (let asiento = 0; asiento < golSudAsientosPorFila; asiento++) {
-                const x = (asiento - golSudAsientosPorFila / 2) * (asientoSize + gap);
+        for (let fila = 0; fila < GOL_SUD_EXTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < GOL_SUD_ASIENTOS_POR_FILA; asiento++) {
+                const x = (asiento - GOL_SUD_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
                 const y = 420 + (fila * (asientoSize + gap));
 
                 this.asientos.push({
@@ -253,14 +260,12 @@ class EstadioCanvas {
         }
 
         // GRADA LATERAL IZQUIERDA - Exterior (8 filas más alejadas)
-        const lateralExteriorFilas = 8;
-        const lateralAsientosPorFila = 35;
         let gradaLateralNumero = 1;
 
-        for (let fila = 0; fila < lateralExteriorFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+        for (let fila = 0; fila < LATERAL_EXTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = -380 - (fila * (asientoSize + gap));
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+                const y = (asiento - LATERAL_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -279,13 +284,12 @@ class EstadioCanvas {
         }
 
         // TRIBUNA IZQUIERDA - Interior (5 filas más cercanas)
-        const tribunaInteriorFilas = 5;
         let tribunaNumero = 1;
 
-        for (let fila = 0; fila < tribunaInteriorFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+        for (let fila = 0; fila < TRIBUNA_INTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = -280 - (fila * (asientoSize + gap));
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+                const y = (asiento - LATERAL_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -304,10 +308,10 @@ class EstadioCanvas {
         }
 
         // GRADA LATERAL DERECHA - Exterior (8 filas más alejadas)
-        for (let fila = 0; fila < lateralExteriorFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+        for (let fila = 0; fila < LATERAL_EXTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = 380 + (fila * (asientoSize + gap));
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+                const y = (asiento - LATERAL_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -326,10 +330,10 @@ class EstadioCanvas {
         }
 
         // TRIBUNA DERECHA - Interior (5 filas más cercanas)
-        for (let fila = 0; fila < tribunaInteriorFilas; fila++) {
-            for (let asiento = 0; asiento < lateralAsientosPorFila; asiento++) {
+        for (let fila = 0; fila < TRIBUNA_INTERIOR_FILAS; fila++) {
+            for (let asiento = 0; asiento < LATERAL_ASIENTOS_POR_FILA; asiento++) {
                 const x = 280 + (fila * (asientoSize + gap));
-                const y = (asiento - lateralAsientosPorFila / 2) * (asientoSize + gap);
+                const y = (asiento - LATERAL_ASIENTOS_POR_FILA / 2) * (asientoSize + gap);
 
                 this.asientos.push({
                     id: asientoIdGlobal,
@@ -849,7 +853,13 @@ class EstadioCanvas {
         // Solo dibujar si el zoom es mayor a 0.5
         if (this.zoom < 0.5) return;
 
-        this.ctx.font = 'bold 22px Arial';
+        // Default font sizes
+        const DEFAULT_FONT_SIZE = '22px';
+        const LARGE_FONT_SIZE = '20px';
+        const MEDIUM_FONT_SIZE = '16px';
+        const SMALL_FONT_SIZE = '14px';
+
+        this.ctx.font = `bold ${DEFAULT_FONT_SIZE} Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
@@ -859,24 +869,24 @@ class EstadioCanvas {
 
         const etiquetas = [
             // Gol Nord sections
-            { texto: 'Gol Nord', x: 0, y: -470, color: '#FFD700', fontSize: '20px' },
-            { texto: 'Gol Nord', x: 0, y: -370, color: '#FFD700', fontSize: '16px' },
+            { texto: 'Gol Nord', x: 0, y: -470, color: '#FFD700', fontSize: LARGE_FONT_SIZE },
+            { texto: 'Gol Nord', x: 0, y: -370, color: '#FFD700', fontSize: MEDIUM_FONT_SIZE },
             
             // Gol Sud sections
-            { texto: 'Gol Sud', x: 0, y: 370, color: '#FFD700', fontSize: '16px' },
-            { texto: 'Gol Sud', x: 0, y: 470, color: '#FFD700', fontSize: '20px' },
+            { texto: 'Gol Sud', x: 0, y: 370, color: '#FFD700', fontSize: MEDIUM_FONT_SIZE },
+            { texto: 'Gol Sud', x: 0, y: 470, color: '#FFD700', fontSize: LARGE_FONT_SIZE },
             
             // Grada total (external labels on sides)
-            { texto: 'Grada total', x: -520, y: 0, rotacion: -Math.PI / 2, color: '#FFD700', fontSize: '20px' },
-            { texto: 'Grada total', x: 520, y: 0, rotacion: Math.PI / 2, color: '#FFD700', fontSize: '20px' },
+            { texto: 'Grada total', x: -520, y: 0, rotacion: -Math.PI / 2, color: '#FFD700', fontSize: LARGE_FONT_SIZE },
+            { texto: 'Grada total', x: 520, y: 0, rotacion: Math.PI / 2, color: '#FFD700', fontSize: LARGE_FONT_SIZE },
             
             // Grada lateral (middle sections)
-            { texto: 'Grada lateral', x: -430, y: 0, rotacion: -Math.PI / 2, color: '#FFFFFF', fontSize: '16px' },
-            { texto: 'Grada lateral', x: 430, y: 0, rotacion: Math.PI / 2, color: '#FFFFFF', fontSize: '16px' },
+            { texto: 'Grada lateral', x: -430, y: 0, rotacion: -Math.PI / 2, color: '#FFFFFF', fontSize: MEDIUM_FONT_SIZE },
+            { texto: 'Grada lateral', x: 430, y: 0, rotacion: Math.PI / 2, color: '#FFFFFF', fontSize: MEDIUM_FONT_SIZE },
             
             // Tribuna (inner sections)
-            { texto: 'tribuna', x: -320, y: 0, rotacion: -Math.PI / 2, color: '#FF8C00', fontSize: '14px' },
-            { texto: 'tribuna', x: 320, y: 0, rotacion: Math.PI / 2, color: '#FF8C00', fontSize: '14px' }
+            { texto: 'tribuna', x: -320, y: 0, rotacion: -Math.PI / 2, color: '#FF8C00', fontSize: SMALL_FONT_SIZE },
+            { texto: 'tribuna', x: 320, y: 0, rotacion: Math.PI / 2, color: '#FF8C00', fontSize: SMALL_FONT_SIZE }
         ];
 
         etiquetas.forEach(etiqueta => {
@@ -886,7 +896,7 @@ class EstadioCanvas {
                 this.ctx.rotate(etiqueta.rotacion);
             }
 
-            this.ctx.font = `bold ${etiqueta.fontSize || '22px'} Arial`;
+            this.ctx.font = `bold ${etiqueta.fontSize || DEFAULT_FONT_SIZE} Arial`;
             const metrics = this.ctx.measureText(etiqueta.texto);
             
             // Background box
