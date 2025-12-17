@@ -19,6 +19,11 @@
             display: block;
             cursor: grab;
             touch-action: none;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
         #loading {
@@ -288,7 +293,8 @@
 </div>
 
 <!-- Canvas Principal -->
-<canvas id="estadio-canvas"></canvas>
+<canvas id="estadio-canvas" data-evento-id="1"></canvas>
+<!-- th:data-evento-id="${evento.id}" para Thymeleaf -->
 
 <!-- Tooltip -->
 <div id="tooltip"></div>
@@ -495,14 +501,14 @@
 </script>
 
 <!-- Script de prueba para diagnosticar carga -->
-<script src="/js/test-load.js?v=3"
+<script src="/js/test-load.js?v=4"
         onerror="console.error('❌ Ni siquiera se puede cargar test-load.js - problema con archivos estáticos');"
         onload="console.log('✅ test-load.js cargado - archivos estáticos funcionan');"></script>
 
 <!-- Cargar el script del estadio -->
-<script src="/js/estadio-canvas.js?v=3"
+<script src="/js/estadio-canvas.js?v=4"
         onerror="console.error('❌ ERROR: No se pudo cargar estadio-canvas.js'); document.getElementById('loading').innerHTML = '<div style=\'color:white;padding:40px;text-align:center;\'><h3>Error: No se pudo cargar el script</h3><p>Verifica que el servidor esté corriendo</p><button onclick=\'location.reload()\' style=\'background:#ffd700;color:#1a237e;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin:10px;\'>Reintentar</button></div>';"
-        onload="console.log('✅ Script estadio-canvas.js cargado correctamente');"></script>
+        onload="console.log('✅ Script estadio-canvas.js v4 cargado correctamente');"></script>
 
 <!-- Inicializar cuando TODO esté listo -->
 <script>
@@ -514,7 +520,7 @@
         console.log('🚀 DOM cargado - Inicializando aplicación');
         console.log('📍 Evento ID:', eventoId);
         console.log('🔍 Verificando funciones globales:');
-        console.log('  - initEstadio3D:', typeof initEstadio3D);
+        console.log('  - inicializarEstadioCanvas:', typeof inicializarEstadioCanvas);
         console.log('  - resetearVista:', typeof resetearVista);
         console.log('  - confirmarCompra:', typeof confirmarCompra);
 
@@ -527,18 +533,18 @@
 
         // 2. Inicializar estadio con un pequeño delay para asegurar que el script se cargó
         setTimeout(() => {
-            if (typeof initEstadio3D === 'function') {
-                console.log('🎮 Función initEstadio3D encontrada, iniciando...');
+            if (typeof inicializarEstadioCanvas === 'function') {
+                console.log('🎮 Función inicializarEstadioCanvas encontrada, iniciando...');
                 try {
-                    initEstadio3D(eventoId);
+                    inicializarEstadioCanvas(eventoId);
                 } catch (error) {
                     console.error('❌ Error al inicializar estadio:', error);
                     console.error('Stack:', error.stack);
                 }
             } else {
-                console.error('❌ ERROR: initEstadio3D no está definida después del DOMContentLoaded');
-                console.error('Tipo actual:', typeof initEstadio3D);
-                console.error('window.initEstadio3D:', typeof window.initEstadio3D);
+                console.error('❌ ERROR: inicializarEstadioCanvas no está definida después del DOMContentLoaded');
+                console.error('Tipo actual:', typeof inicializarEstadioCanvas);
+                console.error('window.inicializarEstadioCanvas:', typeof window.inicializarEstadioCanvas);
 
                 // Mostrar error al usuario
                 const loading = document.getElementById('loading');
@@ -552,9 +558,9 @@
                             <details style="margin: 20px; text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
                                 <summary style="cursor: pointer; color: #ffd700;">Información técnica</summary>
                                 <pre style="color: #fff; font-size: 12px;">
-Tipo de initEstadio3D: ${typeof initEstadio3D}
-window.initEstadio3D: ${typeof window.initEstadio3D}
-Script URL: /js/estadio-canvas.js?v=2
+Tipo de inicializarEstadioCanvas: ${typeof inicializarEstadioCanvas}
+window.inicializarEstadioCanvas: ${typeof window.inicializarEstadioCanvas}
+Script URL: /js/estadio-canvas.js?v=3
 
 Posibles causas:
 1. El servidor no está sirviendo archivos estáticos correctamente

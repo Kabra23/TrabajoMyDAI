@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Directa - Estadio Canvas</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a237e;
+            color: white;
+        }
+
+        #info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        #canvas-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        canvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+        }
+
+        .success { color: #4CAF50; font-weight: bold; }
+        .error { color: #f44336; font-weight: bold; }
+        .warning { color: #FFC107; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>🧪 Prueba Directa del Estadio Canvas</h1>
+        <div id="test-results"></div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="estadio-canvas" width="1200" height="800"></canvas>
+    </div>
+
+    <script>
+        const testResults = document.getElementById('test-results');
+
+        function addResult(message, type = 'info') {
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = message;
+            testResults.appendChild(p);
+        }
+
+        addResult('🔍 Iniciando prueba de carga del script...', 'warning');
+
+        // Cargar el script directamente desde target
+        const script = document.createElement('script');
+        script.src = '/js/estadio-canvas.js?v=' + Date.now(); // Cache buster dinámico
+
+        script.onload = function() {
+            addResult('✅ Script estadio-canvas.js cargado correctamente', 'success');
+
+            if (typeof EstadioCanvas !== 'undefined') {
+                addResult('✅ Clase EstadioCanvas está definida', 'success');
+
+                try {
+                    // Crear instancia temporal solo para verificar
+                    const temp = new EstadioCanvas('estadio-canvas', 1);
+
+                    // Esperar un poco para que se creen los asientos
+                    setTimeout(() => {
+                        const totalAsientos = temp.asientos.length;
+                        addResult(`📊 Total de asientos creados: ${totalAsientos}`, 'success');
+
+                        // Contar por zona
+                        const zonas = {};
+                        temp.asientos.forEach(a => {
+                            zonas[a.zona] = (zonas[a.zona] || 0) + 1;
+                        });
+
+                        addResult('📍 Distribución por zonas:', 'success');
+                        Object.entries(zonas).forEach(([zona, cantidad]) => {
+                            addResult(`   - ${zona}: ${cantidad} asientos`, 'success');
+                        });
+
+                        // Verificar tribunas en esquinas
+                        const tribunas = temp.asientos.filter(a => a.zona === 'Tribuna');
+                        const tribunasEsquinas = tribunas.filter(a =>
+                            Math.abs(a.x) > 350 && (a.y < -100 || a.y > 100)
+                        );
+
+                        if (tribunasEsquinas.length > 0) {
+                            addResult(`✅ CORRECTO: Tribunas en esquinas detectadas (${tribunasEsquinas.length} asientos)`, 'success');
+                        } else {
+                            addResult(`❌ ERROR: No se detectaron tribunas en esquinas`, 'error');
+                        }
+
+                        // Verificar que NO haya tribunas en el centro de los laterales
+                        const tribunasCentro = tribunas.filter(a =>
+                            Math.abs(a.x) < 350 || (a.y > -100 && a.y < 100)
+                        );
+
+                        if (tribunasCentro.length === 0) {
+                            addResult(`✅ CORRECTO: No hay tribunas en el centro de los laterales`, 'success');
+                        } else {
+                            addResult(`⚠️ ADVERTENCIA: Hay ${tribunasCentro.length} tribunas en posiciones del centro`, 'warning');
+                        }
+
+                        // Verificación final
+                        if (totalAsientos === 2480 && tribunasEsquinas.length === 320) {
+                            addResult('', 'success');
+                            addResult('🎉 ¡PERFECTO! El estadio tiene la estructura correcta:', 'success');
+                            addResult('   ✅ 2480 asientos totales', 'success');
+                            addResult('   ✅ 320 tribunas en las 4 esquinas', 'success');
+                            addResult('   ✅ Estructura según el nuevo diseño', 'success');
+                        } else {
+                            addResult('', 'error');
+                            addResult('❌ ERROR: La estructura NO es la correcta:', 'error');
+                            addResult(`   Esperado: 2480 asientos, Actual: ${totalAsientos}`, 'error');
+                            addResult(`   Esperado: 320 tribunas en esquinas, Actual: ${tribunasEsquinas.length}`, 'error');
+                        }
+                    }, 1000);
+
+                } catch (error) {
+                    addResult(`❌ ERROR al crear instancia: ${error.message}`, 'error');
+                }
+            } else {
+                addResult('❌ ERROR: Clase EstadioCanvas NO está definida', 'error');
+            }
+        };
+
+        script.onerror = function() {
+            addResult('❌ ERROR: No se pudo cargar estadio-canvas.js', 'error');
+            addResult('Verifica que el servidor esté corriendo en http://localhost:8080', 'error');
+        };
+
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>
+
